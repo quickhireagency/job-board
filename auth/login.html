@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>QuickHire™ Job Board — Login</title>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">QuickHire™ Job Board</div>
+          <div class="small">Login</div>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a class="btn" href="/">Back to Jobs</a>
+        <a class="btn" href="/auth/signup-job-seeker.html">Candidate Sign Up</a>
+        <a class="btn" href="/auth/signup-employer.html">Employer Sign Up</a>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2 style="margin:0 0 6px;">Login</h2>
+        <div class="small">Candidates can browse jobs without logging in, but must login to apply.</div>
+
+        <label class="label">Account Type</label>
+        <select id="role">
+          <option value="job_seeker">Candidate</option>
+          <option value="employer">Employer</option>
+        </select>
+
+        <label class="label">Username/E-mail</label>
+        <input id="login" placeholder="Enter your username OR your email"/>
+
+        <label class="label">Password</label>
+        <input id="password" type="password" placeholder="Password"/>
+
+        <div class="hr"></div>
+        <button class="btn primary" id="btnLogin">Login</button>
+
+        <div class="hr"></div>
+        <div class="small">
+          Forgot password? Use your Username/E-mail and request a reset inside the UI (we’ll add that next).
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 10px;">IMPORTANT — Purchases & Claims</h3>
+        <div class="note">
+          When you buy a plan (Local/Business/Corporate), Verified Employer add-on, or Resume Service:
+          <ul>
+            <li><b>Use the SAME E-mail at checkout</b> that you used when you signed up.</li>
+            <li><b>Use the SAME Username</b> you used when you signed up.</li>
+            <li>On the success page you’ll “CLAIM” the purchase using <b>E-mail + Username</b>.</li>
+          </ul>
+          People mess this up all the time — don’t.
+        </div>
+
+        <div class="hr"></div>
+        <div class="small">
+          After payment, you will be sent to:
+          <ul>
+            <li><code>/billing/success/</code> (job board purchases)</li>
+            <li><code>https://resumes.quickhireagency.com/success</code> (resume service later)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+document.getElementById("btnLogin").addEventListener("click", async () => {
+  const role = document.getElementById("role").value;
+  const login = document.getElementById("login").value.trim().toLowerCase();
+  const password = document.getElementById("password").value;
+
+  if (!login || !password) return QH.toast("Missing info", "Enter Username/E-mail and Password.");
+
+  const res = await QH.apiPost("login", { role, login, password });
+  if (!res.ok) return QH.toast("Login failed", res.error || "Invalid credentials.");
+
+  // Normalize session store shape
+  const session = { role, session_token: res.session_token };
+  if (role === "employer") {
+    session.employer_id = res.employer_id;
+    session.company_id = res.company_id;
+  } else {
+    session.job_seeker_id = res.job_seeker_id;
+  }
+
+  QH.saveSession(session);
+  QH.toast("Logged in", "Success.");
+
+  // Redirect
+  if (role === "employer") window.location.href = "/employer/dashboard.html";
+  else window.location.href = "/";
+});
+</script>
+</body>
+</html>
