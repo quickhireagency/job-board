@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>QuickHire™ — Payment Success</title>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">QuickHire™ Job Board</div>
+          <div class="small">Payment Success → Claim Your Purchase</div>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a class="btn" href="/">Back to Jobs</a>
+        <a class="btn" href="/auth/login.html">Login</a>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px;">IMPORTANT: Use the SAME E-mail + Username</h2>
+      <div class="note">
+        <b>Do not change emails.</b> Most people mess this up.
+        <ul>
+          <li>Use the <b>same E-mail</b> you used when you created your QuickHire account.</li>
+          <li>Use the <b>same Username</b> you used when you created your QuickHire account.</li>
+          <li>If you used a different email at checkout, your purchase may not attach automatically.</li>
+        </ul>
+      </div>
+
+      <div class="hr"></div>
+
+      <div class="grid2">
+        <div>
+          <h3 style="margin:0 0 6px;">Claim Purchase</h3>
+
+          <label class="label">Purchase Type</label>
+          <select id="ptype">
+            <option value="employer_plan">Employer Plan (Local/Business/Corporate)</option>
+            <option value="verified_addon">Verified Employer Add-on</option>
+            <option value="resume_service">Resume Service (later)</option>
+          </select>
+
+          <label class="label">E-mail (must match checkout + signup)</label>
+          <input id="email" placeholder="you@example.com"/>
+
+          <label class="label">Username (must match signup)</label>
+          <input id="username" placeholder="yourusername"/>
+
+          <div class="hr"></div>
+          <button class="btn green" id="btnClaim">Claim Now</button>
+          <div class="small" style="margin-top:8px;">If it says no purchase found, you almost always used the wrong email at checkout.</div>
+
+          <div class="hr"></div>
+          <div id="claimOut" class="small"></div>
+        </div>
+
+        <div>
+          <h3 style="margin:0 0 6px;">Plan Links (if you need them again)</h3>
+          <div class="small">These open Stripe Payment Links. After paying, come back here and Claim.</div>
+          <div class="hr"></div>
+
+          <div class="note">
+            <div><b>QuickHire Local</b> — $49.99/mo</div>
+            <div class="small"><a href="https://buy.stripe.com/dRm00bblue5Gbz61ufbfO00" target="_blank" rel="noopener">Open Payment Link</a></div>
+            <div class="hr"></div>
+
+            <div><b>QuickHire Business</b> — $99.99/mo</div>
+            <div class="small"><a href="https://buy.stripe.com/4gM7sDahq9PqeLi3CnbfO05" target="_blank" rel="noopener">Open Payment Link</a></div>
+            <div class="hr"></div>
+
+            <div><b>QuickHire Corporate</b> — $249.99/mo</div>
+            <div class="small"><a href="https://buy.stripe.com/14AaEP9dm4v6dHe8WHbfO02" target="_blank" rel="noopener">Open Payment Link</a></div>
+            <div class="hr"></div>
+
+            <div><b>Verified Employer</b> (add-on; not allowed if Corporate)</div>
+            <div class="small"><a href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Open Payment Link</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+document.getElementById("btnClaim").addEventListener("click", async () => {
+  const purchase_type = document.getElementById("ptype").value;
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const username = document.getElementById("username").value.trim().toLowerCase();
+
+  if (!email || !username) return QH.toast("Missing info", "Enter E-mail and Username.");
+
+  const res = await QH.apiPost("claim_purchase", { purchase_type, email, username });
+  const out = document.getElementById("claimOut");
+
+  if (!res.ok) {
+    out.textContent = "❌ " + (res.error || "Claim failed.");
+    return QH.toast("Claim failed", res.error || "Try again.");
+  }
+
+  out.textContent = "✅ " + (res.message || "Claimed.");
+  QH.toast("Claimed", res.message || "Success.");
+
+  // Helpful redirect suggestion:
+  if (purchase_type === "employer_plan" || purchase_type === "verified_addon") {
+    out.innerHTML += "<div style='margin-top:10px;'><a href='/auth/login.html'>Login</a> → Employer Dashboard</div>";
+  } else {
+    out.innerHTML += "<div style='margin-top:10px;'><a href='/'>Back to Job Board</a></div>";
+  }
+});
+</script>
+</body>
+</html>
