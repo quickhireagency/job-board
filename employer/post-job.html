@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>QuickHire™ — Post a Job</title>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">QuickHire™ Job Board</div>
+          <div class="small">Post a Job</div>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a class="btn" href="/employer/dashboard.html">Dashboard</a>
+        <a class="btn" href="/billing/success/">Claim Purchase</a>
+        <button class="btn danger" id="btnLogout">Logout</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px;">Create Job Posting</h2>
+      <div class="small">Requires an active plan. Your posting writes to the Job Board sheet through the backend.</div>
+
+      <div class="hr"></div>
+
+      <label class="label">Job Title</label>
+      <input id="job_title" placeholder="e.g., Warehouse Associate">
+
+      <label class="label">Job Description</label>
+      <textarea id="job_description" placeholder="Full job description..."></textarea>
+
+      <div class="row">
+        <div>
+          <label class="label">City</label>
+          <input id="city" placeholder="Indianapolis">
+        </div>
+        <div>
+          <label class="label">State</label>
+          <input id="state" placeholder="IN">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label class="label">Employment Type</label>
+          <input id="employment_type" placeholder="Full-time / Part-time / Temp / Contract">
+        </div>
+        <div>
+          <label class="label">Work Arrangement</label>
+          <input id="work_arrangement" placeholder="On-site / Hybrid / Remote">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label class="label">Pay Min</label>
+          <input id="pay_min" placeholder="e.g., 18">
+        </div>
+        <div>
+          <label class="label">Pay Max</label>
+          <input id="pay_max" placeholder="e.g., 22">
+        </div>
+      </div>
+
+      <label class="label">Apply URL (optional)</label>
+      <input id="apply_url" placeholder="https://...">
+
+      <label class="small" style="margin-top:10px;">
+        <input type="checkbox" id="honesty_attestation">
+        I attest the job details are accurate and not misleading.
+      </label>
+
+      <div class="hr"></div>
+      <button class="btn green" id="btnPost">Post Job</button>
+      <div id="postOut" class="small" style="margin-top:10px;"></div>
+    </div>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+const session = QH.requireSession("employer");
+if (!session) throw new Error("No session");
+
+document.getElementById("btnLogout").addEventListener("click", () => {
+  QH.clearSession();
+  window.location.href = "/";
+});
+
+document.getElementById("btnPost").addEventListener("click", async () => {
+  const job_title = document.getElementById("job_title").value.trim();
+  const job_description = document.getElementById("job_description").value.trim();
+  const city = document.getElementById("city").value.trim();
+  const state = document.getElementById("state").value.trim().toUpperCase();
+  const employment_type = document.getElementById("employment_type").value.trim();
+  const work_arrangement = document.getElementById("work_arrangement").value.trim();
+  const pay_min = document.getElementById("pay_min").value.trim();
+  const pay_max = document.getElementById("pay_max").value.trim();
+  const apply_url = document.getElementById("apply_url").value.trim();
+  const honesty_attestation = document.getElementById("honesty_attestation").checked;
+
+  if (!job_title || !job_description) return QH.toast("Missing fields", "Job Title and Job Description are required.");
+  if (!honesty_attestation) return QH.toast("Required", "You must check the honesty attestation.");
+
+  const values_map = {
+    job_title, job_description, city, state,
+    employment_type, work_arrangement,
+    pay_min, pay_max,
+    apply_type: apply_url ? "external" : "internal",
+    apply_url,
+    honesty_attestation: honesty_attestation ? "TRUE" : "FALSE",
+    status: "live"
+  };
+
+  const res = await QH.apiPost("create_job", { session_token: session.session_token, values_map });
+  const out = document.getElementById("postOut");
+
+  if (!res.ok) {
+    out.textContent = "❌ " + (res.error || "Failed to post.");
+    return QH.toast("Failed", res.error || "Could not post.");
+  }
+
+  out.textContent = "✅ Posted. Job ID: " + res.job_id;
+  QH.toast("Posted", "Job created successfully.");
+});
+</script>
+</body>
+</html>
