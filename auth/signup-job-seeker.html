@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>QuickHire™ — Candidate Sign Up</title>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">QuickHire™ Job Board</div>
+          <div class="small">Candidate Sign Up</div>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a class="btn" href="/">Back to Jobs</a>
+        <a class="btn" href="/auth/login.html">Login</a>
+        <a class="btn" href="/auth/signup-employer.html">Employer Sign Up</a>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2 style="margin:0 0 6px;">Create Candidate Account</h2>
+        <div class="small">You can browse jobs without an account, but you must have an account to apply.</div>
+
+        <div class="row">
+          <div>
+            <label class="label">First Name</label>
+            <input id="first_name" placeholder="First name">
+          </div>
+          <div>
+            <label class="label">Last Name</label>
+            <input id="last_name" placeholder="Last name">
+          </div>
+        </div>
+
+        <label class="label">E-mail (required)</label>
+        <input id="email" placeholder="you@example.com">
+
+        <label class="label">Username (required)</label>
+        <input id="username" placeholder="yourusername">
+
+        <label class="label">Phone (optional)</label>
+        <input id="phone" placeholder="(317) 555-1234">
+
+        <label class="label">Password</label>
+        <input id="password" type="password" placeholder="Minimum 8 characters">
+
+        <div class="hr"></div>
+
+        <h3 style="margin:0 0 6px;">Policy acknowledgements (required)</h3>
+        <div class="small">Open each page, read it, then check the box.</div>
+
+        <div class="note" style="margin-top:10px;">
+          <div><a href="/legal/terms.html" target="_blank" rel="noopener">Terms of Service</a></div>
+          <label class="small"><input type="checkbox" id="ack_terms"> I acknowledge Terms of Service</label>
+          <div class="hr"></div>
+
+          <div><a href="/legal/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></div>
+          <label class="small"><input type="checkbox" id="ack_privacy"> I acknowledge Privacy Policy</label>
+          <div class="hr"></div>
+
+          <div><a href="/legal/eeo.html" target="_blank" rel="noopener">EEO Policy</a></div>
+          <label class="small"><input type="checkbox" id="ack_eeo"> I acknowledge EEO Policy</label>
+          <div class="hr"></div>
+
+          <div><a href="/legal/drug-alcohol.html" target="_blank" rel="noopener">Drug &amp; Alcohol Policy</a></div>
+          <label class="small"><input type="checkbox" id="ack_drug_alcohol"> I acknowledge Drug &amp; Alcohol Policy</label>
+          <div class="hr"></div>
+
+          <div><a href="/legal/osha.html" target="_blank" rel="noopener">Workplace Safety (OSHA) Acknowledgment</a></div>
+          <label class="small"><input type="checkbox" id="ack_osha"> I acknowledge OSHA Safety Policy</label>
+          <div class="hr"></div>
+
+          <div><a href="/legal/veterans.html" target="_blank" rel="noopener">Veteran’s Policy</a></div>
+          <label class="small"><input type="checkbox" id="ack_veterans"> I acknowledge Veteran’s Policy</label>
+          <div class="hr"></div>
+
+          <div><a href="/legal/candidate-packet.html" target="_blank" rel="noopener">QuickHire Candidate Packet</a></div>
+          <label class="small"><input type="checkbox" id="ack_candidate_packet"> I acknowledge Candidate Packet</label>
+        </div>
+
+        <div class="hr"></div>
+
+        <h3 style="margin:0 0 6px;">Signature (required)</h3>
+        <div class="small">Type your full name exactly as your signature.</div>
+        <label class="label">Typed Full Name</label>
+        <input id="signature_full_name" placeholder="First Last">
+
+        <div class="hr"></div>
+        <button class="btn primary" id="btnSignup">Create Account</button>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 10px;">IMPORTANT — Purchases & Claims</h3>
+        <div class="note">
+          If you ever buy something (resume service later), you MUST:
+          <ul>
+            <li><b>Use the SAME E-mail</b> you used to sign up.</li>
+            <li><b>Use the SAME Username</b> you used to sign up.</li>
+            <li>Then “CLAIM” using <b>E-mail + Username</b> on the success page.</li>
+          </ul>
+          People mess this up constantly — don’t.
+        </div>
+
+        <div class="hr"></div>
+        <div class="small">
+          After signup, you can apply to jobs.
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+function getAcks() {
+  return {
+    terms: document.getElementById("ack_terms").checked,
+    privacy: document.getElementById("ack_privacy").checked,
+    eeo: document.getElementById("ack_eeo").checked,
+    drug_alcohol: document.getElementById("ack_drug_alcohol").checked,
+    osha: document.getElementById("ack_osha").checked,
+    veterans: document.getElementById("ack_veterans").checked,
+    candidate_packet: document.getElementById("ack_candidate_packet").checked
+  };
+}
+
+document.getElementById("btnSignup").addEventListener("click", async () => {
+  const first_name = document.getElementById("first_name").value.trim();
+  const last_name = document.getElementById("last_name").value.trim();
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const username = document.getElementById("username").value.trim().toLowerCase();
+  const phone = document.getElementById("phone").value.trim();
+  const password = document.getElementById("password").value;
+  const signature_full_name = document.getElementById("signature_full_name").value.trim();
+
+  if (!first_name || !last_name || !email || !username || !password) {
+    return QH.toast("Missing fields", "First name, last name, email, username, and password are required.");
+  }
+  if (password.length < 8) {
+    return QH.toast("Password too short", "Password must be 8 characters or more.");
+  }
+  if (!signature_full_name) {
+    return QH.toast("Signature required", "Type your full name to sign.");
+  }
+
+  const acks = getAcks();
+  const required = ["terms","privacy","eeo","drug_alcohol","osha","veterans","candidate_packet"];
+  for (const k of required) {
+    if (!acks[k]) return QH.toast("Missing acknowledgement", "You must acknowledge: " + k);
+  }
+
+  const res = await QH.apiPost("signup_job_seeker", {
+    first_name, last_name, email, username, phone, password,
+    acks,
+    signature_full_name
+  });
+
+  if (!res.ok) return QH.toast("Signup failed", res.error || "Try again.");
+
+  QH.saveSession({ role: "job_seeker", session_token: res.session_token, job_seeker_id: res.job_seeker_id });
+  QH.toast("Account created", "You can now apply to jobs.");
+  window.location.href = "/";
+});
+</script>
+</body>
+</html>
