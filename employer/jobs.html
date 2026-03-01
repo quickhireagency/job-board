@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>QuickHire™ — My Jobs</title>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">QuickHire™ Job Board</div>
+          <div class="small">My Live Jobs</div>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a class="btn" href="/employer/dashboard.html">Dashboard</a>
+        <a class="btn" href="/employer/post-job.html">Post a Job</a>
+        <button class="btn danger" id="btnLogout">Logout</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 8px;">Your Live Jobs</h2>
+      <div class="small">This shows only jobs currently marked live/open.</div>
+
+      <div class="hr"></div>
+
+      <label class="label">Search within your jobs</label>
+      <input id="search" placeholder="Search title/description">
+      <div style="margin-top:10px;">
+        <button class="btn" id="btnSearch">Search</button>
+      </div>
+
+      <div class="hr"></div>
+
+      <div id="list" class="small">Loading…</div>
+    </div>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+const session = QH.requireSession("employer");
+if (!session) throw new Error("No session");
+
+document.getElementById("btnLogout").addEventListener("click", () => {
+  QH.clearSession();
+  window.location.href = "/";
+});
+
+async function loadMyJobs() {
+  const search = document.getElementById("search").value.trim();
+  const res = await QH.apiGet("list_jobs", { search, limit: 200 });
+
+  const list = document.getElementById("list");
+  if (!res.ok) {
+    list.textContent = "Error: " + (res.error || "");
+    return;
+  }
+
+  const jobs = (res.jobs || []).filter(j => String(j.employer_id || "") === String(session.employer_id || ""));
+  if (!jobs.length) {
+    list.innerHTML = "<div class='note'>No live jobs found.</div>";
+    return;
+  }
+
+  list.innerHTML = jobs.map(j => `
+    <div class="note" style="margin-bottom:10px;">
+      <div><b>${QH.esc(j.job_title || "(untitled)")}</b></div>
+      <div class="small">${QH.esc(j.city || "")}${j.state ? ", " + QH.esc(j.state) : ""}</div>
+      <div class="small">Job ID: <span class="badge">${QH.esc(j.job_id || "")}</span></div>
+      <div class="small" style="margin-top:6px;">
+        <a class="btn" href="/?job_id=${encodeURIComponent(j.job_id || "")}">View on Job Board</a>
+      </div>
+    </div>
+  `).join("");
+}
+
+document.getElementById("btnSearch").addEventListener("click", loadMyJobs);
+loadMyJobs();
+</script>
+</body>
+</html>
