@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>QuickHire™ — Reset Password</title>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">QuickHire™ Job Board</div>
+          <div class="small">Reset Password</div>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a class="btn" href="/auth/login.html">Login</a>
+        <a class="btn" href="/">Job Board</a>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2 style="margin:0 0 8px;">Request reset link</h2>
+        <div class="small">Enter your Username or E-mail. We’ll email a reset link if the account exists.</div>
+
+        <div class="hr"></div>
+
+        <label class="label">Account Type</label>
+        <select id="role">
+          <option value="job_seeker">Candidate</option>
+          <option value="employer">Employer</option>
+        </select>
+
+        <label class="label">Username / E-mail</label>
+        <input id="login" placeholder="username or email">
+
+        <div class="hr"></div>
+        <button class="btn primary" id="btnRequest">Send reset link</button>
+        <div id="reqOut" class="small" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="card">
+        <h2 style="margin:0 0 8px;">Reset using token</h2>
+        <div class="small">If you opened a reset link from your email, your token will auto-fill.</div>
+
+        <div class="hr"></div>
+
+        <label class="label">Token</label>
+        <input id="token" placeholder="rst_...">
+
+        <label class="label">New Password</label>
+        <input id="new_password" type="password" placeholder="Minimum 8 characters">
+
+        <div class="hr"></div>
+        <button class="btn green" id="btnReset">Set new password</button>
+        <div id="resetOut" class="small" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+const qs = new URLSearchParams(location.search);
+const token = qs.get("token") || "";
+if (token) document.getElementById("token").value = token;
+
+document.getElementById("btnRequest").addEventListener("click", async () => {
+  const role = document.getElementById("role").value;
+  const login = document.getElementById("login").value.trim().toLowerCase();
+  if (!login) return QH.toast("Missing", "Enter your Username or E-mail.");
+
+  // frontend base = this page without query params
+  const reset_url_base = location.origin + "/auth/reset.html";
+
+  const res = await QH.apiPost("request_password_reset", { role, login, reset_url_base });
+  document.getElementById("reqOut").textContent = res.message || (res.ok ? "Sent." : (res.error || "Error"));
+  if (res.ok) QH.toast("If your account exists…", "A reset link was sent to your email.");
+});
+
+document.getElementById("btnReset").addEventListener("click", async () => {
+  const token = document.getElementById("token").value.trim();
+  const new_password = document.getElementById("new_password").value;
+
+  if (!token) return QH.toast("Missing", "Token is required.");
+  if (!new_password || new_password.length < 8) return QH.toast("Password", "Password must be 8 characters or more.");
+
+  const res = await QH.apiPost("reset_password", { token, new_password });
+  document.getElementById("resetOut").textContent = res.ok ? "Password updated. You can now login." : (res.error || "Error");
+
+  if (res.ok) {
+    QH.toast("Success", "Password updated. Redirecting to login…");
+    setTimeout(() => location.href = "/auth/login.html", 800);
+  }
+});
+</script>
+</body>
+</html>
