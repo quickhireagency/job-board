@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>QuickHire™ — Apply</title>
+  <link rel="stylesheet" href="/assets/styles.css"/>
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>
+          <div class="title">QuickHire™ Job Board</div>
+          <div class="small">Apply to Job</div>
+        </div>
+      </div>
+      <div class="navlinks">
+        <a class="btn" href="/">Back to Jobs</a>
+        <a class="btn" href="/auth/login.html">Login</a>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2 style="margin:0 0 8px;">Job</h2>
+        <div id="jobBox" class="note">Loading…</div>
+      </div>
+
+      <div class="card">
+        <h2 style="margin:0 0 8px;">Application</h2>
+        <div class="small">You must be logged in as a Candidate to apply.</div>
+
+        <div class="hr"></div>
+
+        <label class="label">Cover Letter (optional)</label>
+        <textarea id="cover_letter_text" placeholder="Type your cover letter here..."></textarea>
+
+        <div class="hr"></div>
+
+        <h3 style="margin:0 0 6px;">Resume (optional, but recommended)</h3>
+        <div class="small">Paste a link to your resume file (Google Drive, Dropbox, etc.). We store the link and attach it to your application.</div>
+
+        <label class="label">Resume Title</label>
+        <input id="resume_title" placeholder="e.g., Michael Cook Resume">
+
+        <label class="label">Resume File URL</label>
+        <input id="resume_file_url" placeholder="https://...">
+
+        <div class="hr"></div>
+        <button class="btn primary" id="btnApply">Submit Application</button>
+        <div id="out" class="small" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+const qs = new URLSearchParams(location.search);
+const jobId = qs.get("job_id") || "";
+const jobBox = document.getElementById("jobBox");
+const out = document.getElementById("out");
+
+if (!jobId) {
+  jobBox.textContent = "Missing job_id.";
+}
+
+async function loadJob() {
+  if (!jobId) return;
+  const res = await QH.apiGet("get_job", { job_id: jobId });
+  if (!res.ok) {
+    jobBox.textContent = "Job not found: " + (res.error || "");
+    return;
+  }
+  const j = res.job || {};
+  jobBox.innerHTML = `
+    <div><b>${QH.esc(j.job_title || "(untitled)")}</b></div>
+    <div class="small">${QH.esc(j.city || "")}${j.state ? ", " + QH.esc(j.state) : ""}</div>
+    <div class="hr"></div>
+    <div class="small">${QH.esc(j.job_description || "")}</div>
+  `;
+}
+loadJob();
+
+document.getElementById("btnApply").addEventListener("click", async () => {
+  const session = QH.getSession();
+  if (!session || session.role !== "job_seeker" || !session.session_token) {
+    QH.toast("Login required", "Please login as a Candidate to apply.");
+    return location.href = "/auth/login.html";
+  }
+
+  const cover_letter_text = document.getElementById("cover_letter_text").value.trim();
+  const resume_title = document.getElementById("resume_title").value.trim();
+  const resume_file_url = document.getElementById("resume_file_url").value.trim();
+
+  let resume_id = "";
+
+  // If user provided a resume link, create a resume record first, then attach it to application.
+  if (resume_file_url) {
+    if (!resume_title) return QH.toast("Resume title", "Please enter a resume title.");
+    const r = await QH.apiPost("resume_upsert", {
+      session_token: session.session_token,
+      resume_title,
+      resume_file_url,
+      active_flag: "TRUE"
+    });
+    if (!r.ok) {
+      return QH.toast("Resume error", r.error || "Could not attach resume.");
+    }
+    resume_id = r.resume_id || "";
+  }
+
+  const res = await QH.apiPost("apply", {
+    session_token: session.session_token,
+    job_id: jobId,
+    resume_id,
+    cover_letter_text
+  });
+
+  if (!res.ok) {
+    out.textContent = "❌ " + (res.error || "Failed to apply.");
+    return QH.toast("Failed", res.error || "Could not apply.");
+  }
+
+  out.textContent = "✅ Applied. Application ID: " + res.application_id;
+  QH.toast("Submitted", "Application sent successfully.");
+});
+</script>
+</body>
+</html>
