@@ -4,211 +4,704 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>QuickHire™ — Employer Dashboard</title>
-  <link rel="stylesheet" href="/assets/styles.css"/>
+
+  <!-- Config + shared helpers -->
   <script src="/config/config.js"></script>
   <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+    .btn.danger{
+      border-color: rgba(180,35,24,.35);
+      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
+      color: #4a0f0a;
+    }
+    .btn.green{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.22), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+    input, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+      font-family: var(--font);
+    }
+    textarea{
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .hr{
+      height:1px;
+      background: rgba(10,30,20,.12);
+      margin:12px 0;
+    }
+
+    .note{
+      background: rgba(10,30,20,.04);
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 720px){
+      .row2{grid-template-columns:1fr}
+    }
+
+    .plans{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 980px){
+      .plans{grid-template-columns:1fr}
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(10,30,20,.14);
+      background: rgba(255,255,255,.75);
+      font-size:11px;
+      font-weight:800;
+      color: var(--muted);
+      margin-left:6px;
+    }
+    .badge.ok{
+      border-color: rgba(31,122,74,.35);
+      color: rgba(31,122,74,.95);
+      background: rgba(43,154,94,.12);
+    }
+    .badge.warn{
+      border-color: rgba(180,35,24,.25);
+      color: rgba(180,35,24,.90);
+      background: rgba(180,35,24,.08);
+    }
+
+    /* Footer logo + legal links (match index.html) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="title">QuickHire™ Job Board</div>
-          <div class="small">Employer Dashboard</div>
-        </div>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Employer Dashboard</div>
+            <div class="sub">Plans, entitlements, and job posting</div>
+          </div>
+        </a>
       </div>
-      <div class="navlinks">
+
+      <div class="controls">
         <a class="btn" href="/">Public Job Board</a>
-        <a class="btn" href="/billing/success/">Claim Purchase</a>
+        <a class="btn blue" href="/billing/success/">Claim Purchase</a>
         <button class="btn danger" id="btnLogout">Logout</button>
       </div>
     </div>
+  </div>
 
-    <div class="grid2">
-      <div class="card">
-        <h2 style="margin:0 0 8px;">Your Subscription & Entitlements</h2>
-        <div id="entBox" class="note">Loading…</div>
-
-        <div class="hr"></div>
-        <h3 style="margin:0 0 10px;">Buy / Upgrade Plan</h3>
-        <div class="small">
-          After paying, return to <b>/billing/success/</b> and claim using <b>the SAME E-mail + Username</b> from signup.
+  <div class="wrap">
+    <div class="grid">
+      <!-- Subscription / Plans -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Your Subscription &amp; Entitlements</h2>
+            <div class="meta">Manage your plan and Verified status</div>
+          </div>
         </div>
 
-        <div class="hr"></div>
-        <div class="grid2">
-          <div class="note">
-            <div><b>QuickHire Local</b></div>
-            <div class="small">$49.99/mo</div>
-            <div style="margin-top:8px;">
-              <a class="btn" href="https://buy.stripe.com/dRm00bblue5Gbz61ufbfO00" target="_blank" rel="noopener">Buy Local</a>
-            </div>
+        <div class="content">
+          <div id="entBox" class="note">Loading…</div>
+
+          <div class="hr"></div>
+          <div style="font-weight:1000; margin-bottom:6px;">Buy / Upgrade Plan</div>
+          <div class="muted">
+            After paying, return to <b>/billing/success/</b> and claim using <b>the SAME E-mail + Username</b> from signup.
           </div>
-          <div class="note">
-            <div><b>QuickHire Business</b></div>
-            <div class="small">$99.99/mo</div>
-            <div style="margin-top:8px;">
-              <a class="btn" href="https://buy.stripe.com/4gM7sDahq9PqeLi3CnbfO05" target="_blank" rel="noopener">Buy Business</a>
+
+          <div class="hr"></div>
+
+          <div class="plans">
+            <div class="note">
+              <div style="font-weight:1000;">QuickHire Local</div>
+              <div class="muted">$49.99/mo</div>
+              <div style="margin-top:8px;">
+                <a class="btn" href="https://buy.stripe.com/dRm00bblue5Gbz61ufbfO00" target="_blank" rel="noopener">Buy Local</a>
+              </div>
             </div>
-          </div>
-          <div class="note">
-            <div><b>QuickHire Corporate</b></div>
-            <div class="small">$249.99/mo</div>
-            <div style="margin-top:8px;">
-              <a class="btn" href="https://buy.stripe.com/14AaEP9dm4v6dHe8WHbfO02" target="_blank" rel="noopener">Buy Corporate</a>
+
+            <div class="note">
+              <div style="font-weight:1000;">QuickHire Business</div>
+              <div class="muted">$99.99/mo</div>
+              <div style="margin-top:8px;">
+                <a class="btn" href="https://buy.stripe.com/4gM7sDahq9PqeLi3CnbfO05" target="_blank" rel="noopener">Buy Business</a>
+              </div>
             </div>
-          </div>
-          <div class="note">
-            <div><b>Verified Employer (Add-on)</b></div>
-            <div class="small">Not allowed if Corporate includes it</div>
-            <div style="margin-top:8px;">
-              <a class="btn" href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Buy Verified</a>
+
+            <div class="note">
+              <div style="font-weight:1000;">QuickHire Corporate</div>
+              <div class="muted">$249.99/mo</div>
+              <div style="margin-top:8px;">
+                <a class="btn" href="https://buy.stripe.com/14AaEP9dm4v6dHe8WHbfO02" target="_blank" rel="noopener">Buy Corporate</a>
+              </div>
+            </div>
+
+            <div class="note">
+              <div style="font-weight:1000;">Verified Employer (Add-on)</div>
+              <div class="muted">Not allowed if Corporate includes it</div>
+              <div style="margin-top:8px;">
+                <a class="btn" href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Buy Verified</a>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <h2 style="margin:0 0 8px;">Post a Job</h2>
-        <div class="small">
-          Posting requires an active plan. This uses the backend `create_job` endpoint and writes into your Job Board sheet.
-        </div>
-
-        <div class="hr"></div>
-
-        <label class="label">Job Title</label>
-        <input id="job_title" placeholder="e.g., Warehouse Associate">
-
-        <label class="label">Job Description</label>
-        <textarea id="job_description" placeholder="Full job description..."></textarea>
-
-        <div class="row">
+      <!-- Post job -->
+      <div class="panel">
+        <div class="panel-header">
           <div>
-            <label class="label">City</label>
-            <input id="city" placeholder="Indianapolis">
-          </div>
-          <div>
-            <label class="label">State</label>
-            <input id="state" placeholder="IN">
+            <h2>Post a Job</h2>
+            <div class="meta">Requires an active plan</div>
           </div>
         </div>
 
-        <div class="row">
-          <div>
-            <label class="label">Employment Type</label>
-            <input id="employment_type" placeholder="Full-time / Part-time / Temp / Contract">
+        <div class="content">
+          <div class="muted">
+            Posting requires an active plan. This uses the backend <code>create_job</code> endpoint and writes into your Job Board sheet.
           </div>
-          <div>
-            <label class="label">Work Arrangement</label>
-            <input id="work_arrangement" placeholder="On-site / Hybrid / Remote">
+
+          <div class="hr"></div>
+
+          <label for="job_title">Job Title</label>
+          <input id="job_title" placeholder="e.g., Warehouse Associate">
+
+          <div style="height:10px;"></div>
+
+          <label for="job_description">Job Description</label>
+          <textarea id="job_description" placeholder="Full job description..."></textarea>
+
+          <div class="hr"></div>
+
+          <div class="row2">
+            <div>
+              <label for="city">City</label>
+              <input id="city" placeholder="Indianapolis">
+            </div>
+            <div>
+              <label for="state">State</label>
+              <input id="state" placeholder="IN">
+            </div>
           </div>
+
+          <div style="height:10px;"></div>
+
+          <div class="row2">
+            <div>
+              <label for="employment_type">Employment Type</label>
+              <input id="employment_type" placeholder="Full-time / Part-time / Temp / Contract">
+            </div>
+            <div>
+              <label for="work_arrangement">Work Arrangement</label>
+              <input id="work_arrangement" placeholder="On-site / Hybrid / Remote">
+            </div>
+          </div>
+
+          <div style="height:10px;"></div>
+
+          <div class="row2">
+            <div>
+              <label for="pay_min">Pay Min</label>
+              <input id="pay_min" placeholder="e.g., 18">
+            </div>
+            <div>
+              <label for="pay_max">Pay Max</label>
+              <input id="pay_max" placeholder="e.g., 22">
+            </div>
+          </div>
+
+          <div style="height:10px;"></div>
+
+          <label for="apply_url">Apply URL (optional)</label>
+          <input id="apply_url" placeholder="https://...">
+
+          <label class="muted" style="margin-top:10px; display:flex; gap:10px; align-items:flex-start;">
+            <input type="checkbox" id="honesty_attestation" style="width:auto; margin-top:2px;">
+            <span>I attest the job details are accurate and not misleading.</span>
+          </label>
+
+          <div class="hr"></div>
+          <button class="btn green" id="btnPost">Post Job</button>
+          <div id="postOut" class="muted" style="margin-top:10px;"></div>
         </div>
-
-        <div class="row">
-          <div>
-            <label class="label">Pay Min</label>
-            <input id="pay_min" placeholder="e.g., 18">
-          </div>
-          <div>
-            <label class="label">Pay Max</label>
-            <input id="pay_max" placeholder="e.g., 22">
-          </div>
-        </div>
-
-        <label class="label">Apply URL (optional)</label>
-        <input id="apply_url" placeholder="https://...">
-
-        <label class="small" style="margin-top:10px;">
-          <input type="checkbox" id="honesty_attestation">
-          I attest the job details are accurate and not misleading.
-        </label>
-
-        <div class="hr"></div>
-        <button class="btn green" id="btnPost">Post Job</button>
-        <div id="postOut" class="small" style="margin-top:10px;"></div>
       </div>
     </div>
+
+    <!-- Footer (same as index.html) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-powered{
+        text-align:center;
+        margin-top: 10px;
+        font-weight:900;
+        letter-spacing:.02em;
+      }
+      .qh-powered a{
+        color: var(--blue);
+        text-decoration:underline;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
+      </p>
+
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
+
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
+
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
+
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
+
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
+
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
+
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
+
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
+
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
 
     <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
   </div>
 
 <script>
-const session = QH.requireSession("employer");
-if (!session) throw new Error("No session");
+  const session = QH.requireSession("employer");
+  if (!session) throw new Error("No session");
 
-document.getElementById("btnLogout").addEventListener("click", () => {
-  QH.clearSession();
-  window.location.href = "/";
-});
+  document.getElementById("btnLogout").addEventListener("click", () => {
+    QH.clearSession();
+    window.location.href = "/";
+  });
 
-async function loadEntitlements() {
-  const res = await QH.apiGet("get_employer_entitlements", { session_token: session.session_token });
-  const box = document.getElementById("entBox");
+  async function loadEntitlements() {
+    const res = await QH.apiGet("get_employer_entitlements", { session_token: session.session_token });
+    const box = document.getElementById("entBox");
 
-  if (!res.ok) {
-    box.textContent = "Error loading entitlements: " + (res.error || "");
-    return;
+    if (!res.ok) {
+      box.textContent = "Error loading entitlements: " + (res.error || "");
+      return;
+    }
+    const e = res.entitlements || {};
+    const planName = e.plan_name || "(none yet)";
+    const planId = e.plan_id || "(none)";
+    const verified = e.is_verified ? "YES" : "NO";
+    const eeo = e.eeo_export_included ? "YES (Corporate)" : "NO";
+
+    box.innerHTML = `
+      <div><b>Plan:</b> ${planName} <span class="badge">${planId}</span></div>
+      <div style="margin-top:6px;"><b>Verified Employer:</b> <span class="badge ${e.is_verified ? "ok":"warn"}">${verified}</span></div>
+      <div style="margin-top:6px;"><b>EEO Aggregate Access:</b> <span class="badge ${e.eeo_export_included ? "ok":"warn"}">${eeo}</span></div>
+      <div class="hr"></div>
+      <div class="muted">
+        If you just paid, go to <a href="/billing/success/">/billing/success/</a> and CLAIM using the SAME E-mail + Username.
+      </div>
+    `;
   }
-  const e = res.entitlements || {};
-  const planName = e.plan_name || "(none yet)";
-  const planId = e.plan_id || "(none)";
-  const verified = e.is_verified ? "YES" : "NO";
-  const eeo = e.eeo_export_included ? "YES (Corporate)" : "NO";
+  loadEntitlements();
 
-  box.innerHTML = `
-    <div><b>Plan:</b> ${planName} <span class="badge">${planId}</span></div>
-    <div style="margin-top:6px;"><b>Verified Employer:</b> <span class="badge ${e.is_verified ? "ok":"warn"}">${verified}</span></div>
-    <div style="margin-top:6px;"><b>EEO Aggregate Access:</b> <span class="badge ${e.eeo_export_included ? "ok":"warn"}">${eeo}</span></div>
-    <div class="hr"></div>
-    <div class="small">
-      If you just paid, go to <a href="/billing/success/">/billing/success/</a> and CLAIM using the SAME E-mail + Username.
-    </div>
-  `;
-}
-loadEntitlements();
+  document.getElementById("btnPost").addEventListener("click", async () => {
+    const job_title = document.getElementById("job_title").value.trim();
+    const job_description = document.getElementById("job_description").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const state = document.getElementById("state").value.trim().toUpperCase();
+    const employment_type = document.getElementById("employment_type").value.trim();
+    const work_arrangement = document.getElementById("work_arrangement").value.trim();
+    const pay_min = document.getElementById("pay_min").value.trim();
+    const pay_max = document.getElementById("pay_max").value.trim();
+    const apply_url = document.getElementById("apply_url").value.trim();
+    const honesty_attestation = document.getElementById("honesty_attestation").checked;
 
-document.getElementById("btnPost").addEventListener("click", async () => {
-  const job_title = document.getElementById("job_title").value.trim();
-  const job_description = document.getElementById("job_description").value.trim();
-  const city = document.getElementById("city").value.trim();
-  const state = document.getElementById("state").value.trim().toUpperCase();
-  const employment_type = document.getElementById("employment_type").value.trim();
-  const work_arrangement = document.getElementById("work_arrangement").value.trim();
-  const pay_min = document.getElementById("pay_min").value.trim();
-  const pay_max = document.getElementById("pay_max").value.trim();
-  const apply_url = document.getElementById("apply_url").value.trim();
-  const honesty_attestation = document.getElementById("honesty_attestation").checked;
+    if (!job_title || !job_description) return QH.toast("Missing fields", "Job Title and Job Description are required.");
+    if (!honesty_attestation) return QH.toast("Required", "You must check the honesty attestation.");
 
-  if (!job_title || !job_description) return QH.toast("Missing fields", "Job Title and Job Description are required.");
-  if (!honesty_attestation) return QH.toast("Required", "You must check the honesty attestation.");
+    const values_map = {
+      job_title,
+      job_description,
+      city,
+      state,
+      employment_type,
+      work_arrangement,
+      pay_min,
+      pay_max,
+      apply_type: apply_url ? "external" : "internal",
+      apply_url: apply_url,
+      honesty_attestation: honesty_attestation ? "TRUE" : "FALSE",
+      status: "live"
+    };
 
-  const values_map = {
-    job_title,
-    job_description,
-    city,
-    state,
-    employment_type,
-    work_arrangement,
-    pay_min,
-    pay_max,
-    apply_type: apply_url ? "external" : "internal",
-    apply_url: apply_url,
-    honesty_attestation: honesty_attestation ? "TRUE" : "FALSE",
-    status: "live"
-  };
+    const res = await QH.apiPost("create_job", { session_token: session.session_token, values_map });
+    const out = document.getElementById("postOut");
 
-  const res = await QH.apiPost("create_job", { session_token: session.session_token, values_map });
-  const out = document.getElementById("postOut");
+    if (!res.ok) {
+      out.textContent = "❌ " + (res.error || "Failed to post.");
+      return QH.toast("Failed", res.error || "Could not post.");
+    }
 
-  if (!res.ok) {
-    out.textContent = "❌ " + (res.error || "Failed to post.");
-    return QH.toast("Failed", res.error || "Could not post.");
-  }
-
-  out.textContent = "✅ Posted. Job ID: " + res.job_id;
-  QH.toast("Posted", "Job created successfully.");
-});
+    out.textContent = "✅ Posted. Job ID: " + res.job_id;
+    QH.toast("Posted", "Job created successfully.");
+  });
 </script>
 </body>
 </html>
