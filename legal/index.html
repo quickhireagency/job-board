@@ -4,73 +4,480 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>QuickHire™ — Legal & Policies</title>
-  <link rel="stylesheet" href="/assets/styles.css"/>
+
+  <!-- Match index pages: include config + app (safe; does not change content) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h1{margin:0; font-size:16px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    .notice{
+      background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.70));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+      margin-bottom:14px;
+    }
+    .notice h3{margin:0 0 8px 0; font-size:14px}
+    .notice p{margin:0; color:var(--muted); font-size:13px; line-height:1.45}
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 860px){
+      .grid2{grid-template-columns:1fr}
+    }
+
+    .tile{
+      background: rgba(255,255,255,.85);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+    .tile .k{font-weight:1000}
+    .tile .s{color:var(--muted); font-size:12px; margin-top:4px; line-height:1.35}
+    .tile .actions{margin-top:10px; display:flex; gap:10px; flex-wrap:wrap}
+
+    /* Footer logo + legal links (match index.html) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="title">QuickHire™ Job Board</div>
-          <div class="small">Legal & Policies</div>
-        </div>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Legal &amp; Policies</div>
+            <div class="sub">Read each required policy and return to signup to acknowledge.</div>
+          </div>
+        </a>
       </div>
-      <div class="navlinks">
+
+      <div class="controls">
         <a class="btn" href="/">Back to Jobs</a>
-        <a class="btn" href="/auth/login.html">Login</a>
+        <a class="btn blue" href="/auth/login.html">Login</a>
+        <a class="btn primary" href="/auth/signup-job-seeker.html">Candidate Sign Up</a>
+        <a class="btn primary" href="/auth/signup-employer.html">Employer Sign Up</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="notice" aria-label="Instructions">
+      <h3>Policies you must read &amp; acknowledge at signup</h3>
+      <p>Open each policy page, read it, then return to signup and check the acknowledgement box.</p>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h1>Required Policies & Packets</h1>
+          <div class="meta">These links are the same ones used on the signup pages.</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="grid2">
+          <div class="tile">
+            <div class="k">Terms of Service</div>
+            <div class="s">Required</div>
+            <div class="actions"><a class="btn" href="/legal/terms.html">Open</a></div>
+          </div>
+
+          <div class="tile">
+            <div class="k">Privacy Policy</div>
+            <div class="s">Required</div>
+            <div class="actions"><a class="btn" href="/legal/privacy.html">Open</a></div>
+          </div>
+
+          <div class="tile">
+            <div class="k">EEO Policy</div>
+            <div class="s">Required</div>
+            <div class="actions"><a class="btn" href="/legal/eeo.html">Open</a></div>
+          </div>
+
+          <div class="tile">
+            <div class="k">Drug &amp; Alcohol Policy</div>
+            <div class="s">Required</div>
+            <div class="actions"><a class="btn" href="/legal/drug-alcohol.html">Open</a></div>
+          </div>
+
+          <div class="tile">
+            <div class="k">Workplace Safety (OSHA) Acknowledgment</div>
+            <div class="s">Required</div>
+            <div class="actions"><a class="btn" href="/legal/osha.html">Open</a></div>
+          </div>
+
+          <div class="tile">
+            <div class="k">Veteran’s Policy</div>
+            <div class="s">Required</div>
+            <div class="actions"><a class="btn" href="/legal/veterans.html">Open</a></div>
+          </div>
+
+          <div class="tile">
+            <div class="k">Employer Packet</div>
+            <div class="s">Required for Employer signup</div>
+            <div class="actions"><a class="btn" href="/legal/employer-packet.html">Open</a></div>
+          </div>
+
+          <div class="tile">
+            <div class="k">Candidate Packet</div>
+            <div class="s">Required for Candidate signup</div>
+            <div class="actions"><a class="btn" href="/legal/candidate-packet.html">Open</a></div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="card">
-      <h2 style="margin:0 0 8px;">Policies you must read & acknowledge at signup</h2>
-      <div class="small">Open each policy page, read it, then return to signup and check the acknowledgement box.</div>
+    <!-- Footer (same as index.html) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
 
-      <div class="hr"></div>
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
 
-      <div class="grid2">
-        <div class="note">
-          <div><b>Terms of Service</b></div>
-          <div class="small">Required</div>
-          <div style="margin-top:8px;"><a class="btn" href="/legal/terms.html">Open</a></div>
-        </div>
-        <div class="note">
-          <div><b>Privacy Policy</b></div>
-          <div class="small">Required</div>
-          <div style="margin-top:8px;"><a class="btn" href="/legal/privacy.html">Open</a></div>
-        </div>
-        <div class="note">
-          <div><b>EEO Policy</b></div>
-          <div class="small">Required</div>
-          <div style="margin-top:8px;"><a class="btn" href="/legal/eeo.html">Open</a></div>
-        </div>
-        <div class="note">
-          <div><b>Drug & Alcohol Policy</b></div>
-          <div class="small">Required</div>
-          <div style="margin-top:8px;"><a class="btn" href="/legal/drug-alcohol.html">Open</a></div>
-        </div>
-        <div class="note">
-          <div><b>Workplace Safety (OSHA) Acknowledgment</b></div>
-          <div class="small">Required</div>
-          <div style="margin-top:8px;"><a class="btn" href="/legal/osha.html">Open</a></div>
-        </div>
-        <div class="note">
-          <div><b>Veteran’s Policy</b></div>
-          <div class="small">Required</div>
-          <div style="margin-top:8px;"><a class="btn" href="/legal/veterans.html">Open</a></div>
-        </div>
-        <div class="note">
-          <div><b>Employer Packet</b></div>
-          <div class="small">Required for Employer signup</div>
-          <div style="margin-top:8px;"><a class="btn" href="/legal/employer-packet.html">Open</a></div>
-        </div>
-        <div class="note">
-          <div><b>Candidate Packet</b></div>
-          <div class="small">Required for Candidate signup</div>
-          <div style="margin-top:8px;"><a class="btn" href="/legal/candidate-packet.html">Open</a></div>
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-powered{
+        text-align:center;
+        margin-top: 10px;
+        font-weight:900;
+        letter-spacing:.02em;
+      }
+      .qh-powered a{
+        color: var(--blue);
+        text-decoration:underline;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
+      </p>
+
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
+
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
+
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
+
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
+
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
+
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
+
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
+
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
+
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
         </div>
       </div>
-    </div>
+    </footer>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
   </div>
 </body>
 </html>
