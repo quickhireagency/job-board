@@ -4,172 +4,676 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>QuickHire™ — Candidate Sign Up</title>
-  <link rel="stylesheet" href="/assets/styles.css"/>
+
+  <!-- Config + shared helpers -->
   <script src="/config/config.js"></script>
   <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr .85fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+    input{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 720px){
+      .row2{grid-template-columns:1fr}
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .hr{
+      height:1px;
+      background: rgba(10,30,20,.12);
+      margin:12px 0;
+    }
+
+    .note{
+      background: rgba(10,30,20,.04);
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .ack-row{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      margin-top:8px;
+    }
+    .ack-row input{ width:auto; margin-top:2px; }
+    .ack-row .text{ flex:1; }
+
+    /* Footer logo + legal links (match index.html) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="title">QuickHire™ Job Board</div>
-          <div class="small">Candidate Sign Up</div>
-        </div>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Candidate Sign Up</div>
+            <div class="sub">Create a Job Seeker account</div>
+          </div>
+        </a>
       </div>
-      <div class="navlinks">
+
+      <div class="controls">
         <a class="btn" href="/">Back to Jobs</a>
-        <a class="btn" href="/auth/login.html">Login</a>
-        <a class="btn" href="/auth/signup-employer.html">Employer Sign Up</a>
+        <a class="btn blue" id="loginBtn" href="/auth/login.html">Login</a>
+        <a class="btn primary" id="employerSignupBtn" href="/auth/signup-employer.html">Employer Sign Up</a>
       </div>
     </div>
+  </div>
 
-    <div class="grid2">
-      <div class="card">
-        <h2 style="margin:0 0 6px;">Create Candidate Account</h2>
-        <div class="small">You can browse jobs without an account, but you must have an account to apply.</div>
-
-        <div class="row">
+  <div class="wrap">
+    <div class="grid">
+      <!-- Main signup form -->
+      <div class="panel">
+        <div class="panel-header">
           <div>
-            <label class="label">First Name</label>
-            <input id="first_name" placeholder="First name">
-          </div>
-          <div>
-            <label class="label">Last Name</label>
-            <input id="last_name" placeholder="Last name">
+            <h2>Create Candidate Account</h2>
+            <div class="meta">You can browse jobs without an account, but you must have an account to apply.</div>
           </div>
         </div>
 
-        <label class="label">E-mail (required)</label>
-        <input id="email" placeholder="you@example.com">
+        <div class="content">
+          <div class="row2">
+            <div>
+              <label for="first_name">First Name</label>
+              <input id="first_name" placeholder="First name">
+            </div>
+            <div>
+              <label for="last_name">Last Name</label>
+              <input id="last_name" placeholder="Last name">
+            </div>
+          </div>
 
-        <label class="label">Username (required)</label>
-        <input id="username" placeholder="yourusername">
+          <div style="height:10px;"></div>
 
-        <label class="label">Phone (optional)</label>
-        <input id="phone" placeholder="(317) 555-1234">
+          <label for="email">E-mail (required)</label>
+          <input id="email" placeholder="you@example.com">
 
-        <label class="label">Password</label>
-        <input id="password" type="password" placeholder="Minimum 8 characters">
+          <div style="height:10px;"></div>
 
-        <div class="hr"></div>
+          <label for="username">Username (required)</label>
+          <input id="username" placeholder="yourusername">
 
-        <h3 style="margin:0 0 6px;">Policy acknowledgements (required)</h3>
-        <div class="small">Open each page, read it, then check the box.</div>
+          <div style="height:10px;"></div>
 
-        <div class="note" style="margin-top:10px;">
-          <div><a href="/legal/terms.html" target="_blank" rel="noopener">Terms of Service</a></div>
-          <label class="small"><input type="checkbox" id="ack_terms"> I acknowledge Terms of Service</label>
+          <label for="phone">Phone (optional)</label>
+          <input id="phone" placeholder="(317) 555-1234">
+
+          <div style="height:10px;"></div>
+
+          <label for="password">Password</label>
+          <input id="password" type="password" placeholder="Minimum 8 characters">
+
           <div class="hr"></div>
 
-          <div><a href="/legal/privacy.html" target="_blank" rel="noopener">Privacy Policy</a></div>
-          <label class="small"><input type="checkbox" id="ack_privacy"> I acknowledge Privacy Policy</label>
+          <div style="font-weight:1000; margin-bottom:6px;">Policy acknowledgements (required)</div>
+          <div class="muted">Open each page, read it, then check the box.</div>
+
+          <div class="note" style="margin-top:10px;">
+            <div style="font-weight:900;">Terms of Service</div>
+            <div class="muted"><a href="/legal/terms.html" target="_blank" rel="noopener">Open Terms of Service</a></div>
+            <div class="ack-row">
+              <input type="checkbox" id="ack_terms">
+              <div class="text muted">I acknowledge Terms of Service</div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div style="font-weight:900;">Privacy Policy</div>
+            <div class="muted"><a href="/legal/privacy.html" target="_blank" rel="noopener">Open Privacy Policy</a></div>
+            <div class="ack-row">
+              <input type="checkbox" id="ack_privacy">
+              <div class="text muted">I acknowledge Privacy Policy</div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div style="font-weight:900;">EEO Policy</div>
+            <div class="muted"><a href="/legal/eeo.html" target="_blank" rel="noopener">Open EEO Policy</a></div>
+            <div class="ack-row">
+              <input type="checkbox" id="ack_eeo">
+              <div class="text muted">I acknowledge EEO Policy</div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div style="font-weight:900;">Drug &amp; Alcohol Policy</div>
+            <div class="muted"><a href="/legal/drug-alcohol.html" target="_blank" rel="noopener">Open Drug &amp; Alcohol Policy</a></div>
+            <div class="ack-row">
+              <input type="checkbox" id="ack_drug_alcohol">
+              <div class="text muted">I acknowledge Drug &amp; Alcohol Policy</div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div style="font-weight:900;">Workplace Safety (OSHA)</div>
+            <div class="muted"><a href="/legal/osha.html" target="_blank" rel="noopener">Open OSHA Safety Policy</a></div>
+            <div class="ack-row">
+              <input type="checkbox" id="ack_osha">
+              <div class="text muted">I acknowledge OSHA Safety Policy</div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div style="font-weight:900;">Veteran’s Policy</div>
+            <div class="muted"><a href="/legal/veterans.html" target="_blank" rel="noopener">Open Veteran’s Policy</a></div>
+            <div class="ack-row">
+              <input type="checkbox" id="ack_veterans">
+              <div class="text muted">I acknowledge Veteran’s Policy</div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div style="font-weight:900;">QuickHire Candidate Packet</div>
+            <div class="muted"><a href="/legal/candidate-packet.html" target="_blank" rel="noopener">Open Candidate Packet</a></div>
+            <div class="ack-row">
+              <input type="checkbox" id="ack_candidate_packet">
+              <div class="text muted">I acknowledge Candidate Packet</div>
+            </div>
+          </div>
+
           <div class="hr"></div>
 
-          <div><a href="/legal/eeo.html" target="_blank" rel="noopener">EEO Policy</a></div>
-          <label class="small"><input type="checkbox" id="ack_eeo"> I acknowledge EEO Policy</label>
-          <div class="hr"></div>
+          <div style="font-weight:1000; margin-bottom:6px;">Signature (required)</div>
+          <div class="muted">Type your full name exactly as your signature.</div>
 
-          <div><a href="/legal/drug-alcohol.html" target="_blank" rel="noopener">Drug &amp; Alcohol Policy</a></div>
-          <label class="small"><input type="checkbox" id="ack_drug_alcohol"> I acknowledge Drug &amp; Alcohol Policy</label>
-          <div class="hr"></div>
+          <div style="height:10px;"></div>
 
-          <div><a href="/legal/osha.html" target="_blank" rel="noopener">Workplace Safety (OSHA) Acknowledgment</a></div>
-          <label class="small"><input type="checkbox" id="ack_osha"> I acknowledge OSHA Safety Policy</label>
-          <div class="hr"></div>
+          <label for="signature_full_name">Typed Full Name</label>
+          <input id="signature_full_name" placeholder="First Last">
 
-          <div><a href="/legal/veterans.html" target="_blank" rel="noopener">Veteran’s Policy</a></div>
-          <label class="small"><input type="checkbox" id="ack_veterans"> I acknowledge Veteran’s Policy</label>
           <div class="hr"></div>
-
-          <div><a href="/legal/candidate-packet.html" target="_blank" rel="noopener">QuickHire Candidate Packet</a></div>
-          <label class="small"><input type="checkbox" id="ack_candidate_packet"> I acknowledge Candidate Packet</label>
+          <button class="btn primary" id="btnSignup">Create Account</button>
         </div>
-
-        <div class="hr"></div>
-
-        <h3 style="margin:0 0 6px;">Signature (required)</h3>
-        <div class="small">Type your full name exactly as your signature.</div>
-        <label class="label">Typed Full Name</label>
-        <input id="signature_full_name" placeholder="First Last">
-
-        <div class="hr"></div>
-        <button class="btn primary" id="btnSignup">Create Account</button>
       </div>
 
-      <div class="card">
-        <h3 style="margin:0 0 10px;">IMPORTANT — Purchases & Claims</h3>
-        <div class="note">
-          If you ever buy something (resume service later), you MUST:
-          <ul>
-            <li><b>Use the SAME E-mail</b> you used to sign up.</li>
-            <li><b>Use the SAME Username</b> you used to sign up.</li>
-            <li>Then “CLAIM” using <b>E-mail + Username</b> on the success page.</li>
-          </ul>
-          People mess this up constantly — don’t.
+      <!-- Purchases / info -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>IMPORTANT — Purchases &amp; Claims</h2>
+            <div class="meta">Use the same E-mail + Username everywhere</div>
+          </div>
         </div>
 
-        <div class="hr"></div>
-        <div class="small">
-          After signup, you can apply to jobs.
+        <div class="content">
+          <div class="note">
+            If you ever buy something (resume service later), you MUST:
+            <ul style="margin:10px 0 0; padding-left:18px;">
+              <li><b>Use the SAME E-mail</b> you used to sign up.</li>
+              <li><b>Use the SAME Username</b> you used to sign up.</li>
+              <li>Then “CLAIM” using <b>E-mail + Username</b> on the success page.</li>
+            </ul>
+            <div class="muted" style="margin-top:10px;">People mess this up constantly — don’t.</div>
+          </div>
+
+          <div class="hr"></div>
+          <div class="muted">
+            After signup, you can apply to jobs immediately.
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Footer (same as index.html) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-powered{
+        text-align:center;
+        margin-top: 10px;
+        font-weight:900;
+        letter-spacing:.02em;
+      }
+      .qh-powered a{
+        color: var(--blue);
+        text-decoration:underline;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
+      </p>
+
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
+
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
+
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
+
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
+
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
+
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
+
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
+
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
+
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
 
     <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
   </div>
 
 <script>
-function getAcks() {
-  return {
-    terms: document.getElementById("ack_terms").checked,
-    privacy: document.getElementById("ack_privacy").checked,
-    eeo: document.getElementById("ack_eeo").checked,
-    drug_alcohol: document.getElementById("ack_drug_alcohol").checked,
-    osha: document.getElementById("ack_osha").checked,
-    veterans: document.getElementById("ack_veterans").checked,
-    candidate_packet: document.getElementById("ack_candidate_packet").checked
-  };
-}
-
-document.getElementById("btnSignup").addEventListener("click", async () => {
-  const first_name = document.getElementById("first_name").value.trim();
-  const last_name = document.getElementById("last_name").value.trim();
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const username = document.getElementById("username").value.trim().toLowerCase();
-  const phone = document.getElementById("phone").value.trim();
-  const password = document.getElementById("password").value;
-  const signature_full_name = document.getElementById("signature_full_name").value.trim();
-
-  if (!first_name || !last_name || !email || !username || !password) {
-    return QH.toast("Missing fields", "First name, last name, email, username, and password are required.");
-  }
-  if (password.length < 8) {
-    return QH.toast("Password too short", "Password must be 8 characters or more.");
-  }
-  if (!signature_full_name) {
-    return QH.toast("Signature required", "Type your full name to sign.");
+  function getAcks() {
+    return {
+      terms: document.getElementById("ack_terms").checked,
+      privacy: document.getElementById("ack_privacy").checked,
+      eeo: document.getElementById("ack_eeo").checked,
+      drug_alcohol: document.getElementById("ack_drug_alcohol").checked,
+      osha: document.getElementById("ack_osha").checked,
+      veterans: document.getElementById("ack_veterans").checked,
+      candidate_packet: document.getElementById("ack_candidate_packet").checked
+    };
   }
 
-  const acks = getAcks();
-  const required = ["terms","privacy","eeo","drug_alcohol","osha","veterans","candidate_packet"];
-  for (const k of required) {
-    if (!acks[k]) return QH.toast("Missing acknowledgement", "You must acknowledge: " + k);
-  }
+  // Preserve return flows across pages (signup -> next)
+  (function () {
+    const next = new URLSearchParams(window.location.search).get("next");
+    const safeNext = (next && next.startsWith("/")) ? next : "";
+    const nextParam = encodeURIComponent(safeNext || "/");
 
-  const res = await QH.apiPost("signup_job_seeker", {
-    first_name, last_name, email, username, phone, password,
-    acks,
-    signature_full_name
+    const loginBtn = document.getElementById("loginBtn");
+    const employerBtn = document.getElementById("employerSignupBtn");
+
+    if (loginBtn) loginBtn.href = "/auth/login.html?next=" + nextParam;
+    if (employerBtn) employerBtn.href = "/auth/signup-employer.html?next=" + nextParam;
+  })();
+
+  document.getElementById("btnSignup").addEventListener("click", async () => {
+    const first_name = document.getElementById("first_name").value.trim();
+    const last_name = document.getElementById("last_name").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const username = document.getElementById("username").value.trim().toLowerCase();
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value;
+    const signature_full_name = document.getElementById("signature_full_name").value.trim();
+
+    if (!first_name || !last_name || !email || !username || !password) {
+      return QH.toast("Missing fields", "First name, last name, email, username, and password are required.");
+    }
+    if (password.length < 8) {
+      return QH.toast("Password too short", "Password must be 8 characters or more.");
+    }
+    if (!signature_full_name) {
+      return QH.toast("Signature required", "Type your full name to sign.");
+    }
+
+    const acks = getAcks();
+    const required = ["terms","privacy","eeo","drug_alcohol","osha","veterans","candidate_packet"];
+    for (const k of required) {
+      if (!acks[k]) return QH.toast("Missing acknowledgement", "You must acknowledge: " + k);
+    }
+
+    const res = await QH.apiPost("signup_job_seeker", {
+      first_name, last_name, email, username, phone, password,
+      acks,
+      signature_full_name
+    });
+
+    if (!res.ok) return QH.toast("Signup failed", res.error || "Try again.");
+
+    QH.saveSession({ role: "job_seeker", session_token: res.session_token, job_seeker_id: res.job_seeker_id });
+    QH.toast("Account created", "You can now apply to jobs.");
+
+    // Redirect to next if provided, else home
+    const next = new URLSearchParams(window.location.search).get("next");
+    const safeNext = (next && next.startsWith("/")) ? next : "";
+    window.location.href = safeNext || "/";
   });
 
-  if (!res.ok) return QH.toast("Signup failed", res.error || "Try again.");
-
-  QH.saveSession({ role: "job_seeker", session_token: res.session_token, job_seeker_id: res.job_seeker_id });
-  QH.toast("Account created", "You can now apply to jobs.");
-  window.location.href = "/";
-});
+  // Enter-to-submit on password field
+  document.getElementById("password").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") document.getElementById("btnSignup").click();
+  });
 </script>
 </body>
 </html>
