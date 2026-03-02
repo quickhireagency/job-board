@@ -100,10 +100,9 @@ document.getElementById("btnLogin").addEventListener("click", async () => {
   QH.saveSession(session);
   QH.toast("Logged in", "Success.");
 
-  // Redirect
-  if (role === "employer") window.location.href = "/employer/dashboard.html";
-  else window.location.href = "/";
-});
-</script>
-</body>
-</html>
+  // Redirect (honor ?next=... if present)
+  const next = new URLSearchParams(window.location.search).get("next");
+  const safeNext = (next && next.startsWith("/")) ? next : "";
+
+  if (role === "employer") window.location.href = safeNext || "/employer/dashboard.html";
+  else window.location.href = safeNext || "/";
