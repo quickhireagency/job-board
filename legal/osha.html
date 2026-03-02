@@ -4,99 +4,461 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>QuickHire™ — Workplace Safety (OSHA)</title>
-  <link rel="stylesheet" href="/assets/styles.css"/>
+
+  <!-- Match index pages: include config + app (safe; does not change content) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h1{margin:0; font-size:16px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    /* Typography inside policy */
+    h3{ margin:18px 0 8px; font-size:14px; }
+    p{ margin: 0 0 10px; line-height: 1.65; }
+    ul, ol{ margin: 8px 0 12px; padding-left: 18px; line-height: 1.65; }
+
+    /* Footer logo + legal links (match index.html) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
 </head>
+
 <body>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Workplace Safety (OSHA)</div>
+            <div class="sub">QuickHire™ Legal</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="controls">
+        <a class="btn" href="/">Job Board</a>
+        <a class="btn blue" href="/legal/">All Policies</a>
+      </div>
+    </div>
+  </div>
+
   <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-        <div class="logo"></div>
+    <div class="panel">
+      <div class="panel-header">
         <div>
-          <div class="title">QuickHire™</div>
-          <div class="small">Workplace Safety (OSHA) Acknowledgment</div>
+          <h1>WORKPLACE SAFETY (OSHA) ACKNOWLEDGMENT</h1>
+          <div class="meta">QuickHire™ • Effective Date: 30 September 2025</div>
         </div>
       </div>
-      <div class="navlinks">
-        <a class="btn" href="/legal/">All Policies</a>
-        <a class="btn" href="/">Job Board</a>
+
+      <div class="content">
+        <p>
+          QuickHire™ is committed to providing a safe and healthy work environment for all employees and assigned personnel.
+          This Workplace Safety Acknowledgment (“Acknowledgment”) outlines key safety responsibilities for individuals assigned
+          to Client worksites. Compliance with this policy is required as a condition of assignment.
+        </p>
+
+        <h3>1. GENERAL SAFETY POLICY</h3>
+        <p>QuickHire™ complies with all applicable federal, state, and local workplace safety and health laws, including the Occupational Safety and Health Act (OSHA).</p>
+        <p>Employees and assigned personnel are expected to:</p>
+        <ul>
+          <li>Work safely and follow all health and safety rules;</li>
+          <li>Report unsafe conditions immediately;</li>
+          <li>Participate in safety training as required;</li>
+          <li>Use personal protective equipment (PPE) as instructed;</li>
+          <li>Cooperate with QuickHire™ and Client safety personnel.</li>
+        </ul>
+
+        <h3>2. CLIENT SITE SAFETY RULES</h3>
+        <p>While on assignment, employees and assigned personnel are subject to Client-specific workplace safety rules, training, and protocols. These may include, but are not limited to:</p>
+        <ul>
+          <li>PPE requirements;</li>
+          <li>Hazard communication procedures;</li>
+          <li>Lockout/tagout programs;</li>
+          <li>Emergency evacuation routes;</li>
+          <li>Equipment operation policies;</li>
+          <li>Housekeeping standards;</li>
+          <li>Reporting procedures for accidents, incidents, or near-misses.</li>
+        </ul>
+        <p>QuickHire™ relies on Clients to provide appropriate site-specific orientation and training prior to beginning work assignments.</p>
+
+        <h3>3. INJURY AND INCIDENT REPORTING</h3>
+        <p>Any workplace injury, illness, accident, or unsafe condition must be reported immediately to:</p>
+        <ol>
+          <li>Client Supervisor (on-site), and</li>
+          <li>QuickHire™ Representative (by phone or email as provided during onboarding).</li>
+        </ol>
+        <p>Employees may also report safety concerns anonymously. Prompt reporting helps ensure proper medical care, investigation, and corrective action.</p>
+
+        <h3>4. MEDICAL TREATMENT &amp; WORKERS’ COMPENSATION</h3>
+        <p>QuickHire™ provides workers’ compensation insurance for its employees and assigned personnel. In the event of a workplace injury:</p>
+        <ul>
+          <li>QuickHire™ will coordinate authorized medical treatment;</li>
+          <li>Employees must cooperate with medical providers and claims administrators;</li>
+          <li>Failure to report injuries promptly may affect benefits eligibility.</li>
+        </ul>
+
+        <h3>5. RIGHT TO REFUSE UNSAFE WORK</h3>
+        <p>QuickHire™ employees have the right under OSHA to refuse work that presents an imminent danger to their health or safety, provided they follow appropriate reporting procedures. Employees should:</p>
+        <ul>
+          <li>Notify their Client supervisor and QuickHire™ representative immediately;</li>
+          <li>Remain available for reassignment or alternative duties;</li>
+          <li>Cooperate in any safety investigation.</li>
+        </ul>
+
+        <h3>6. DRUG-FREE AND WEAPON-FREE WORKPLACE</h3>
+        <p>QuickHire™ and its Clients maintain drug-free and weapon-free workplaces, consistent with applicable federal, state, and local law. The use, possession, distribution, or sale of illegal drugs, controlled substances, or unauthorized weapons at Client worksites or during assignments is strictly prohibited.</p>
+
+        <h3>7. ENFORCEMENT</h3>
+        <p>Failure to follow safety rules and procedures may result in:</p>
+        <ul>
+          <li>Removal from the assignment;</li>
+          <li>Disciplinary action, up to and including termination;</li>
+          <li>Disqualification from future assignments.</li>
+        </ul>
+        <p>QuickHire™ may also take appropriate corrective or legal action as required.</p>
+
+        <h3>8. ACKNOWLEDGMENT AND AGREEMENT</h3>
+        <p>I acknowledge that I have received, read, and understand QuickHire™’s Workplace Safety (OSHA) Acknowledgment. I agree to follow all safety rules, report unsafe conditions, and cooperate with QuickHire™ and Client safety requirements while on assignment.</p>
       </div>
     </div>
 
-    <div class="card">
-      <h1 style="margin:0 0 8px;">WORKPLACE SAFETY (OSHA) ACKNOWLEDGMENT</h1>
-      <div class="small">QuickHire™<br/>Effective Date: 30 September 2025</div>
+    <!-- Footer (same as index.html) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
 
-      <div class="hr"></div>
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
 
-      <p>
-        QuickHire™ is committed to providing a safe and healthy work environment for all employees and assigned personnel.
-        This Workplace Safety Acknowledgment (“Acknowledgment”) outlines key safety responsibilities for individuals assigned
-        to Client worksites. Compliance with this policy is required as a condition of assignment.
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-powered{
+        text-align:center;
+        margin-top: 10px;
+        font-weight:900;
+        letter-spacing:.02em;
+      }
+      .qh-powered a{
+        color: var(--blue);
+        text-decoration:underline;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
       </p>
 
-      <h3>1. GENERAL SAFETY POLICY</h3>
-      <p>QuickHire™ complies with all applicable federal, state, and local workplace safety and health laws, including the Occupational Safety and Health Act (OSHA).</p>
-      <p>Employees and assigned personnel are expected to:</p>
-      <ul>
-        <li>Work safely and follow all health and safety rules;</li>
-        <li>Report unsafe conditions immediately;</li>
-        <li>Participate in safety training as required;</li>
-        <li>Use personal protective equipment (PPE) as instructed;</li>
-        <li>Cooperate with QuickHire™ and Client safety personnel.</li>
-      </ul>
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
 
-      <h3>2. CLIENT SITE SAFETY RULES</h3>
-      <p>While on assignment, employees and assigned personnel are subject to Client-specific workplace safety rules, training, and protocols. These may include, but are not limited to:</p>
-      <ul>
-        <li>PPE requirements;</li>
-        <li>Hazard communication procedures;</li>
-        <li>Lockout/tagout programs;</li>
-        <li>Emergency evacuation routes;</li>
-        <li>Equipment operation policies;</li>
-        <li>Housekeeping standards;</li>
-        <li>Reporting procedures for accidents, incidents, or near-misses.</li>
-      </ul>
-      <p>QuickHire™ relies on Clients to provide appropriate site-specific orientation and training prior to beginning work assignments.</p>
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
 
-      <h3>3. INJURY AND INCIDENT REPORTING</h3>
-      <p>Any workplace injury, illness, accident, or unsafe condition must be reported immediately to:</p>
-      <ol>
-        <li>Client Supervisor (on-site), and</li>
-        <li>QuickHire™ Representative (by phone or email as provided during onboarding).</li>
-      </ol>
-      <p>Employees may also report safety concerns anonymously. Prompt reporting helps ensure proper medical care, investigation, and corrective action.</p>
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
 
-      <h3>4. MEDICAL TREATMENT &amp; WORKERS’ COMPENSATION</h3>
-      <p>QuickHire™ provides workers’ compensation insurance for its employees and assigned personnel. In the event of a workplace injury:</p>
-      <ul>
-        <li>QuickHire™ will coordinate authorized medical treatment;</li>
-        <li>Employees must cooperate with medical providers and claims administrators;</li>
-        <li>Failure to report injuries promptly may affect benefits eligibility.</li>
-      </ul>
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
 
-      <h3>5. RIGHT TO REFUSE UNSAFE WORK</h3>
-      <p>QuickHire™ employees have the right under OSHA to refuse work that presents an imminent danger to their health or safety, provided they follow appropriate reporting procedures. Employees should:</p>
-      <ul>
-        <li>Notify their Client supervisor and QuickHire™ representative immediately;</li>
-        <li>Remain available for reassignment or alternative duties;</li>
-        <li>Cooperate in any safety investigation.</li>
-      </ul>
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
 
-      <h3>6. DRUG-FREE AND WEAPON-FREE WORKPLACE</h3>
-      <p>QuickHire™ and its Clients maintain drug-free and weapon-free workplaces, consistent with applicable federal, state, and local law. The use, possession, distribution, or sale of illegal drugs, controlled substances, or unauthorized weapons at Client worksites or during assignments is strictly prohibited.</p>
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
 
-      <h3>7. ENFORCEMENT</h3>
-      <p>Failure to follow safety rules and procedures may result in:</p>
-      <ul>
-        <li>Removal from the assignment;</li>
-        <li>Disciplinary action, up to and including termination;</li>
-        <li>Disqualification from future assignments.</li>
-      </ul>
-      <p>QuickHire™ may also take appropriate corrective or legal action as required.</p>
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
 
-      <h3>8. ACKNOWLEDGMENT AND AGREEMENT</h3>
-      <p>I acknowledge that I have received, read, and understand QuickHire™’s Workplace Safety (OSHA) Acknowledgment. I agree to follow all safety rules, report unsafe conditions, and cooperate with QuickHire™ and Client safety requirements while on assignment.</p>
-    </div>
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
+
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
   </div>
 </body>
 </html>
