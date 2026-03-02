@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QuickHire™ Job Board</title>
 
-<!-- Config (API base) -->
-<script src="/config/config.js"></script>
-<script src="/assets/app.js"></script>
+  <!-- Config (API base) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
 
   <style>
     :root{
@@ -679,10 +679,8 @@
       jobs: [],
       filtered: [],
       selectedJobId: "",
-       session: {
-    token: localStorage.getItem("qh_session_token") || "",
-    role: localStorage.getItem("qh_role") || "",
-  },
+      // FIX #2: use the shared session store used by /assets/app.js + /auth/login.html
+      session: QH.loadSession() || {},
       geo: {
         enabled: false,
         lat: null,
@@ -979,11 +977,11 @@
       const applyUrl = PATHS.applyPage + "?job_id=" + encodeURIComponent(state.selectedJobId);
 
       // If not logged in as job seeker, force candidate login page with next=applyUrl
- const sess = state.session || {};
-if (!sess.session_token || sess.role !== "job_seeker"){
-  window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(applyUrl);
-  return;
-}
+      const sess = state.session || {};
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(applyUrl);
+        return;
+      }
 
       // If logged in, go straight to apply page
       window.location.href = applyUrl;
