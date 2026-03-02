@@ -50,12 +50,13 @@ const QH = {
     window.__qh_toast_timer = setTimeout(() => el.classList.remove("show"), 4200);
   },
 
-  requireSession(role) {
-    const s = QH.loadSession();
-    if (!s || !s.session_token || (role && s.role !== role)) {
-      window.location.href = "/auth/login.html";
-      return null;
-    }
-    return s;
+requireSession(role) {
+  const s = QH.loadSession();
+
+  if (!s || !s.session_token || (role && s.role !== role)) {
+    const here = window.location.pathname + window.location.search;
+    window.location.href = "/auth/login.html?next=" + encodeURIComponent(here);
+    return null;
   }
+  return s;
 };
