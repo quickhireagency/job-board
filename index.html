@@ -10,19 +10,19 @@
 
   <style>
     :root{
-      /* Updated brand palette (greens / yellows / blues) */
-      --bg:#f7fbf3;
+      /* Updated to QuickHire-ish palette (greens / yellows / blues) */
+      --bg:#f7fbf6;
       --panel:#ffffff;
-      --panel2:#f3faea;
-      --text:#0f1b12;
-      --muted:#4e6b5a;
-      --line:rgba(16,48,24,.12);
-      --accent:#1e88e5;   /* blue */
-      --accent2:#2e7d32;  /* green */
-      --accent3:#f6c445;  /* soft yellow */
-      --danger:#d32f2f;
-      --ok:#2e7d32;
-      --shadow: 0 12px 28px rgba(16,48,24,.12);
+      --panel2:#ffffff;
+      --text:#0b1b12;
+      --muted:#3b5a48;
+      --line:rgba(11,27,18,.12);
+      --accent:#1f78ff;          /* blue */
+      --accent2:#2f9e44;         /* green */
+      --accent3:#f2c94c;         /* light yellow */
+      --danger:#d7263d;
+      --ok:#2f9e44;
+      --shadow: 0 10px 30px rgba(0,0,0,.08);
       --radius:14px;
       --radius2:18px;
       --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -32,9 +32,9 @@
     body{
       margin:0; font-family:var(--font);
       background:
-        radial-gradient(1100px 600px at 15% -10%, rgba(30,136,229,.18), transparent 60%),
-        radial-gradient(900px 500px at 100% 0%, rgba(46,125,50,.14), transparent 55%),
-        radial-gradient(800px 520px at 55% 10%, rgba(246,196,69,.16), transparent 55%),
+        radial-gradient(1000px 520px at 10% -10%, rgba(47,158,68,.20), transparent 60%),
+        radial-gradient(900px 500px at 95% 0%, rgba(31,120,255,.14), transparent 55%),
+        radial-gradient(700px 420px at 60% 110%, rgba(242,201,76,.18), transparent 60%),
         var(--bg);
       color:var(--text);
     }
@@ -44,42 +44,37 @@
 
     .topbar{
       position:sticky; top:0; z-index:5;
-      background: rgba(247,251,243,.88);
+      background: rgba(247,251,246,.86);
       backdrop-filter: blur(10px);
       border-bottom:1px solid var(--line);
     }
     .topbar-inner{
-      max-width:1200px; margin:0 auto; padding:12px 16px;
+      max-width:1200px; margin:0 auto; padding:14px 16px;
       display:flex; align-items:center; gap:14px;
     }
 
+    /* Brand w/ logo */
     .brand{
-      display:flex; align-items:center; gap:12px; min-width:320px;
+      display:flex; align-items:center; gap:12px; min-width:260px;
     }
-    .brand a{display:flex; align-items:center; gap:12px}
-    .brand img{
-      height: 96px; /* ~3x larger as requested */
-      width: auto;
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand a:hover{ text-decoration:none; }
+    .brand-logo{
+      height:54px; /* ~3x larger feel vs tiny icon */
+      width:auto;
       display:block;
-      object-fit: contain;
     }
-    @media (max-width: 720px){
-      .brand{min-width:unset}
-      .brand img{height: 70px;}
-    }
-    .brand .tag{
-      display:flex; flex-direction:column; line-height:1.1;
-    }
-    .brand .tag b{font-size:16px; letter-spacing:.2px}
-    .brand .tag span{color:var(--muted); font-size:12px; margin-top:4px}
+    .brand b{font-size:16px; letter-spacing:.2px}
+    .brand span{color:var(--muted); font-size:12px}
 
     .searchbar{
       flex:1;
       display:flex; gap:10px; align-items:center;
-      background: rgba(16,48,24,.03);
+      background: rgba(255,255,255,.75);
       border:1px solid var(--line);
       border-radius:999px;
       padding:10px 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.04) inset;
     }
     .searchbar input{
       width:100%;
@@ -89,26 +84,26 @@
 
     .btn{
       border:1px solid var(--line);
-      background: rgba(16,48,24,.03);
+      background: rgba(255,255,255,.85);
       color:var(--text);
       padding:10px 12px;
       border-radius:12px;
       cursor:pointer;
       font-weight:700;
     }
-    .btn:hover{border-color: rgba(16,48,24,.22)}
+    .btn:hover{border-color: rgba(11,27,18,.22)}
     .btn.primary{
-      background: linear-gradient(135deg, rgba(46,125,50,.18), rgba(30,136,229,.12));
-      border-color: rgba(46,125,50,.35);
+      background: linear-gradient(135deg, rgba(47,158,68,.20), rgba(47,158,68,.08));
+      border-color: rgba(47,158,68,.32);
     }
     .btn.danger{
-      border-color: rgba(211,47,47,.35);
-      background: rgba(211,47,47,.08);
+      border-color: rgba(215,38,61,.35);
+      background: rgba(215,38,61,.08);
     }
 
     .wrap{max-width:1200px; margin:0 auto; padding:18px 16px 28px}
     .notice{
-      background: linear-gradient(135deg, rgba(255,255,255,.85), rgba(243,250,234,.92));
+      background: linear-gradient(135deg, rgba(47,158,68,.10), rgba(31,120,255,.06));
       border:1px solid var(--line);
       border-radius: var(--radius);
       padding:14px;
@@ -116,8 +111,8 @@
       margin-bottom:16px;
     }
     .notice h3{margin:0 0 8px 0; font-size:14px}
-    .notice ul{margin:0; padding-left:18px; color:var(--muted); font-size:13px}
-    .notice .strong{color:var(--text); font-weight:800}
+    .notice ul{margin:0; padding-left:18px; color:rgba(11,27,18,.78); font-size:13px}
+    .notice .strong{color:var(--text); font-weight:900}
 
     .grid{
       display:grid;
@@ -129,7 +124,7 @@
     }
 
     .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(243,250,234,.85));
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(255,255,255,.90));
       border:1px solid var(--line);
       border-radius: var(--radius2);
       box-shadow: var(--shadow);
@@ -146,7 +141,7 @@
     .panel-header .meta{color:var(--muted); font-size:12px}
 
     .list{
-      max-height: calc(100vh - 240px);
+      max-height: calc(100vh - 220px);
       overflow:auto;
     }
     .item{
@@ -155,32 +150,23 @@
       cursor:pointer;
       background: transparent;
     }
-    .item:hover{background: rgba(46,125,50,.06)}
-    .item.active{background: rgba(30,136,229,.10)}
+    .item:hover{background: rgba(47,158,68,.06)}
+    .item.active{background: rgba(31,120,255,.08)}
     .item .title{font-weight:900; font-size:14px; margin-bottom:4px}
-    .item .sub{color:var(--muted); font-size:12px; display:flex; gap:10px; flex-wrap:wrap}
-
+    .item .sub{color:rgba(11,27,18,.72); font-size:12px; display:flex; gap:10px; flex-wrap:wrap}
     .pill{
       border:1px solid var(--line);
       border-radius:999px;
       padding:2px 8px;
       font-size:11px;
-      color:var(--muted);
-      background: rgba(16,48,24,.03);
+      color:rgba(11,27,18,.72);
+      background: rgba(255,255,255,.65);
     }
-    .pill.verified{
-      border-color: rgba(46,125,50,.35);
-      color: rgba(46,125,50,.95);
-      background: rgba(46,125,50,.10)
-    }
-    .pill.featured{
-      border-color: rgba(30,136,229,.35);
-      color: rgba(30,136,229,.95);
-      background: rgba(30,136,229,.10)
-    }
+    .pill.verified{border-color: rgba(47,158,68,.35); color: rgba(47,158,68,.95); background: rgba(47,158,68,.10)}
+    .pill.featured{border-color: rgba(31,120,255,.30); color: rgba(31,120,255,.95); background: rgba(31,120,255,.10)}
     .empty{
       padding:18px 14px;
-      color:var(--muted);
+      color:rgba(11,27,18,.70);
       font-size:13px;
     }
 
@@ -189,9 +175,9 @@
     }
     .detail h1{margin:0 0 8px 0; font-size:18px}
     .detail .row{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 14px}
-    .detail .muted{color:var(--muted); font-size:13px}
+    .detail .muted{color:rgba(11,27,18,.70); font-size:13px}
     .detail .box{
-      background: rgba(16,48,24,.03);
+      background: rgba(11,27,18,.04);
       border:1px solid var(--line);
       border-radius:14px;
       padding:12px;
@@ -208,16 +194,16 @@
 
     /* modal */
     .overlay{
-      position:fixed; inset:0; background: rgba(0,0,0,.45);
+      position:fixed; inset:0; background: rgba(0,0,0,.55);
       display:none; align-items:center; justify-content:center;
       padding:18px; z-index:99;
     }
     .modal{
       width:min(860px, 100%);
-      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(243,250,234,.96));
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.96));
       border:1px solid var(--line);
       border-radius: 18px;
-      box-shadow: 0 18px 60px rgba(16,48,24,.25);
+      box-shadow: 0 18px 60px rgba(0,0,0,.20);
       overflow:hidden;
     }
     .modal-head{
@@ -232,36 +218,32 @@
       padding:10px 12px;
       border-radius:12px;
       border:1px solid var(--line);
-      color:var(--muted);
+      color:rgba(11,27,18,.70);
       cursor:pointer;
       user-select:none;
-      font-weight:800;
-      background: rgba(16,48,24,.03);
+      font-weight:900;
+      background: rgba(255,255,255,.80);
     }
-    .tab.active{
-      color:var(--text);
-      border-color: rgba(46,125,50,.35);
-      background: rgba(46,125,50,.10)
-    }
+    .tab.active{color:var(--text); border-color: rgba(31,120,255,.35); background: rgba(31,120,255,.10)}
     .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
     @media (max-width: 820px){.grid2{grid-template-columns:1fr}}
-    label{display:block; font-size:12px; color:var(--muted); margin:10px 0 6px}
+    label{display:block; font-size:12px; color:rgba(11,27,18,.70); margin:10px 0 6px}
     input, textarea, select{
       width:100%;
       padding:10px 12px;
       border-radius:12px;
       border:1px solid var(--line);
-      background: rgba(16,48,24,.03);
+      background: rgba(255,255,255,.92);
       color:var(--text);
       outline:none;
     }
     textarea{min-height:96px; resize:vertical}
-    .help{color:var(--muted); font-size:12px; margin-top:6px}
-    .warn{color: rgba(211,47,47,.95); font-size:12px; margin-top:8px}
-    .ok{color: rgba(46,125,50,.95); font-size:12px; margin-top:8px}
+    .help{color:rgba(11,27,18,.70); font-size:12px; margin-top:6px}
+    .warn{color: rgba(215,38,61,.95); font-size:12px; margin-top:8px}
+    .ok{color: rgba(47,158,68,.95); font-size:12px; margin-top:8px}
     .checks{
       border:1px solid var(--line);
-      background: rgba(255,255,255,.6);
+      background: rgba(255,255,255,.82);
       border-radius:14px;
       padding:10px 12px;
       margin-top:10px;
@@ -270,71 +252,59 @@
       display:flex; gap:10px; align-items:flex-start;
       margin:8px 0;
       font-size:13px;
-      color:var(--muted);
+      color:rgba(11,27,18,.78);
     }
     .checks input{width:auto; margin-top:2px}
     .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
     .hr{height:1px; background: var(--line); margin:14px 0}
-    .tiny{font-size:12px; color:var(--muted)}
+    .tiny{font-size:12px; color:rgba(11,27,18,.70)}
 
-    /* Footer additions (logo + policy image row) */
+    /* Footer policy icons row */
     .qh-footer-top{
       display:flex;
       flex-direction:column;
       align-items:center;
       gap:12px;
-      margin: 0 0 14px;
-      padding: 0 0 14px;
-      border-bottom: 1px solid rgba(0,0,0,0.10);
+      margin: 0 0 12px;
+      padding: 0;
     }
-    .qh-footer-top a{ text-decoration:none; }
     .qh-footer-logo{
-      display:block;
-      height: 72px;
-      width: auto;
-      object-fit: contain;
-    }
-    .qh-policy-row{
-      width:100%;
-      display:grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 12px;
-      align-items:center;
-    }
-    @media (max-width: 820px){
-      .qh-policy-row{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    .qh-policy-btn{
-      display:flex;
+      display:inline-flex;
       align-items:center;
       justify-content:center;
-      border:1px solid rgba(0,0,0,0.12);
-      border-radius: 12px;
-      background: rgba(255,255,255,0.75);
-      padding: 10px;
-      transition: transform .08s ease, border-color .12s ease;
+      text-decoration:none !important;
     }
-    .qh-policy-btn:hover{
-      transform: translateY(-1px);
-      border-color: rgba(0,0,0,0.22);
-    }
-    .qh-policy-btn img{
-      height: 44px;
-      width: 100%;
-      object-fit: contain;
+    .qh-footer-logo img{
+      height:56px;
+      width:auto;
       display:block;
     }
-
-    /* Powered by link */
-    .qh-powered{
-      text-align:center;
-      margin-top:12px;
-      font-weight:800;
-      letter-spacing:.02em;
+    .qh-policy-icons{
+      width:100%;
+      display:flex;
+      justify-content:center;
+      gap:14px;
+      flex-wrap:wrap;
+      margin:0;
+      padding:0;
     }
-    .qh-powered a{
-      color: var(--text);
-      text-decoration: underline;
+    .qh-policy-icons a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:64px;
+      height:64px;
+      border-radius:12px;
+      border:1px solid rgba(11,27,18,.12);
+      background: rgba(255,255,255,.92);
+      overflow:hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,.05);
+    }
+    .qh-policy-icons img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
     }
   </style>
 </head>
@@ -343,10 +313,11 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" title="QuickHire™ Job Board">
-        <a href="https://www.quickhire.agency" target="_self" aria-label="Go to QuickHire main website">
-          <img src="/assets/QuickHireTransparentLogo02.png" alt="QuickHire" />
-          <div class="tag">
-            <b>QuickHire™ Job Board</b>
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <!-- Top-left logo (links to main site) -->
+          <img class="brand-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <b>QuickHire™ Job Board</b><br/>
             <span>Browse jobs — apply with an account</span>
           </div>
         </a>
@@ -438,6 +409,7 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
           <div class="actions">
             <button class="btn primary" id="doLoginBtn">Login</button>
             <button class="btn" id="switchToSignupBtn">Create an account</button>
+            <button class="btn" id="forgotPwBtn">Forgot Password?</button>
           </div>
           <div class="warn" id="loginErr" style="display:none;"></div>
           <div class="ok" id="loginOk" style="display:none;"></div>
@@ -492,31 +464,31 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
 
             <div class="c">
               <input type="checkbox" id="ackTerms" />
-              <div>I acknowledge the <a href="/legal/terms.html" target="_blank">Terms of Service</a>.</div>
+              <div>I acknowledge the <a href="/legal/terms.html" target="_self">Terms of Service</a>.</div>
             </div>
             <div class="c">
               <input type="checkbox" id="ackPrivacy" />
-              <div>I acknowledge the <a href="/legal/privacy.html" target="_blank">Privacy Policy</a>.</div>
+              <div>I acknowledge the <a href="/legal/privacy.html" target="_self">Privacy Policy</a>.</div>
             </div>
             <div class="c">
               <input type="checkbox" id="ackEeo" />
-              <div>I acknowledge the <a href="/legal/eeo.html" target="_blank">EEO Policy</a>.</div>
+              <div>I acknowledge the <a href="/legal/eeo.html" target="_self">EEO Policy</a>.</div>
             </div>
             <div class="c">
               <input type="checkbox" id="ackDrug" />
-              <div>I acknowledge the <a href="/legal/drug-alcohol.html" target="_blank">Drug &amp; Alcohol Policy</a>.</div>
+              <div>I acknowledge the <a href="/legal/drug-alcohol.html" target="_self">Drug &amp; Alcohol Policy</a>.</div>
             </div>
             <div class="c">
               <input type="checkbox" id="ackOsha" />
-              <div>I acknowledge the <a href="/legal/osha.html" target="_blank">Workplace Safety (OSHA) Acknowledgment</a>.</div>
+              <div>I acknowledge the <a href="/legal/osha.html" target="_self">Workplace Safety (OSHA) Acknowledgment</a>.</div>
             </div>
             <div class="c">
               <input type="checkbox" id="ackVet" />
-              <div>I acknowledge the <a href="/legal/veterans.html" target="_blank">Veteran’s Policy</a>.</div>
+              <div>I acknowledge the <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>.</div>
             </div>
             <div class="c">
               <input type="checkbox" id="ackPacket" />
-              <div>I have read the <a href="https://drive.google.com/file/d/1yVzvz5RVL9d2p324PrkTdCpIZhFchAFN/preview" target="_blank">QuickHire Candidate Packet</a>.</div>
+              <div>I have read the <a href="https://drive.google.com/file/d/1yVzvz5RVL9d2p324PrkTdCpIZhFchAFN/preview" target="_blank" rel="noopener">QuickHire Candidate Packet</a>.</div>
             </div>
           </div>
 
@@ -527,6 +499,7 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
           <div class="actions">
             <button class="btn primary" id="doSignupBtn">Create Account</button>
             <button class="btn" id="switchToLoginBtn">Back to login</button>
+            <button class="btn" id="forgotPwBtn2">Forgot Password?</button>
           </div>
           <div class="warn" id="signupErr" style="display:none;"></div>
           <div class="ok" id="signupOk" style="display:none;"></div>
@@ -541,29 +514,139 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
     </div>
   </div>
 
-  <!-- Footer (with required top logo + policy image row + provided footer code + powered by link) -->
+  <!-- Footer (your exact code + policy image row + powered by link) -->
+  <!-- QuickHire™ — Footer Block (Squarespace Code Block) -->
+  <style>
+    /* =========================================================
+       IMPORTANT: Squarespace adds bottom padding/margins OUTSIDE
+       your code block (footer section + block wrappers).
+       This override targets the common Squarespace 7.1 wrappers
+       to eliminate the “big space” under the footer.
+       ========================================================= */
+
+    /* Kill bottom spacing on Squarespace footer containers */
+    footer,
+    #footer,
+    .sqs-footer,
+    .Footer,
+    .Footer-inner,
+    .footer-sections,
+    .footer-sections .page-section,
+    .footer-sections .content-wrapper,
+    .footer-sections .content,
+    .footer-sections .sqs-layout,
+    .footer-sections .sqs-row,
+    .footer-sections .sqs-col-12,
+    .footer-sections .sqs-block,
+    .footer-sections .sqs-block-content{
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* Also kill “last block” spacing that Squarespace sometimes injects */
+    .footer-sections .sqs-block:last-child,
+    .footer-sections .sqs-block-content:last-child{
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* If your footer is in the LAST section, this helps too */
+    .page-section:last-of-type{
+      padding-bottom: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    /* =========================================================
+       Your footer styling (kept the same, but with ZERO padding)
+       ========================================================= */
+    .qh-footer{
+      max-width: 1100px;
+      margin: 0 auto !important;
+      padding: 0 !important;
+      box-sizing: border-box;
+    }
+    .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+    .qh-footer-grid{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 22px;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    @media (min-width: 900px){
+      .qh-footer-grid{
+        grid-template-columns: 1.2fr 1fr 1fr;
+        gap: 26px;
+      }
+    }
+
+    .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+    .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+    .qh-footer a{ text-decoration: underline; }
+
+    .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+    .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+    .qh-footer-legal{
+      margin: 18px 0 0;
+      padding: 14px 0 0;
+      border-top: 1px solid rgba(0,0,0,0.15);
+    }
+
+    .qh-footer-links{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 18px;
+      align-items: center;
+      justify-content:center;
+      margin: 10px 0 0;
+      padding: 0;
+    }
+
+    .qh-badge{
+      margin: 10px 0 0;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+
+    /* Absolute: no trailing whitespace from the last visible element */
+    .qh-footer > *:last-child,
+    .qh-footer-legal > *:last-child{
+      margin-bottom: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    /* Powered by line */
+    .qh-powered{
+      text-align:center;
+      margin: 14px 0 0;
+      padding: 0;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+  </style>
+
   <footer class="qh-footer" aria-label="QuickHire footer">
-    <div class="qh-footer-top" aria-label="Footer logo and policy shortcuts">
-      <a href="https://jobboard.quickhireagency.com" target="_self" aria-label="Go to QuickHire Job Board home">
-        <img class="qh-footer-logo" src="/assets/QuickHireTransparentLogo02.png" alt="QuickHire Job Board" />
+    <!-- Footer top: logo + policy icons row -->
+    <div class="qh-footer-top" aria-label="QuickHire footer logo and policy icons">
+      <a class="qh-footer-logo" href="https://jobboard.quickhireagency.com" target="_self" aria-label="QuickHire Job Board Home">
+        <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
       </a>
 
-      <div class="qh-policy-row" aria-label="Policy shortcuts">
+      <div class="qh-policy-icons" aria-label="Policy shortcuts">
         <!-- Order: Veterans, EEO, OSHA, Drugs -->
-        <a class="qh-policy-btn" href="/legal/veterans.html" target="_self" aria-label="Veteran’s Policy">
-          <img src="/assets/topveteran%20employer00.jpg" alt="Veteran’s Policy" />
+        <a href="/legal/veterans.html" target="_self" aria-label="Veteran’s Policy">
+          <img src="/topveteran%20employer00.jpg" alt="Veteran’s Policy" />
         </a>
-
-        <a class="qh-policy-btn" href="/legal/eeo.html" target="_self" aria-label="EEO Policy">
-          <img src="/assets/Equal%20Employment%20Opportunity%20Logo.png" alt="EEO Policy" />
+        <a href="/legal/eeo.html" target="_self" aria-label="EEO Policy">
+          <img src="/Equal%20Employment%20Opportunity%20Logo.png" alt="EEO Policy" />
         </a>
-
-        <a class="qh-policy-btn" href="/legal/osha.html" target="_self" aria-label="Workplace Safety (OSHA) Acknowledgment">
-          <img src="/assets/OSHA-logo-1600x900-1.jpg" alt="Workplace Safety (OSHA) Acknowledgment" />
+        <a href="/legal/osha.html" target="_self" aria-label="Workplace Safety OSHA Policy">
+          <img src="/OSHA-logo-1600x900-1.jpg" alt="OSHA Policy" />
         </a>
-
-        <a class="qh-policy-btn" href="/legal/drug-alcohol.html" target="_self" aria-label="Drug &amp; Alcohol Policy">
-          <img src="/assets/drugsarebadmkay.png" alt="Drug &amp; Alcohol Policy" />
+        <a href="/legal/drug-alcohol.html" target="_self" aria-label="Drug & Alcohol Policy">
+          <img src="/drugsarebadmkay.png" alt="Drug & Alcohol Policy" />
         </a>
       </div>
     </div>
@@ -621,14 +704,15 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
       <p class="qh-badge">VETERAN OWNED BUSINESS</p>
 
       <nav class="qh-footer-links" aria-label="Footer links">
+        <!-- Re-linked to job board legal pages -->
         <a href="/legal/terms.html" target="_self">Terms of Service</a>
         <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
       </nav>
 
-      <!-- REQUIRED: Powered by link at bottom -->
-      <div class="qh-powered" aria-label="Powered by Cook Technology Services">
-        <a href="https://cts.cook-international.com/" target="_self">POWERED BY COOK TECHNOLOGY SERVICES</a>
-      </div>
+      <!-- Powered by link (your exact requirement) -->
+      <p class="qh-powered">
+        <a href="https://cts.cook-international.com/" target="_self" rel="noopener">POWERED BY COOK TECHNOLOGY SERVICES</a>
+      </p>
     </div>
   </footer>
 
@@ -817,25 +901,14 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
     }
 
     // ----------------------------
-    // Apply routing (NEW: go to /apply/index.html)
+    // Apply flow (Job Seeker only)
+    // CHANGE: redirect to /apply/index.html (your requirement)
     // ----------------------------
-    function goToApplyPage(){
-      if (!state.selectedJobId){
-        toast("Select a job first.");
-        return;
-      }
-
-      const applyUrl = "/apply/index.html?job_id=" + encodeURIComponent(state.selectedJobId);
-
-      // must be logged in as job seeker
-      if (!state.session.token || state.session.role !== "job_seeker"){
-        // send them to candidate login with next=applyUrl
-        window.location.href = "/auth/login.html?next=" + encodeURIComponent(applyUrl);
-        return;
-      }
-
-      // already logged in
-      window.location.href = applyUrl;
+    function applyToSelectedJobRedirect(){
+      if (!state.selectedJobId) return;
+      // always direct to apply page; apply page can force login/signup if needed
+      const url = "/apply/index.html?job_id=" + encodeURIComponent(state.selectedJobId);
+      window.location.href = url;
     }
 
     // ----------------------------
@@ -999,14 +1072,22 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
         .replaceAll("'","&#039;");
     }
 
+    function debounce(fn, ms){
+      let t = null;
+      return (...args) => {
+        if (t) clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
     // ----------------------------
     // Wire up UI
     // ----------------------------
     qs("#refreshBtn").addEventListener("click", loadJobs);
     qs("#searchInput").addEventListener("input", debounce(loadJobs, 250));
 
-    // Apply now routes to /apply/index.html (with login enforcement)
-    qs("#applyBtn").addEventListener("click", goToApplyPage);
+    // Apply now redirects to /apply/index.html (required)
+    qs("#applyBtn").addEventListener("click", applyToSelectedJobRedirect);
 
     qs("#loginBtn").addEventListener("click", () => openModal("login"));
     qs("#closeModalBtn").addEventListener("click", closeModal);
@@ -1021,15 +1102,11 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
     qs("#doLoginBtn").addEventListener("click", doLogin);
     qs("#doSignupBtn").addEventListener("click", doSignupJobSeeker);
 
-    function debounce(fn, ms){
-      let t = null;
-      return (...args) => {
-        if (t) clearTimeout(t);
-        t = setTimeout(() => fn(...args), ms);
-      };
-    }
+    // Forgot password links to /auth/reset.html
+    qs("#forgotPwBtn").addEventListener("click", () => { window.location.href = "/auth/reset.html"; });
+    qs("#forgotPwBtn2").addEventListener("click", () => { window.location.href = "/auth/reset.html"; });
 
-    // year
+    // footer year
     (function () {
       var y = new Date().getFullYear();
       var el = document.getElementById('qh-year');
@@ -1042,107 +1119,5 @@ Tip: Use the search bar above to filter. Jobs appear on the left; details on the
     }
     loadJobs();
   </script>
-
-  <!-- QuickHire™ — Footer Block (Squarespace Code Block) -->
-  <style>
-    /* =========================================================
-       IMPORTANT: Squarespace adds bottom padding/margins OUTSIDE
-       your code block (footer section + block wrappers).
-       This override targets the common Squarespace 7.1 wrappers
-       to eliminate the “big space” under the footer.
-       ========================================================= */
-
-    /* Kill bottom spacing on Squarespace footer containers */
-    footer,
-    #footer,
-    .sqs-footer,
-    .Footer,
-    .Footer-inner,
-    .footer-sections,
-    .footer-sections .page-section,
-    .footer-sections .content-wrapper,
-    .footer-sections .content,
-    .footer-sections .sqs-layout,
-    .footer-sections .sqs-row,
-    .footer-sections .sqs-col-12,
-    .footer-sections .sqs-block,
-    .footer-sections .sqs-block-content{
-      padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
-    }
-
-    /* Also kill “last block” spacing that Squarespace sometimes injects */
-    .footer-sections .sqs-block:last-child,
-    .footer-sections .sqs-block-content:last-child{
-      padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
-    }
-
-    /* If your footer is in the LAST section, this helps too */
-    .page-section:last-of-type{
-      padding-bottom: 0 !important;
-      margin-bottom: 0 !important;
-    }
-
-    /* =========================================================
-       Your footer styling (kept the same, but with ZERO padding)
-       ========================================================= */
-    .qh-footer{
-      max-width: 1100px;
-      margin: 0 auto !important;
-      padding: 0 !important;
-      box-sizing: border-box;
-    }
-    .qh-footer, .qh-footer *{ box-sizing: border-box; }
-
-    .qh-footer-grid{
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 22px;
-      margin: 0 !important;
-      padding: 0 !important;
-    }
-    @media (min-width: 900px){
-      .qh-footer-grid{
-        grid-template-columns: 1.2fr 1fr 1fr;
-        gap: 26px;
-      }
-    }
-
-    .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
-    .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
-    .qh-footer a{ text-decoration: underline; }
-
-    .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
-    .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
-
-    .qh-footer-legal{
-      margin: 18px 0 0;
-      padding: 14px 0 0;
-      border-top: 1px solid rgba(0,0,0,0.15);
-    }
-
-    .qh-footer-links{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px 18px;
-      align-items: center;
-      margin: 10px 0 0;
-      padding: 0;
-    }
-
-    .qh-badge{
-      margin: 10px 0 0;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-    }
-
-    /* Absolute: no trailing whitespace from the last visible element */
-    .qh-footer > *:last-child,
-    .qh-footer-legal > *:last-child{
-      margin-bottom: 0 !important;
-      padding-bottom: 0 !important;
-    }
-  </style>
 </body>
 </html>
