@@ -4,119 +4,497 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>QuickHire™ — Terms of Service</title>
-  <link rel="stylesheet" href="/assets/styles.css"/>
+
+  <!-- Match index pages: include config + app (safe; does not change content) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h1{margin:0; font-size:16px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    .hr{
+      height:1px;
+      background: rgba(10,30,20,.12);
+      margin:12px 0;
+    }
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    /* Typography inside policy */
+    h3{ margin:18px 0 8px; font-size:14px; }
+    p{ margin: 0 0 10px; line-height: 1.65; }
+    ul{ margin: 8px 0 12px; padding-left: 18px; line-height: 1.65; }
+
+    /* Footer logo + legal links (match index.html) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
 </head>
+
 <body>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Terms of Service</div>
+            <div class="sub">QuickHire™ Legal</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="controls">
+        <a class="btn" href="/">Job Board</a>
+        <a class="btn blue" href="/legal/">All Policies</a>
+      </div>
+    </div>
+  </div>
+
   <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-        <div class="logo"></div>
+    <div class="panel">
+      <div class="panel-header">
         <div>
-          <div class="title">QuickHire™</div>
-          <div class="small">Terms of Service</div>
+          <h1>Terms of Service</h1>
+          <div class="meta">Effective Date: 31 May 2017 • Last Updated: 25 February 2026</div>
         </div>
       </div>
-      <div class="navlinks">
-        <a class="btn" href="/legal/">All Policies</a>
-        <a class="btn" href="/">Job Board</a>
+
+      <div class="content">
+        <p>
+          These Terms of Service (“Terms”) constitute a legally binding agreement between Cook Holding Company
+          (“QuickHire™,” “we,” “our,” or “us”) and any individual or entity (“Client,” “Candidate,” “you,” or “your”)
+          who accesses or uses our website at www.quickhire.agency (the “Site”), our staffing and talent acquisition
+          services (the “Services”), or otherwise engages with QuickHire™.
+        </p>
+
+        <p>
+          By accessing or using our Services, you acknowledge that you have read, understood, and agree to be bound
+          by these Terms and our Privacy Policy. If you do not agree, you may not use our Services.
+        </p>
+
+        <h3>1. Services Provided</h3>
+        <p>1.1 QuickHire™ provides staffing, recruiting, and talent acquisition services to businesses and organizations seeking personnel and to individuals seeking employment opportunities.</p>
+        <p>1.2 QuickHire™ does not guarantee employment, assignment, or placement to any Candidate. Employment decisions remain at the discretion of the hiring Client.</p>
+        <p>1.3 QuickHire™ reserves the right to refuse service, terminate assignments, or discontinue Services at its discretion, subject to applicable law.</p>
+
+        <h3>2. Eligibility</h3>
+        <p>2.1 To use our Services, you must be at least 18 years of age (or the age of legal majority in your jurisdiction) and legally able to enter into a binding agreement under Indiana law and applicable federal law.</p>
+        <p>2.2 By engaging our Services, you represent and warrant that all information provided to QuickHire™ is true, accurate, and complete.</p>
+
+        <h3>3. Client Obligations</h3>
+        <p>3.1 Clients agree to provide accurate job descriptions, compensation information, and workplace requirements when engaging QuickHire™.</p>
+        <p>3.2 Clients are solely responsible for complying with all applicable labor, employment, wage, and workplace safety laws, including but not limited to the Fair Labor Standards Act of 1938 (FLSA), as amended; Title VII of the Civil Rights Act of 1964, as amended; The Americans with Disabilities Act of 1990 (ADA), as amended; and the Indiana Civil Rights Law.</p>
+        <p>3.3 Clients agree not to directly circumvent QuickHire™ by hiring Candidates introduced through QuickHire™ without compensation to QuickHire™ as agreed in separate staffing agreements.</p>
+
+        <h3>4. Candidate Obligations</h3>
+        <p>4.1 Candidates agree to provide truthful and complete information regarding work history, education, and qualifications.</p>
+        <p>4.2 Candidates authorize QuickHire™ to verify information provided and to share Candidate information with potential employers, subject to our Privacy Policy.</p>
+        <p>4.3 Candidates acknowledge that all employment relationships are “at will” unless otherwise specified in writing by the hiring employer.</p>
+
+        <h3>5. Data Protection &amp; Privacy</h3>
+        <p>5.1 QuickHire™ collects, processes, and stores personal data in accordance with applicable federal law, the Indiana Consumer Data Protection Act (INCDPA), and other relevant privacy regulations.</p>
+        <p>5.2 Under the INCDPA, Indiana consumers have the following rights:</p>
+        <ul>
+          <li>Right to Access: You may request access to the personal data QuickHire™ maintains about you.</li>
+          <li>Right to Correction: You may request corrections to inaccurate or incomplete personal data.</li>
+          <li>Right to Deletion: You may request the deletion of personal data, subject to lawful exceptions.</li>
+          <li>Right to Data Portability: You may request a copy of your personal data in a portable format.</li>
+          <li>Right to Opt-Out: You may opt-out of the processing of personal data for targeted advertising, sale of data, or profiling.</li>
+        </ul>
+        <p>5.3 QuickHire™ does not sell personal data as defined by the INCDPA.</p>
+        <p>5.4 Requests to exercise privacy rights may be submitted by emailing privacy@quickhire.agency or using the webform on our Contact page. QuickHire™ will respond within statutory timelines.</p>
+
+        <h3>6. Intellectual Property</h3>
+        <p>6.1 All content on the Site, including but not limited to text, graphics, logos, icons, and software, is the exclusive intellectual property of QuickHire™ or its licensors and is protected by copyright, trademark, and other applicable laws.</p>
+        <p>6.2 The name QuickHire™ and related logos are trademarks of Cook Holding Company. Unauthorized use is prohibited, and violations will be prosecuted.</p>
+
+        <h3>7. Prohibited Conduct</h3>
+        <p>You agree not to:</p>
+        <ul>
+          <li>Use the Services for any unlawful purpose or in violation of applicable employment or labor laws.</li>
+          <li>Submit false, misleading, or fraudulent information.</li>
+          <li>Attempt to disrupt or compromise the security of the Site or Services.</li>
+          <li>Misuse or unlawfully disclose any confidential information obtained through QuickHire™.</li>
+        </ul>
+
+        <h3>8. Disclaimers</h3>
+        <p>8.1 QuickHire™ provides Services “AS IS” and without warranties of any kind, express or implied.</p>
+        <p>8.2 QuickHire™ does not guarantee job placement, employment duration, or candidate performance.</p>
+        <p>8.3 Nothing in these Terms constitutes legal, financial, or tax advice.</p>
+
+        <h3>9. Limitation of Liability</h3>
+        <p>To the fullest extent permitted by law, QuickHire™ shall not be liable for any indirect, incidental, consequential, or punitive damages arising from the use of our Services. QuickHire’s™ aggregate liability shall not exceed the amount paid by the Client for Services within the six (6) months preceding the claim.</p>
+
+        <h3>10. Indemnification</h3>
+        <p>You agree to indemnify, defend, and hold harmless QuickHire™, its officers, employees, and agents from any claims, liabilities, damages, losses, or expenses arising out of or related to your use of the Services, your violation of these Terms, or your violation of applicable laws.</p>
+
+        <h3>11. Governing Law &amp; Dispute Resolution</h3>
+        <p>11.1 These Terms are governed by and construed under the laws of the State of Indiana, without regard to conflict of law principles.</p>
+        <p>11.2 Any disputes arising from these Terms shall be resolved through binding arbitration in The City of Indianapolis, County of Marion, State of Indiana, pursuant to the rules of the American Arbitration Association, such arbitrator to be chosen at the discretion of QuickHire™ or its agents.</p>
+        <p>11.3 Each party waives the right to a jury trial.</p>
+
+        <h3>12. Modifications</h3>
+        <p>QuickHire™ reserves the right to modify these Terms at any time. Updated Terms will be posted on the Site with a new effective date. Continued use of the Services constitutes acceptance of the updated Terms.</p>
+
+        <h3>13. Severability</h3>
+        <p>If any provision(s) of these Terms is found to be unenforceable, the unenforceable provision(s) shall be severed, and the remaining provisions shall remain in full force and effect.</p>
+
+        <h3>14. Contact Information</h3>
+        <p>
+          QuickHire™<br/>
+          151 N. Delaware Street<br/>
+          Suite 122<br/>
+          Indianapolis, Indiana 46204<br/>
+          (317) 442-1437<br/>
+          legal@quickhire.agency
+        </p>
       </div>
     </div>
 
-    <div class="card">
-      <h1 style="margin:0 0 8px;">Terms of Service</h1>
-      <div class="small">Effective Date: 31 May 2017<br/>Last Updated: 25 February 2026</div>
+    <!-- Footer (same as index.html) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
 
-      <div class="hr"></div>
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
 
-      <p>
-        These Terms of Service (“Terms”) constitute a legally binding agreement between Cook Holding Company
-        (“QuickHire™,” “we,” “our,” or “us”) and any individual or entity (“Client,” “Candidate,” “you,” or “your”)
-        who accesses or uses our website at www.quickhire.agency (the “Site”), our staffing and talent acquisition
-        services (the “Services”), or otherwise engages with QuickHire™.
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-powered{
+        text-align:center;
+        margin-top: 10px;
+        font-weight:900;
+        letter-spacing:.02em;
+      }
+      .qh-powered a{
+        color: var(--blue);
+        text-decoration:underline;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
       </p>
 
-      <p>
-        By accessing or using our Services, you acknowledge that you have read, understood, and agree to be bound
-        by these Terms and our Privacy Policy. If you do not agree, you may not use our Services.
-      </p>
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
 
-      <h3>1. Services Provided</h3>
-      <p>1.1 QuickHire™ provides staffing, recruiting, and talent acquisition services to businesses and organizations seeking personnel and to individuals seeking employment opportunities.</p>
-      <p>1.2 QuickHire™ does not guarantee employment, assignment, or placement to any Candidate. Employment decisions remain at the discretion of the hiring Client.</p>
-      <p>1.3 QuickHire™ reserves the right to refuse service, terminate assignments, or discontinue Services at its discretion, subject to applicable law.</p>
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
 
-      <h3>2. Eligibility</h3>
-      <p>2.1 To use our Services, you must be at least 18 years of age (or the age of legal majority in your jurisdiction) and legally able to enter into a binding agreement under Indiana law and applicable federal law.</p>
-      <p>2.2 By engaging our Services, you represent and warrant that all information provided to QuickHire™ is true, accurate, and complete.</p>
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
 
-      <h3>3. Client Obligations</h3>
-      <p>3.1 Clients agree to provide accurate job descriptions, compensation information, and workplace requirements when engaging QuickHire™.</p>
-      <p>3.2 Clients are solely responsible for complying with all applicable labor, employment, wage, and workplace safety laws, including but not limited to the Fair Labor Standards Act of 1938 (FLSA), as amended; Title VII of the Civil Rights Act of 1964, as amended; The Americans with Disabilities Act of 1990 (ADA), as amended; and the Indiana Civil Rights Law.</p>
-      <p>3.3 Clients agree not to directly circumvent QuickHire™ by hiring Candidates introduced through QuickHire™ without compensation to QuickHire™ as agreed in separate staffing agreements.</p>
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
 
-      <h3>4. Candidate Obligations</h3>
-      <p>4.1 Candidates agree to provide truthful and complete information regarding work history, education, and qualifications.</p>
-      <p>4.2 Candidates authorize QuickHire™ to verify information provided and to share Candidate information with potential employers, subject to our Privacy Policy.</p>
-      <p>4.3 Candidates acknowledge that all employment relationships are “at will” unless otherwise specified in writing by the hiring employer.</p>
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
 
-      <h3>5. Data Protection &amp; Privacy</h3>
-      <p>5.1 QuickHire™ collects, processes, and stores personal data in accordance with applicable federal law, the Indiana Consumer Data Protection Act (INCDPA), and other relevant privacy regulations.</p>
-      <p>5.2 Under the INCDPA, Indiana consumers have the following rights:</p>
-      <ul>
-        <li>Right to Access: You may request access to the personal data QuickHire™ maintains about you.</li>
-        <li>Right to Correction: You may request corrections to inaccurate or incomplete personal data.</li>
-        <li>Right to Deletion: You may request the deletion of personal data, subject to lawful exceptions.</li>
-        <li>Right to Data Portability: You may request a copy of your personal data in a portable format.</li>
-        <li>Right to Opt-Out: You may opt-out of the processing of personal data for targeted advertising, sale of data, or profiling.</li>
-      </ul>
-      <p>5.3 QuickHire™ does not sell personal data as defined by the INCDPA.</p>
-      <p>5.4 Requests to exercise privacy rights may be submitted by emailing privacy@quickhire.agency or using the webform on our Contact page. QuickHire™ will respond within statutory timelines.</p>
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
 
-      <h3>6. Intellectual Property</h3>
-      <p>6.1 All content on the Site, including but not limited to text, graphics, logos, icons, and software, is the exclusive intellectual property of QuickHire™ or its licensors and is protected by copyright, trademark, and other applicable laws.</p>
-      <p>6.2 The name QuickHire™ and related logos are trademarks of Cook Holding Company. Unauthorized use is prohibited, and violations will be prosecuted.</p>
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
 
-      <h3>7. Prohibited Conduct</h3>
-      <p>You agree not to:</p>
-      <ul>
-        <li>Use the Services for any unlawful purpose or in violation of applicable employment or labor laws.</li>
-        <li>Submit false, misleading, or fraudulent information.</li>
-        <li>Attempt to disrupt or compromise the security of the Site or Services.</li>
-        <li>Misuse or unlawfully disclose any confidential information obtained through QuickHire™.</li>
-      </ul>
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
 
-      <h3>8. Disclaimers</h3>
-      <p>8.1 QuickHire™ provides Services “AS IS” and without warranties of any kind, express or implied.</p>
-      <p>8.2 QuickHire™ does not guarantee job placement, employment duration, or candidate performance.</p>
-      <p>8.3 Nothing in these Terms constitutes legal, financial, or tax advice.</p>
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
+        </div>
+      </div>
+    </footer>
 
-      <h3>9. Limitation of Liability</h3>
-      <p>To the fullest extent permitted by law, QuickHire™ shall not be liable for any indirect, incidental, consequential, or punitive damages arising from the use of our Services. QuickHire’s™ aggregate liability shall not exceed the amount paid by the Client for Services within the six (6) months preceding the claim.</p>
-
-      <h3>10. Indemnification</h3>
-      <p>You agree to indemnify, defend, and hold harmless QuickHire™, its officers, employees, and agents from any claims, liabilities, damages, losses, or expenses arising out of or related to your use of the Services, your violation of these Terms, or your violation of applicable laws.</p>
-
-      <h3>11. Governing Law &amp; Dispute Resolution</h3>
-      <p>11.1 These Terms are governed by and construed under the laws of the State of Indiana, without regard to conflict of law principles.</p>
-      <p>11.2 Any disputes arising from these Terms shall be resolved through binding arbitration in The City of Indianapolis, County of Marion, State of Indiana, pursuant to the rules of the American Arbitration Association, such arbitrator to be chosen at the discretion of QuickHire™ or its agents.</p>
-      <p>11.3 Each party waives the right to a jury trial.</p>
-
-      <h3>12. Modifications</h3>
-      <p>QuickHire™ reserves the right to modify these Terms at any time. Updated Terms will be posted on the Site with a new effective date. Continued use of the Services constitutes acceptance of the updated Terms.</p>
-
-      <h3>13. Severability</h3>
-      <p>If any provision(s) of these Terms is found to be unenforceable, the unenforceable provision(s) shall be severed, and the remaining provisions shall remain in full force and effect.</p>
-
-      <h3>14. Contact Information</h3>
-      <p>
-        QuickHire™<br/>
-        151 N. Delaware Street<br/>
-        Suite 122<br/>
-        Indianapolis, Indiana 46204<br/>
-        (317) 442-1437<br/>
-        legal@quickhire.agency
-      </p>
-    </div>
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
   </div>
 </body>
 </html>
