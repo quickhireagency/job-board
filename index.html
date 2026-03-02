@@ -680,7 +680,7 @@
       filtered: [],
       selectedJobId: "",
       // FIX #2: use the shared session store used by /assets/app.js + /auth/login.html
-      session: QH.loadSession() || {},
+     session: (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {}),
       geo: {
         enabled: false,
         lat: null,
@@ -1093,8 +1093,9 @@
 
       // buttons
       qs("#loginBtn").addEventListener("click", () => {
-        window.location.href = PATHS.candidateLogin;
-      });
+  const here = window.location.pathname + window.location.search;
+  window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
+});
 
       qs("#applyBtn").addEventListener("click", goApply);
 
