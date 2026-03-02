@@ -4,101 +4,528 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>QuickHire™ — Reset Password</title>
-  <link rel="stylesheet" href="/assets/styles.css"/>
+
+  <!-- Match index pages: include config + app (safe; does not change endpoints) -->
   <script src="/config/config.js"></script>
   <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .notice{
+      background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.70));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+      margin-bottom:14px;
+    }
+    .notice h3{margin:0 0 6px 0; font-size:14px}
+    .notice p{margin:0; color:var(--muted); font-size:13px; line-height:1.45}
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid2{grid-template-columns:1fr}
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+    input, select{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      color:var(--text);
+      outline:none;
+    }
+
+    .hr{
+      height:1px;
+      background: rgba(10,30,20,.12);
+      margin:12px 0;
+    }
+
+    .small{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    /* Footer logo + legal links (match index.html) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
 </head>
+
 <body>
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>
-          <div class="title">QuickHire™ Job Board</div>
-          <div class="small">Reset Password</div>
-        </div>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Reset Password</div>
+            <div class="sub">Request a reset link or use a token from email.</div>
+          </div>
+        </a>
       </div>
-      <div class="navlinks">
-        <a class="btn" href="/auth/login.html">Login</a>
+
+      <div class="controls">
+        <a class="btn blue" href="/auth/login.html">Login</a>
         <a class="btn" href="/">Job Board</a>
       </div>
     </div>
+  </div>
+
+  <div class="wrap">
+    <div class="notice">
+      <h3>Password reset</h3>
+      <p>Step 1: Request a reset link (we email you if your account exists). Step 2: Use the token from that email to set a new password.</p>
+    </div>
 
     <div class="grid2">
-      <div class="card">
-        <h2 style="margin:0 0 8px;">Request reset link</h2>
-        <div class="small">Enter your Username or E-mail. We’ll email a reset link if the account exists.</div>
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Request reset link</h2>
+            <div class="meta">Enter your Username or E-mail.</div>
+          </div>
+        </div>
+        <div class="content">
+          <label for="role">Account Type</label>
+          <select id="role">
+            <option value="job_seeker">Candidate</option>
+            <option value="employer">Employer</option>
+          </select>
 
-        <div class="hr"></div>
+          <div class="hr"></div>
 
-        <label class="label">Account Type</label>
-        <select id="role">
-          <option value="job_seeker">Candidate</option>
-          <option value="employer">Employer</option>
-        </select>
+          <label for="login">Username / E-mail</label>
+          <input id="login" placeholder="username or email">
 
-        <label class="label">Username / E-mail</label>
-        <input id="login" placeholder="username or email">
-
-        <div class="hr"></div>
-        <button class="btn primary" id="btnRequest">Send reset link</button>
-        <div id="reqOut" class="small" style="margin-top:10px;"></div>
+          <div class="hr"></div>
+          <button class="btn primary" id="btnRequest">Send reset link</button>
+          <div id="reqOut" class="small" style="margin-top:10px;"></div>
+        </div>
       </div>
 
-      <div class="card">
-        <h2 style="margin:0 0 8px;">Reset using token</h2>
-        <div class="small">If you opened a reset link from your email, your token will auto-fill.</div>
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Reset using token</h2>
+            <div class="meta">If you opened a reset link, token will auto-fill.</div>
+          </div>
+        </div>
+        <div class="content">
+          <label for="token">Token</label>
+          <input id="token" placeholder="rst_...">
 
-        <div class="hr"></div>
+          <div class="hr"></div>
 
-        <label class="label">Token</label>
-        <input id="token" placeholder="rst_...">
+          <label for="new_password">New Password</label>
+          <input id="new_password" type="password" placeholder="Minimum 8 characters">
 
-        <label class="label">New Password</label>
-        <input id="new_password" type="password" placeholder="Minimum 8 characters">
+          <div class="hr"></div>
+          <button class="btn primary" id="btnReset">Set new password</button>
+          <div id="resetOut" class="small" style="margin-top:10px;"></div>
 
-        <div class="hr"></div>
-        <button class="btn green" id="btnReset">Set new password</button>
-        <div id="resetOut" class="small" style="margin-top:10px;"></div>
+          <div class="hr"></div>
+          <div class="small">
+            If your token is expired, request a new reset link on the left.
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+    <!-- Footer (same as index.html) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-powered{
+        text-align:center;
+        margin-top: 10px;
+        font-weight:900;
+        letter-spacing:.02em;
+      }
+      .qh-powered a{
+        color: var(--blue);
+        text-decoration:underline;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
+      </p>
+
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
+
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
+
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
+
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
+
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
+
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
+
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
+
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
+
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
   </div>
 
-<script>
-const qs = new URLSearchParams(location.search);
-const token = qs.get("token") || "";
-if (token) document.getElementById("token").value = token;
+  <script>
+    // Keep your logic exactly (only wrapped to avoid globals)
+    (function(){
+      const qs = new URLSearchParams(location.search);
+      const token = qs.get("token") || "";
+      if (token) document.getElementById("token").value = token;
 
-document.getElementById("btnRequest").addEventListener("click", async () => {
-  const role = document.getElementById("role").value;
-  const login = document.getElementById("login").value.trim().toLowerCase();
-  if (!login) return QH.toast("Missing", "Enter your Username or E-mail.");
+      document.getElementById("btnRequest").addEventListener("click", async () => {
+        const role = document.getElementById("role").value;
+        const login = document.getElementById("login").value.trim().toLowerCase();
+        if (!login) return QH.toast("Missing", "Enter your Username or E-mail.");
 
-  // frontend base = this page without query params
-  const reset_url_base = location.origin + "/auth/reset.html";
+        // frontend base = this page without query params
+        const reset_url_base = location.origin + "/auth/reset.html";
 
-  const res = await QH.apiPost("request_password_reset", { role, login, reset_url_base });
-  document.getElementById("reqOut").textContent = res.message || (res.ok ? "Sent." : (res.error || "Error"));
-  if (res.ok) QH.toast("If your account exists…", "A reset link was sent to your email.");
-});
+        const res = await QH.apiPost("request_password_reset", { role, login, reset_url_base });
+        document.getElementById("reqOut").textContent = res.message || (res.ok ? "Sent." : (res.error || "Error"));
+        if (res.ok) QH.toast("If your account exists…", "A reset link was sent to your email.");
+      });
 
-document.getElementById("btnReset").addEventListener("click", async () => {
-  const token = document.getElementById("token").value.trim();
-  const new_password = document.getElementById("new_password").value;
+      document.getElementById("btnReset").addEventListener("click", async () => {
+        const token = document.getElementById("token").value.trim();
+        const new_password = document.getElementById("new_password").value;
 
-  if (!token) return QH.toast("Missing", "Token is required.");
-  if (!new_password || new_password.length < 8) return QH.toast("Password", "Password must be 8 characters or more.");
+        if (!token) return QH.toast("Missing", "Token is required.");
+        if (!new_password || new_password.length < 8) return QH.toast("Password", "Password must be 8 characters or more.");
 
-  const res = await QH.apiPost("reset_password", { token, new_password });
-  document.getElementById("resetOut").textContent = res.ok ? "Password updated. You can now login." : (res.error || "Error");
+        const res = await QH.apiPost("reset_password", { token, new_password });
+        document.getElementById("resetOut").textContent = res.ok ? "Password updated. You can now login." : (res.error || "Error");
 
-  if (res.ok) {
-    QH.toast("Success", "Password updated. Redirecting to login…");
-    setTimeout(() => location.href = "/auth/login.html", 800);
-  }
-});
-</script>
+        if (res.ok) {
+          QH.toast("Success", "Password updated. Redirecting to login…");
+          setTimeout(() => location.href = "/auth/login.html", 800);
+        }
+      });
+    })();
+  </script>
 </body>
 </html>
