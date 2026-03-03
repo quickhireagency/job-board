@@ -118,6 +118,13 @@
       background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
       color: #0b2540;
     }
+    .btn.mini{
+      padding:8px 10px;
+      border-radius: 10px;
+      font-size:12px;
+      font-weight:900;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
 
     .wrap{
       max-width:1200px;
@@ -218,6 +225,74 @@
       line-height:1.45;
     }
 
+    /* Resume UI */
+    .resume-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .resume-state{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .resume-name{
+      font-weight:1000;
+      color: rgba(10,30,20,.80);
+    }
+    .hidden{ display:none !important; }
+
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:16px;
+      z-index: 9999;
+    }
+    .modal.open{ display:flex; }
+    .modal-card{
+      width:min(980px, 100%);
+      height:min(80vh, 720px);
+      background: rgba(255,255,255,.98);
+      border:1px solid rgba(255,255,255,.30);
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.28);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+    .modal-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:12px 12px;
+      border-bottom:1px solid rgba(10,30,20,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,1), rgba(255,255,255,.92));
+    }
+    .modal-title{
+      font-weight:1000;
+      font-size:13px;
+      color: rgba(10,30,20,.75);
+    }
+    .modal-body{
+      flex:1;
+      background: rgba(10,30,20,.02);
+    }
+    .modal-body iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      background:#fff;
+    }
+
     /* Footer logo + legal links (match index.html) */
     .qh-footer-logo-wrap{
       display:flex;
@@ -290,13 +365,13 @@
         <div class="panel-header">
           <div>
             <h2>Application</h2>
-            <div class="meta">Candidate account required</div>
+            <div class="meta" id="applyMeta">Candidate account required</div>
           </div>
           <button class="btn primary" id="btnApply">Submit</button>
         </div>
 
         <div class="content">
-          <div class="muted">You must be logged in as a Candidate to apply.</div>
+          <div class="muted" id="loginNote">You must be logged in as a Candidate to apply.</div>
 
           <div class="hr"></div>
 
@@ -305,18 +380,27 @@
 
           <div class="hr"></div>
 
-          <div style="font-weight:900; margin-bottom:6px;">Resume (optional, but recommended)</div>
+          <div style="font-weight:900; margin-bottom:6px;">Resume (required)</div>
           <div class="muted">
-            Paste a link to your resume file (Google Drive, Dropbox, etc.). We store the link and attach it to your application.
+            Upload a PDF/DOC/DOCX resume. If you already have one on file, it will auto-populate here.
           </div>
 
-          <div style="height:10px;"></div>
+          <div class="resume-row">
+            <div class="resume-state" id="resumeState">
+              <span class="pill" id="resumePill">Checking…</span>
+              <span class="resume-name" id="resumeName"></span>
+            </div>
 
-          <label for="resume_title">Resume Title</label>
-          <input id="resume_title" placeholder="e.g., Michael Cook Resume" />
+            <div style="flex:1"></div>
 
-          <label for="resume_file_url" style="margin-top:10px;">Resume File URL</label>
-          <input id="resume_file_url" placeholder="https://..." />
+            <button class="btn mini blue" id="btnViewResume" type="button">View Resume</button>
+            <button class="btn mini" id="btnUploadResume" type="button">Upload / Replace Resume</button>
+            <input id="resumeFile" type="file" class="hidden" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+          </div>
+
+          <div class="muted" id="resumeHelp" style="margin-top:10px;">
+            Tip: Uploading here saves to your Candidate account and is used automatically on future applications.
+          </div>
 
           <div class="hr"></div>
 
@@ -506,9 +590,26 @@
     </script>
   </div>
 
+  <!-- Resume Modal -->
+  <div class="modal" id="resumeModal" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-label="Resume Preview">
+      <div class="modal-head">
+        <div class="modal-title" id="resumeModalTitle">Resume Preview</div>
+        <button class="btn mini" id="btnCloseResume" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <iframe id="resumeFrame" title="Resume Preview" src=""></iframe>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ----------------------------
-    // Apply page logic (kept compatible with /assets/app.js)
+    // Apply page logic (uses backend actions):
+    //  - GET  get_job
+    //  - GET  get_my_active_resume
+    //  - POST resume_upload
+    //  - POST apply   (requires resume_id)
     // ----------------------------
     const params = new URLSearchParams(location.search);
     const jobId = params.get("job_id") || "";
@@ -517,9 +618,23 @@
     const jobMeta = document.getElementById("jobMeta");
     const out = document.getElementById("out");
     const loginBtn = document.getElementById("loginBtn");
+    const loginNote = document.getElementById("loginNote");
+    const applyMeta = document.getElementById("applyMeta");
+
+    const resumePill = document.getElementById("resumePill");
+    const resumeName = document.getElementById("resumeName");
+    const btnViewResume = document.getElementById("btnViewResume");
+    const btnUploadResume = document.getElementById("btnUploadResume");
+    const resumeFile = document.getElementById("resumeFile");
+
+    const resumeModal = document.getElementById("resumeModal");
+    const resumeFrame = document.getElementById("resumeFrame");
+    const resumeModalTitle = document.getElementById("resumeModalTitle");
+    const btnCloseResume = document.getElementById("btnCloseResume");
+
+    let __activeResume = { has: false, resume_id: "", resume_title: "", resume_file_url: "" };
 
     function esc(s){
-      // Prefer shared escape if present
       if (window.QH && typeof QH.esc === "function") return QH.esc(s);
       return String(s == null ? "" : s)
         .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
@@ -527,9 +642,7 @@
     }
 
     async function apiGet(action, paramsObj){
-      // Prefer shared apiGet if present
       if (window.QH && typeof QH.apiGet === "function") return await QH.apiGet(action, paramsObj);
-      // Fallback compatible with your backend (mode=public_api)
       const API_BASE = (window.QH_CONFIG && window.QH_CONFIG.API_BASE) || "";
       const url = API_BASE + "?" + new URLSearchParams(Object.assign({ mode:"public_api", action }, paramsObj)).toString();
       const res = await fetch(url, { method:"GET" });
@@ -553,8 +666,7 @@
     }
 
     function loadSession(){
-      // The canonical session object is stored by QH.saveSession() (qh_session)
-      if (window.QH && typeof QH.loadSession === "function") return QH.loadSession();
+      if (window.QH && typeof QH.loadSession === "function") return QH.loadSession() || null;
       try { return JSON.parse(localStorage.getItem("qh_session") || "null"); } catch(e){ return null; }
     }
 
@@ -563,6 +675,196 @@
       loginBtn.href = "/auth/login.html?next=" + encodeURIComponent(here);
     }
     setLoginLink();
+
+    function openResumeModal(url, title){
+      resumeFrame.src = url || "";
+      resumeModalTitle.textContent = title ? ("Resume — " + title) : "Resume Preview";
+      resumeModal.classList.add("open");
+      resumeModal.setAttribute("aria-hidden","false");
+    }
+    function closeResumeModal(){
+      resumeModal.classList.remove("open");
+      resumeModal.setAttribute("aria-hidden","true");
+      // stop PDF from continuing in background
+      resumeFrame.src = "";
+    }
+
+    btnCloseResume.addEventListener("click", closeResumeModal);
+    resumeModal.addEventListener("click", (e) => {
+      if (e.target === resumeModal) closeResumeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeResumeModal();
+    });
+
+    function setResumeUi(state){
+      // state: {has, resume_id, resume_title, resume_file_url}
+      __activeResume = Object.assign({ has:false, resume_id:"", resume_title:"", resume_file_url:"" }, state || {});
+
+      if (__activeResume.has){
+        resumePill.textContent = "On file";
+        resumeName.textContent = __activeResume.resume_title ? ("— " + __activeResume.resume_title) : "";
+        btnViewResume.disabled = !__activeResume.resume_file_url;
+        btnViewResume.style.opacity = btnViewResume.disabled ? ".6" : "1";
+      } else {
+        resumePill.textContent = "None on file";
+        resumeName.textContent = "";
+        btnViewResume.disabled = true;
+        btnViewResume.style.opacity = ".6";
+      }
+    }
+
+    function setResumeLoading(msg){
+      resumePill.textContent = msg || "Loading…";
+      resumeName.textContent = "";
+      btnViewResume.disabled = true;
+      btnViewResume.style.opacity = ".6";
+    }
+
+    async function loadActiveResumeIfLoggedIn(){
+      const session = loadSession();
+      const isJs = session && session.role === "job_seeker" && session.session_token;
+      if (!isJs){
+        // not logged in
+        loginNote.textContent = "You must be logged in as a Candidate to apply.";
+        applyMeta.textContent = "Candidate account required";
+        setResumeUi({ has:false });
+        return;
+      }
+
+      // logged in
+      const who = session.email || session.username || "Candidate";
+      loginNote.textContent = "Signed in as " + who + ".";
+      applyMeta.textContent = "Ready to submit";
+
+      setResumeLoading("Checking…");
+
+      try{
+        const res = await apiGet("get_my_active_resume", { session_token: session.session_token });
+        if (res && res.ok && res.has_resume && res.resume){
+          setResumeUi({
+            has: true,
+            resume_id: String(res.resume.resume_id || ""),
+            resume_title: String(res.resume.resume_title || ""),
+            resume_file_url: String(res.resume.resume_file_url || "")
+          });
+          return;
+        }
+        setResumeUi({ has:false });
+      }catch(e){
+        setResumeUi({ has:false });
+      }
+    }
+
+    btnViewResume.addEventListener("click", () => {
+      if (!__activeResume || !__activeResume.has || !__activeResume.resume_file_url){
+        toast("No resume", "No resume on file yet. Upload one first.");
+        return;
+      }
+      openResumeModal(__activeResume.resume_file_url, __activeResume.resume_title || "");
+    });
+
+    btnUploadResume.addEventListener("click", () => {
+      const session = loadSession();
+      if (!session || session.role !== "job_seeker" || !session.session_token){
+        toast("Login required", "Please login as a Candidate to upload your resume.");
+        const here = window.location.pathname + window.location.search;
+        window.location.href = "/auth/login.html?next=" + encodeURIComponent(here);
+        return;
+      }
+      resumeFile.value = "";
+      resumeFile.click();
+    });
+
+    function mimeFromFileName(name){
+      const n = String(name || "").toLowerCase();
+      if (n.endsWith(".pdf")) return "application/pdf";
+      if (n.endsWith(".doc")) return "application/msword";
+      if (n.endsWith(".docx")) return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+      return "";
+    }
+
+    function fileToBase64(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("File read failed."));
+        reader.onload = () => {
+          const s = String(reader.result || "");
+          // reader gives: data:<mime>;base64,XXXX
+          const idx = s.indexOf("base64,");
+          if (idx === -1) return reject(new Error("Invalid file encoding."));
+          resolve(s.substring(idx + 7));
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    resumeFile.addEventListener("change", async () => {
+      const session = loadSession();
+      if (!session || session.role !== "job_seeker" || !session.session_token){
+        toast("Login required", "Please login as a Candidate.");
+        return;
+      }
+
+      const file = resumeFile.files && resumeFile.files[0] ? resumeFile.files[0] : null;
+      if (!file) return;
+
+      // Basic allowlist
+      const name = String(file.name || "resume");
+      const mime = String(file.type || "") || mimeFromFileName(name);
+      const ok =
+        mime === "application/pdf" ||
+        mime === "application/msword" ||
+        mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+      if (!ok){
+        toast("Unsupported", "Upload a PDF, DOC, or DOCX file.");
+        return;
+      }
+
+      // Size guard (10 MB)
+      if (file.size > 10 * 1024 * 1024){
+        toast("Too large", "Max file size is 10 MB.");
+        return;
+      }
+
+      try{
+        setResumeLoading("Uploading…");
+        btnUploadResume.disabled = true;
+        btnUploadResume.style.opacity = ".6";
+
+        const b64 = await fileToBase64(file);
+
+        const res = await apiPost("resume_upload", {
+          session_token: session.session_token,
+          file_name: name,
+          mime_type: mime,
+          file_base64: b64
+        });
+
+        if (!res || !res.ok){
+          setResumeUi({ has:false });
+          toast("Upload failed", (res && res.error) ? res.error : "Could not upload resume.");
+          return;
+        }
+
+        // Update local state immediately
+        setResumeUi({
+          has: true,
+          resume_id: String(res.resume_id || ""),
+          resume_title: name,
+          resume_file_url: String(res.resume_file_url || "")
+        });
+
+        toast("Uploaded", "Resume saved to your account.");
+      }catch(err){
+        setResumeUi({ has:false });
+        toast("Upload failed", String(err && err.message ? err.message : err));
+      }finally{
+        btnUploadResume.disabled = false;
+        btnUploadResume.style.opacity = "1";
+      }
+    });
 
     async function loadJob(){
       if (!jobId){
@@ -603,7 +905,9 @@
       `;
     }
 
+    // Init
     loadJob();
+    loadActiveResumeIfLoggedIn();
 
     document.getElementById("btnApply").addEventListener("click", async () => {
       const session = loadSession();
@@ -614,35 +918,19 @@
         return;
       }
 
-      const cover_letter_text = document.getElementById("cover_letter_text").value.trim();
-      const resume_title = document.getElementById("resume_title").value.trim();
-      const resume_file_url = document.getElementById("resume_file_url").value.trim();
-
-      let resume_id = "";
-
-      // If user provided a resume link, create a resume record first, then attach it to application.
-      if (resume_file_url){
-        if (!resume_title){
-          toast("Resume title", "Please enter a resume title.");
-          return;
-        }
-        const r = await apiPost("resume_upsert", {
-          session_token: session.session_token,
-          resume_title,
-          resume_file_url,
-          active_flag: "TRUE"
-        });
-        if (!r.ok){
-          toast("Resume error", r.error || "Could not attach resume.");
-          return;
-        }
-        resume_id = r.resume_id || "";
+      // Must have resume_id
+      const resumeId = (__activeResume && __activeResume.has) ? String(__activeResume.resume_id || "") : "";
+      if (!resumeId){
+        toast("Resume required", "Please upload your resume before applying.");
+        return;
       }
+
+      const cover_letter_text = document.getElementById("cover_letter_text").value.trim();
 
       const res = await apiPost("apply", {
         session_token: session.session_token,
         job_id: jobId,
-        resume_id,
+        resume_id: resumeId,
         cover_letter_text
       });
 
