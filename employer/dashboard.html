@@ -929,9 +929,28 @@
     });
   }
 
+  // --- Resume URL normalization (fixes 404 when backend returns view/download links) ---
+  function normalizeResumeUrl(url){
+    const u = String(url || "").trim();
+    if (!u) return "";
+    // If already a /preview link, keep it
+    if (u.includes("/preview")) return u;
+
+    // Convert Drive "open?id=" or "uc?id=" or "file/d/.../view" into iframe-safe /preview
+    const m1 = u.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+    if (m1 && m1[1]) return `https://drive.google.com/file/d/${m1[1]}/preview`;
+
+    const m2 = u.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})\//);
+    if (m2 && m2[1]) return `https://drive.google.com/file/d/${m2[1]}/preview`;
+
+    // Otherwise return as-is
+    return u;
+  }
+
   function resumeIframeHtml(url){
-    if (!url) return `<div class="muted">No resume on file.</div>`;
-    return `<div class="resumeFrame"><iframe src="${escapeHtml(url)}" title="Resume Preview" referrerpolicy="no-referrer"></iframe></div>`;
+    const fixed = normalizeResumeUrl(url);
+    if (!fixed) return `<div class="muted">No resume on file.</div>`;
+    return `<div class="resumeFrame"><iframe src="${escapeHtml(fixed)}" title="Resume Preview" referrerpolicy="no-referrer"></iframe></div>`;
   }
 
   // Applicants
@@ -972,7 +991,8 @@
       const status = normalizeStatus(r.status || "Applied");
       const xoff = !!r.is_x_off;
 
-      const resumeUrl = String(r.resume_file_url || "");
+      // Resume URL coming from backend list may be a view/download link; normalize to /preview for iframe
+      const resumeUrl = normalizeResumeUrl(String(r.resume_file_url || ""));
 
       const loc = [r.city, r.state].filter(Boolean).join(", ");
       const appliedAt = String(r.applied_at || "");
