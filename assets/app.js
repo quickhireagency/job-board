@@ -11,7 +11,7 @@ const QH = {
     const url = new URL(QH.apiBase());
     url.searchParams.set("mode", "public_api");
     url.searchParams.set("action", action);
-    Object.keys(params).forEach(k => {
+    Object.keys(params).forEach((k) => {
       if (params[k] != null && params[k] !== "") url.searchParams.set(k, params[k]);
     });
     const res = await fetch(url.toString(), { method: "GET" });
@@ -23,7 +23,7 @@ const QH = {
     const res = await fetch(QH.apiBase(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "public_api", action, ...body })
+      body: JSON.stringify({ mode: "public_api", action, ...body }),
     });
     const data = await res.json();
     return data;
@@ -33,8 +33,11 @@ const QH = {
     localStorage.setItem("qh_session", JSON.stringify(session));
   },
   loadSession() {
-    try { return JSON.parse(localStorage.getItem("qh_session") || "null"); }
-    catch { return null; }
+    try {
+      return JSON.parse(localStorage.getItem("qh_session") || "null");
+    } catch {
+      return null;
+    }
   },
   clearSession() {
     localStorage.removeItem("qh_session");
@@ -50,13 +53,14 @@ const QH = {
     window.__qh_toast_timer = setTimeout(() => el.classList.remove("show"), 4200);
   },
 
-requireSession(role) {
-  const s = QH.loadSession();
+  requireSession(role) {
+    const s = QH.loadSession();
 
-  if (!s || !s.session_token || (role && s.role !== role)) {
-    const here = window.location.pathname + window.location.search;
-    window.location.href = "/auth/login.html?next=" + encodeURIComponent(here);
-    return null;
-  }
-  return s;
-}
+    if (!s || !s.session_token || (role && s.role !== role)) {
+      const here = window.location.pathname + window.location.search;
+      window.location.href = "/auth/login.html?next=" + encodeURIComponent(here);
+      return null;
+    }
+    return s;
+  },
+};
