@@ -1,4 +1,6 @@
 /* global QH_CONFIG */
+"use strict";
+
 const QH = {
   apiBase() {
     if (!window.QH_CONFIG || !window.QH_CONFIG.API_BASE) {
@@ -11,9 +13,11 @@ const QH = {
     const url = new URL(QH.apiBase());
     url.searchParams.set("mode", "public_api");
     url.searchParams.set("action", action);
+
     Object.keys(params).forEach((k) => {
       if (params[k] != null && params[k] !== "") url.searchParams.set(k, params[k]);
     });
+
     const res = await fetch(url.toString(), { method: "GET" });
     const data = await res.json();
     return data;
@@ -32,6 +36,7 @@ const QH = {
   saveSession(session) {
     localStorage.setItem("qh_session", JSON.stringify(session));
   },
+
   loadSession() {
     try {
       return JSON.parse(localStorage.getItem("qh_session") || "null");
@@ -39,6 +44,7 @@ const QH = {
       return null;
     }
   },
+
   clearSession() {
     localStorage.removeItem("qh_session");
   },
@@ -46,9 +52,11 @@ const QH = {
   toast(title, message) {
     const el = document.getElementById("toast");
     if (!el) return alert(title + "\n\n" + message);
+
     el.querySelector(".t").textContent = title;
     el.querySelector(".m").textContent = message;
     el.classList.add("show");
+
     clearTimeout(window.__qh_toast_timer);
     window.__qh_toast_timer = setTimeout(() => el.classList.remove("show"), 4200);
   },
@@ -61,6 +69,10 @@ const QH = {
       window.location.href = "/auth/login.html?next=" + encodeURIComponent(here);
       return null;
     }
+
     return s;
   },
 };
+
+// Optional but helpful: expose to window explicitly
+window.QH = QH;
