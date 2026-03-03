@@ -95,7 +95,7 @@
 
     .searchbar{
       flex: 1;
-      min-width: 240px;
+      min-width: 220px;
       max-width: 520px;
       display:flex; gap:8px; align-items:center;
       background: rgba(255,255,255,.9);
@@ -139,6 +139,11 @@
       border-color: rgba(27,111,184,.35);
       background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
       color: #0b2540;
+    }
+    .btn.danger{
+      border-color: rgba(180,35,24,.35);
+      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
+      color: #3a0f0b;
     }
 
     .wrap{
@@ -191,7 +196,7 @@
       font-weight:800;
       letter-spacing:.01em;
     }
-    input, select{
+    input, select, textarea{
       width:100%;
       padding:10px 12px;
       border-radius: 12px;
@@ -200,6 +205,7 @@
       color:var(--text);
       outline:none;
     }
+    textarea{min-height:110px; resize:vertical;}
 
     .filter-actions{
       display:flex;
@@ -366,15 +372,46 @@
     }
     .dropdown.open .menu{display:block}
 
-    /* Mobile: make detail open as full-width section */
-    .mobile-back{
+    /* Report modal */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.35);
       display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 100;
+      padding: 18px;
     }
-    @media (max-width: 980px){
-      .mobile-back{
-        display:inline-flex;
-      }
+    .modal{
+      width: 100%;
+      max-width: 560px;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
+    .modal-head{
+      padding: 14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .modal-head h3{margin:0; font-size:14px}
+    .modal-body{padding: 14px}
+    .modal-actions{
+      padding: 12px 14px 14px;
+      border-top:1px solid var(--line);
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .modal-backdrop.show{display:flex}
 
     /* Footer logo + extra links */
     .qh-footer-logo-wrap{
@@ -392,20 +429,6 @@
       height:102px; /* 3x larger */
       width:auto;
       display:block;
-    }
-
-    .qh-legal-links-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap: 10px 16px;
-      justify-content:center;
-      align-items:center;
-      margin: 10px 0 0;
-      padding: 0;
-    }
-    .qh-legal-links-row a{
-      font-weight:800;
-      text-decoration:underline;
     }
 
     .qh-powered{
@@ -443,7 +466,7 @@
         <!-- Help -->
         <a class="btn" id="helpBtn" href="/help.html" target="_self">Help</a>
 
-        <!-- Candidate auth entry point -->
+        <!-- Candidate auth entry point (ALWAYS visible) -->
         <button class="btn blue" id="loginBtn">Login / Sign Up</button>
 
         <!-- My Account dropdown (candidate only; shown when logged in) -->
@@ -530,7 +553,7 @@
     </div>
 
     <div class="grid">
-      <div class="panel" id="listPanel">
+      <div class="panel">
         <div class="panel-header">
           <div>
             <h2>Jobs</h2>
@@ -543,15 +566,15 @@
         </div>
       </div>
 
-      <div class="panel" id="detailPanel">
+      <div class="panel">
         <div class="panel-header">
           <div>
             <h2>Overview</h2>
             <div class="meta" id="detailMeta">Select a job on the left</div>
           </div>
 
-          <div style="display:flex; gap:10px; align-items:center;">
-            <button class="btn mobile-back" id="backBtn" type="button">Back</button>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+            <button class="btn danger" id="reportBtn" disabled>Report Job</button>
             <button class="btn primary" id="applyBtn" disabled>Apply</button>
           </div>
         </div>
@@ -761,6 +784,47 @@
 
   </div>
 
+  <!-- Report modal -->
+  <div class="modal-backdrop" id="reportModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Report job">
+      <div class="modal-head">
+        <h3>Report this job</h3>
+        <button class="btn" id="reportCloseBtn" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="muted" style="margin-bottom:10px;">
+          Reports are reviewed by our team. Please be specific.
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label for="complaintTypeSel">Reason</label>
+          <select id="complaintTypeSel">
+            <option value="">Select a reason…</option>
+            <option>Scam / Fraud</option>
+            <option>Misleading job posting</option>
+            <option>Discrimination concern</option>
+            <option>Harassment / abusive content</option>
+            <option>Incorrect location / pay / details</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="complaintMsg">Message</label>
+          <textarea id="complaintMsg" placeholder="Describe what’s wrong with this posting…"></textarea>
+        </div>
+
+        <div class="muted" style="margin-top:10px;">
+          You must be logged in as a candidate to submit a report.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="reportCancelBtn" type="button">Cancel</button>
+        <button class="btn danger" id="reportSubmitBtn" type="button">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // ----------------------------
     // Config / State
@@ -770,7 +834,6 @@
       jobs: [],
       filtered: [],
       selectedJobId: "",
-      // use the shared session store used by /assets/app.js + /auth/login.html
       session: (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {}),
       geo: {
         enabled: false,
@@ -797,6 +860,16 @@
     async function apiGet(params){
       const url = API_BASE + "?" + new URLSearchParams(params).toString();
       const res = await fetch(url, { method:"GET" });
+      const json = await res.json();
+      return json;
+    }
+
+    async function apiPost(body){
+      const res = await fetch(API_BASE, {
+        method:"POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(body)
+      });
       const json = await res.json();
       return json;
     }
@@ -847,10 +920,6 @@
         US_STATES_AND_TERRITORIES.map(s => `<option value="${s}">${s}</option>`).join("");
     }
 
-    function isMobile(){
-      return window.matchMedia && window.matchMedia("(max-width: 980px)").matches;
-    }
-
     // ----------------------------
     // Job loading + filtering
     // ----------------------------
@@ -882,7 +951,6 @@
     }
 
     function hydrateFilterOptionsFromJobs(jobs){
-      // category
       const cats = new Set();
       const wa = new Set();
       jobs.forEach(j => {
@@ -915,7 +983,6 @@
       const radius = (qs("#radiusSel").value || "").trim();
       const radiusMiles = radius ? Number(radius) : null;
 
-      // First-pass filter (no geo)
       let filtered = (state.jobs || []).filter(j => {
         if (keyword){
           const hay = (String(j.job_title||"") + " " + String(j.job_description||"")).toLowerCase();
@@ -938,7 +1005,6 @@
 
       state.filtered = filtered;
 
-      // Geo radius filter (optional)
       if (radiusMiles && state.geo.lat != null && state.geo.lon != null){
         filterByRadius(radiusMiles).then(() => {
           renderJobs();
@@ -960,7 +1026,6 @@
         state.selectedJobId = state.filtered[0].job_id;
       }
       renderSelectedJob(state.selectedJobId);
-      // highlight selection
       renderJobs();
     }
 
@@ -996,23 +1061,8 @@
         el.addEventListener("click", () => {
           const id = el.getAttribute("data-job");
           state.selectedJobId = id;
-
-          // Update URL for /job/<job_id>/index.html (client-side support)
-          try{
-            const newPath = "/job/" + encodeURIComponent(id) + "/index.html";
-            window.history.pushState({ job_id: id }, "", newPath);
-          }catch(e){ /* ignore */ }
-
           renderJobs();
           renderSelectedJob(id);
-
-          // Mobile: open detail as full-width section by scrolling into view
-          if (isMobile()){
-            setTimeout(() => {
-              const dp = qs("#detailPanel");
-              if (dp) dp.scrollIntoView({ behavior:"smooth", block:"start" });
-            }, 50);
-          }
         });
       });
     }
@@ -1021,6 +1071,7 @@
       if (!jobId){
         setText(qs("#detailMeta"), "Select a job on the left");
         qs("#applyBtn").disabled = true;
+        qs("#reportBtn").disabled = true;
         qs("#jobDetail").innerHTML = `<div class="muted">Select a job to view details.</div>`;
         return;
       }
@@ -1034,6 +1085,7 @@
       if (!json.ok){
         setText(qs("#detailMeta"), "Error");
         qs("#applyBtn").disabled = true;
+        qs("#reportBtn").disabled = true;
         qs("#jobDetail").innerHTML = `<div class="muted">Error loading job: ${escapeHtml(json.error || "Unknown")}</div>`;
         return;
       }
@@ -1044,7 +1096,9 @@
       const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
 
       setText(qs("#detailMeta"), (j.company_id ? `Company: ${j.company_id}` : "Job detail"));
+
       qs("#applyBtn").disabled = false;
+      qs("#reportBtn").disabled = false;
 
       qs("#jobDetail").innerHTML = `
         <h1>${escapeHtml(j.job_title || "Untitled role")}</h1>
@@ -1062,7 +1116,7 @@
           <div class="verified-badge-wrap" aria-label="Verified Employer badge">
             <img
               class="verified-badge-img"
-              src="/job-board/QuickHireVerifiedEmployerBadge.png"
+              src="/QuickHireVerifiedEmployerBadge.png"
               alt="QuickHire™ Verified Employer"
               loading="lazy"
             />
@@ -1095,20 +1149,94 @@
     function goApply(){
       if (!state.selectedJobId) return;
 
-      // refresh session right before we decide
       state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
       const sess = state.session || {};
-
       const applyUrl = PATHS.applyPage + "?job_id=" + encodeURIComponent(state.selectedJobId);
 
-      // If not logged in as job seeker, force candidate login page with next=applyUrl
       if (!sess.session_token || sess.role !== "job_seeker"){
         window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(applyUrl);
         return;
       }
 
-      // If logged in, go straight to apply page
       window.location.href = applyUrl;
+    }
+
+    // ----------------------------
+    // Report job flow
+    // ----------------------------
+    function openReportModal(){
+      if (!state.selectedJobId) return;
+
+      // must be logged in as job seeker
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        const here = window.location.pathname + window.location.search;
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
+        return;
+      }
+
+      qs("#complaintTypeSel").value = "";
+      qs("#complaintMsg").value = "";
+      qs("#reportModal").classList.add("show");
+      qs("#reportModal").setAttribute("aria-hidden","false");
+    }
+
+    function closeReportModal(){
+      qs("#reportModal").classList.remove("show");
+      qs("#reportModal").setAttribute("aria-hidden","true");
+    }
+
+    async function submitReport(){
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        toast("You must be logged in as a candidate to submit a report.");
+        closeReportModal();
+        return;
+      }
+
+      const complaintType = (qs("#complaintTypeSel").value || "").trim();
+      const message = (qs("#complaintMsg").value || "").trim();
+
+      if (!state.selectedJobId){
+        toast("Select a job first.");
+        return;
+      }
+      if (!complaintType){
+        toast("Please select a reason.");
+        return;
+      }
+      if (!message || message.length < 10){
+        toast("Please enter a message (at least 10 characters).");
+        return;
+      }
+
+      qs("#reportSubmitBtn").disabled = true;
+
+      try{
+        const json = await apiPost({
+          mode: "public_api",
+          action: "report_job",
+          session_token: sess.session_token,
+          job_id: state.selectedJobId,
+          complaint_type: complaintType,
+          message: message
+        });
+
+        if (!json.ok){
+          toast("Unable to submit report: " + (json.error || "Unknown error"));
+          return;
+        }
+
+        toast("Report submitted. Thank you.");
+        closeReportModal();
+      } catch(e){
+        toast("Unable to submit report. Please try again.");
+      } finally {
+        qs("#reportSubmitBtn").disabled = false;
+      }
     }
 
     // ----------------------------
@@ -1126,11 +1254,9 @@
         state.geo.lon = pos.coords.longitude;
         state.geo.enabled = true;
 
-        // Reverse geocode to prefill city/state
         const place = await reverseGeocode(state.geo.lat, state.geo.lon);
         if (place && place.city) qs("#cityInput").value = place.city;
 
-        // only dropdown now
         if (place && place.state) {
           const st = (place.state.length === 2 ? place.state.toUpperCase() : "");
           if (st && US_STATES_AND_TERRITORIES.includes(st)) qs("#stateSel").value = st;
@@ -1146,7 +1272,6 @@
 
     async function reverseGeocode(lat, lon){
       try{
-        // OpenStreetMap Nominatim (no key).
         const url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + encodeURIComponent(lat) + "&lon=" + encodeURIComponent(lon);
         const res = await fetch(url, { headers: { "Accept":"application/json" } });
         const json = await res.json();
@@ -1212,7 +1337,7 @@
     }
 
     // ----------------------------
-    // My Account dropdown (candidate only)
+    // My Account dropdown (candidate only) - DOES NOT hide login button
     // ----------------------------
     function syncAccountUi(){
       state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
@@ -1220,15 +1345,7 @@
       const isCandidate = !!sess.session_token && sess.role === "job_seeker";
 
       const acctWrap = qs("#acctWrap");
-      const loginBtn = qs("#loginBtn");
-
-      if (isCandidate){
-        acctWrap.style.display = "inline-flex";
-        loginBtn.style.display = "none";
-      } else {
-        acctWrap.style.display = "none";
-        loginBtn.style.display = "inline-flex";
-      }
+      acctWrap.style.display = isCandidate ? "inline-flex" : "none";
     }
 
     function closeAccountMenu(){
@@ -1252,11 +1369,15 @@
       });
 
       qs("#applyBtn").addEventListener("click", goApply);
+      qs("#reportBtn").addEventListener("click", openReportModal);
 
-      // Mobile back button: scroll to list panel
-      qs("#backBtn").addEventListener("click", () => {
-        const lp = qs("#listPanel");
-        if (lp) lp.scrollIntoView({ behavior:"smooth", block:"start" });
+      qs("#reportCloseBtn").addEventListener("click", closeReportModal);
+      qs("#reportCancelBtn").addEventListener("click", closeReportModal);
+      qs("#reportSubmitBtn").addEventListener("click", submitReport);
+
+      // click outside modal to close
+      qs("#reportModal").addEventListener("click", (e) => {
+        if (e.target === qs("#reportModal")) closeReportModal();
       });
 
       // My Account dropdown toggle + logout
@@ -1275,8 +1396,7 @@
         }catch(e){ /* ignore */ }
         closeAccountMenu();
         syncAccountUi();
-        const here = window.location.pathname + window.location.search;
-        window.location.href = "/?logged_out=1&next=" + encodeURIComponent(here);
+        toast("Logged out.");
       });
 
       // close menu on outside click
@@ -1308,37 +1428,7 @@
       qs("#stateSel").addEventListener("change", onChange);
       qs("#radiusSel").addEventListener("change", onChange);
 
-      // Support /job/<job_id>/index.html if served
-      try{
-        const m = window.location.pathname.match(/^\/job\/([^\/]+)\/index\.html$/);
-        if (m && m[1]){
-          state.selectedJobId = decodeURIComponent(m[1]);
-        }
-      }catch(e){ /* ignore */ }
-
-      // Back/forward support
-      window.addEventListener("popstate", (evt) => {
-        const jobId = (evt && evt.state && evt.state.job_id) ? evt.state.job_id : "";
-        if (jobId){
-          state.selectedJobId = jobId;
-          renderJobs();
-          renderSelectedJob(jobId);
-        }
-      });
-
-      loadJobs().then(() => {
-        // if URL preselected job, render it after list loads
-        if (state.selectedJobId){
-          renderSelectedJob(state.selectedJobId);
-          renderJobs();
-          if (isMobile()){
-            setTimeout(() => {
-              const dp = qs("#detailPanel");
-              if (dp) dp.scrollIntoView({ behavior:"smooth", block:"start" });
-            }, 50);
-          }
-        }
-      });
+      loadJobs();
     }
 
     init();
