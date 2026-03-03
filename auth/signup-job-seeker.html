@@ -161,7 +161,7 @@
       font-weight:800;
       letter-spacing:.01em;
     }
-    input{
+    input, select{
       width:100%;
       padding:10px 12px;
       border-radius: 12px;
@@ -207,6 +207,12 @@
     }
     .ack-row input{ width:auto; margin-top:2px; }
     .ack-row .text{ flex:1; }
+
+    .req{
+      color: var(--danger);
+      font-weight:1000;
+      margin-left:6px;
+    }
 
     /* Footer logo + legal links (match index.html) */
     .qh-footer-logo-wrap{
@@ -306,6 +312,73 @@
 
           <div class="hr"></div>
 
+          <!-- NEW: EEO ONE-TIME SECTION -->
+          <div style="font-weight:1000; margin-bottom:6px;">EEO Identification (one time)</div>
+          <div class="muted">
+            This information is collected one time during signup and will be linked to your applications automatically.
+          </div>
+
+          <div class="note" style="margin-top:10px;">
+            <div class="row2">
+              <div>
+                <label for="eeo_race_ethnicity">Race / Ethnicity</label>
+                <select id="eeo_race_ethnicity">
+                  <option value="">Prefer not to say</option>
+                  <option>American Indian or Alaska Native</option>
+                  <option>Asian</option>
+                  <option>Black or African American</option>
+                  <option>Hispanic or Latino</option>
+                  <option>Native Hawaiian or Other Pacific Islander</option>
+                  <option>Two or More Races</option>
+                  <option>White</option>
+                </select>
+              </div>
+              <div>
+                <label for="eeo_sex">Sex</label>
+                <select id="eeo_sex">
+                  <option value="">Prefer not to say</option>
+                  <option>Male</option>
+                  <option>Female</option>
+                  <option>Non-binary</option>
+                  <option>Other</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="height:10px;"></div>
+
+            <div class="row2">
+              <div>
+                <label for="eeo_veteran_status">Veteran Status</label>
+                <select id="eeo_veteran_status">
+                  <option value="">Prefer not to say</option>
+                  <option>I am a veteran</option>
+                  <option>I am not a veteran</option>
+                </select>
+              </div>
+              <div>
+                <label for="eeo_disability_status">Disability Status</label>
+                <select id="eeo_disability_status">
+                  <option value="">Prefer not to say</option>
+                  <option>I have a disability</option>
+                  <option>I do not have a disability</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="ack-row">
+              <input type="checkbox" id="eeo_consent_acknowledged">
+              <div class="text muted">
+                I consent to providing this information for equal employment opportunity reporting purposes.
+                <span class="req">(required)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
           <div style="font-weight:1000; margin-bottom:6px;">Policy acknowledgements (required)</div>
           <div class="muted">Open each page, read it, then check the box.</div>
 
@@ -387,24 +460,23 @@
         </div>
       </div>
 
-      <!-- Purchases / info -->
+      <!-- Friendly info -->
       <div class="panel">
         <div class="panel-header">
           <div>
-            <h2>IMPORTANT — Purchases &amp; Claims</h2>
-            <div class="meta">Use the same E-mail + Username everywhere</div>
+            <h2>Welcome</h2>
+            <div class="meta">Quick note before you get started</div>
           </div>
         </div>
 
         <div class="content">
           <div class="note">
-            If you ever buy something (resume service later), you MUST:
-            <ul style="margin:10px 0 0; padding-left:18px;">
-              <li><b>Use the SAME E-mail</b> you used to sign up.</li>
-              <li><b>Use the SAME Username</b> you used to sign up.</li>
-              <li>Then “CLAIM” using <b>E-mail + Username</b> on the success page.</li>
-            </ul>
-            <div class="muted" style="margin-top:10px;">People mess this up constantly — don’t.</div>
+            <div style="font-weight:1000; margin-bottom:6px;">Welcome to QuickHire™.</div>
+            <div class="muted">
+              To keep your account running smoothly, please use the same <b>E-mail</b> and <b>Username</b> each time you sign up or log in.
+              <br><br>
+              If you ever purchase a service later, you’ll attach it to your account by claiming it using that same <b>E-mail + Username</b> on the success page.
+            </div>
           </div>
 
           <div class="hr"></div>
@@ -615,6 +687,16 @@
     };
   }
 
+  function getEeo() {
+    return {
+      race_ethnicity: document.getElementById("eeo_race_ethnicity").value || "",
+      sex: document.getElementById("eeo_sex").value || "",
+      veteran_status: document.getElementById("eeo_veteran_status").value || "",
+      disability_status: document.getElementById("eeo_disability_status").value || "",
+      consent_acknowledged: document.getElementById("eeo_consent_acknowledged").checked
+    };
+  }
+
   // Preserve return flows across pages (signup -> next)
   (function () {
     const next = new URLSearchParams(window.location.search).get("next");
@@ -647,6 +729,11 @@
       return QH.toast("Signature required", "Type your full name to sign.");
     }
 
+    const eeo = getEeo();
+    if (!eeo.consent_acknowledged) {
+      return QH.toast("Consent required", "You must consent to provide EEO information to complete signup.");
+    }
+
     const acks = getAcks();
     const required = ["terms","privacy","eeo","drug_alcohol","osha","veterans","candidate_packet"];
     for (const k of required) {
@@ -656,12 +743,21 @@
     const res = await QH.apiPost("signup_job_seeker", {
       first_name, last_name, email, username, phone, password,
       acks,
-      signature_full_name
+      signature_full_name,
+      eeo // <-- NEW payload
     });
 
     if (!res.ok) return QH.toast("Signup failed", res.error || "Try again.");
 
-    QH.saveSession({ role: "job_seeker", session_token: res.session_token, job_seeker_id: res.job_seeker_id });
+    // Store richer session for UI use (email/username helpful on dashboard)
+    QH.saveSession({
+      role: "job_seeker",
+      session_token: res.session_token,
+      job_seeker_id: res.job_seeker_id,
+      email: email,
+      username: username
+    });
+
     QH.toast("Account created", "You can now apply to jobs.");
 
     // Redirect to next if provided, else home
