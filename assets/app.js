@@ -59,4 +59,4 @@ requireSession(role) {
     return null;
   }
   return s;
-},
+}
