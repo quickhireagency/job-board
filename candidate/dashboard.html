@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QuickHire™ — Candidate Dashboard</title>
+
+  <!-- Config (API base) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px;
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+      position:relative;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+    .btn.danger{
+      border-color: rgba(180,35,24,.35);
+      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
+      color: #3a0f0b;
+    }
+
+    /* My Account dropdown */
+    .dropdown{ position:relative; display:inline-flex; }
+    .menu{
+      position:absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 190px;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display:none;
+      z-index: 50;
+    }
+    .menu a, .menu button{
+      width:100%;
+      border:none;
+      background:transparent;
+      text-align:left;
+      padding:10px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+      color: var(--text);
+      text-decoration:none;
+      display:block;
+    }
+    .menu a:hover, .menu button:hover{
+      background: rgba(43,134,214,.10);
+      text-decoration:none;
+    }
+    .menu .danger{ color: var(--danger); }
+    .dropdown.open .menu{display:block}
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .notice{
+      background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.70));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+      margin-bottom:14px;
+    }
+    .notice h3{margin:0 0 8px 0; font-size:14px}
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+
+    .content{
+      padding:14px;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:12px;
+    }
+
+    .card{
+      background: rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding:12px;
+      box-shadow: 0 6px 18px rgba(16,24,40,.08);
+    }
+
+    .card-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .title{
+      font-weight:1000;
+      font-size:15px;
+      margin:0 0 4px 0;
+      letter-spacing:.1px;
+    }
+    .subline{
+      color:var(--muted);
+      font-size:12px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:2px;
+    }
+
+    .pill{
+      border:1px solid rgba(10,30,20,.14);
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:11px;
+      color:var(--muted);
+      background: rgba(255,255,255,.75);
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .pill.good{
+      border-color: rgba(31,122,74,.35);
+      color: rgba(31,122,74,.95);
+      background: rgba(43,154,94,.12)
+    }
+    .pill.bad{
+      border-color: rgba(180,35,24,.35);
+      color: rgba(180,35,24,.95);
+      background: rgba(180,35,24,.08)
+    }
+
+    /* Domino’s-style tracker (clean + professional) */
+    .tracker{
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid rgba(10,30,20,.10);
+    }
+    .track{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .step{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      min-width: 140px;
+    }
+    .dot{
+      width:12px;
+      height:12px;
+      border-radius:999px;
+      border:2px solid rgba(10,30,20,.25);
+      background: rgba(255,255,255,.9);
+      flex:0 0 auto;
+    }
+    .label{
+      font-size:12px;
+      font-weight:900;
+      color: rgba(10,30,20,.55);
+      white-space:nowrap;
+    }
+    .bar{
+      height:6px;
+      width: 52px;
+      border-radius:999px;
+      background: rgba(10,30,20,.12);
+      flex:0 0 auto;
+    }
+
+    .step.done .dot{
+      border-color: rgba(31,122,74,.55);
+      background: rgba(43,154,94,.35);
+    }
+    .step.done .label{
+      color: rgba(31,122,74,.95);
+    }
+    .bar.done{
+      background: rgba(43,154,94,.35);
+    }
+
+    .step.active .dot{
+      border-color: rgba(27,111,184,.65);
+      background: rgba(43,134,214,.30);
+    }
+    .step.active .label{
+      color: rgba(27,111,184,.95);
+    }
+
+    .step.bad .dot{
+      border-color: rgba(180,35,24,.75);
+      background: rgba(180,35,24,.25);
+    }
+    .step.bad .label{
+      color: rgba(180,35,24,.95);
+    }
+
+    /* Footer (same as your standard block) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px;
+      width:auto;
+      display:block;
+    }
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Job Board</div>
+            <div class="sub">Candidate Dashboard</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="controls">
+        <a class="btn" href="/" target="_self">Back to Jobs</a>
+        <a class="btn" href="/help.html" target="_self">Help</a>
+
+        <div class="dropdown" id="acctWrap">
+          <button class="btn blue" id="acctBtn" aria-haspopup="true" aria-expanded="false">My Account</button>
+          <div class="menu" id="acctMenu" role="menu" aria-label="My Account menu">
+            <a href="/candidate/dashboard.html" target="_self" role="menuitem">Dashboard</a>
+            <button class="danger" id="logoutBtn" type="button" role="menuitem">Logout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="notice">
+      <h3>My Dashboard</h3>
+      <div class="muted" id="whoami">Loading your account…</div>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>My Applications</h2>
+            <div class="meta"><span id="appCount">0</span> total</div>
+          </div>
+          <button class="btn primary" id="refreshBtn" type="button">Refresh</button>
+        </div>
+
+        <div class="content">
+          <div class="muted" id="appsNote" style="margin-bottom:10px;">
+            Your applications will appear here after you apply to a job.
+          </div>
+          <div class="cards" id="appsList">
+            <div class="muted">Loading…</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- QuickHire™ — Footer Block (Squarespace Code Block) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
+      </p>
+
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
+
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
+
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
+
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
+
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
+
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
+
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
+
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
+
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
+  </div>
+
+  <script>
+    const API_BASE = (window.QH_CONFIG && window.QH_CONFIG.API_BASE) || "";
+
+    const PATHS = {
+      jobs: "/",
+      help: "/help.html",
+      login: "/auth/login.html",
+      dashboard: "/candidate/dashboard.html",
+    };
+
+    function qs(sel){ return document.querySelector(sel); }
+
+    function safeLoadSession(){
+      try{
+        if (window.QH && typeof QH.loadSession === "function") return QH.loadSession() || {};
+        return JSON.parse(localStorage.getItem("qh_session") || "null") || {};
+      }catch(e){
+        return {};
+      }
+    }
+
+    function goLoginWithNext(){
+      const here = window.location.pathname + window.location.search;
+      window.location.href = PATHS.login + "?next=" + encodeURIComponent(here);
+    }
+
+    function requireJobSeeker(){
+      const s = safeLoadSession();
+      if (!s || !s.session_token || s.role !== "job_seeker"){
+        goLoginWithNext();
+        return null;
+      }
+      return s;
+    }
+
+    function closeAccountMenu(){
+      const wrap = qs("#acctWrap");
+      if (wrap) wrap.classList.remove("open");
+      const btn = qs("#acctBtn");
+      if (btn) btn.setAttribute("aria-expanded", "false");
+    }
+
+    function mapStatusToSteps(statusRaw){
+      const s = String(statusRaw || "").trim().toLowerCase();
+
+      // Terminal
+      if (s === "rejected") return { terminal: "rejected", idx: 5 };
+      if (s === "accepted" || s === "hired") return { terminal: "accepted", idx: 5 };
+
+      // Normalized
+      // You can map your sheet values later; defaults now:
+      if (s === "new" || s === "applied") return { idx: 0 };
+      if (s === "reviewed" || s === "screening") return { idx: 1 };
+      if (s === "interview") return { idx: 2 };
+      if (s === "offer") return { idx: 3 };
+
+      // fallback
+      return { idx: 0 };
+    }
+
+    function renderTracker(status){
+      // Steps: Applied → Reviewed → Interview → Offer → Final
+      const steps = ["Applied","Reviewed","Interview","Offer","Final"];
+      const m = mapStatusToSteps(status);
+
+      const finalLabel = m.terminal === "rejected" ? "Rejected" : (m.terminal === "accepted" ? "Accepted" : "Pending");
+      const finalClass = m.terminal === "rejected" ? "bad" : (m.terminal === "accepted" ? "done" : "");
+      const activeIdx = typeof m.idx === "number" ? m.idx : 0;
+
+      const html = steps.map((name, i) => {
+        const isFinal = i === 4;
+        const label = isFinal ? finalLabel : name;
+
+        let stepClass = "";
+        if (m.terminal === "rejected" && isFinal) stepClass = "bad";
+        else if (m.terminal === "accepted" && isFinal) stepClass = "done";
+        else if (!isFinal && i < activeIdx) stepClass = "done";
+        else if (!isFinal && i === activeIdx) stepClass = "active";
+        else if (isFinal && activeIdx >= 4) stepClass = "active";
+
+        const barClass = (!isFinal && i < activeIdx) ? "done" : "";
+
+        return `
+          <div class="step ${stepClass}">
+            <span class="dot"></span>
+            <span class="label">${label}</span>
+          </div>
+          ${i < steps.length - 1 ? `<span class="bar ${barClass}"></span>` : ``}
+        `;
+      }).join("");
+
+      return `<div class="tracker"><div class="track">${html}</div></div>`;
+    }
+
+    function escapeHtml(s){
+      return String(s == null ? "" : s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    async function apiGet(params){
+      const url = API_BASE + "?" + new URLSearchParams(params).toString();
+      const res = await fetch(url, { method:"GET" });
+      return await res.json();
+    }
+
+    async function apiPost(action, body){
+      // Prefer shared helper if present
+      if (window.QH && typeof QH.apiPost === "function"){
+        return await QH.apiPost(action, body);
+      }
+      const res = await fetch(API_BASE, {
+        method:"POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify({ mode:"public_api", action, ...body })
+      });
+      return await res.json();
+    }
+
+    function setCount(n){
+      qs("#appCount").textContent = String(n || 0);
+    }
+
+    function renderApps(apps){
+      const el = qs("#appsList");
+      if (!apps || !apps.length){
+        setCount(0);
+        el.innerHTML = `<div class="muted">No applications yet.</div>`;
+        return;
+      }
+      setCount(apps.length);
+
+      el.innerHTML = apps.map(a => {
+        const title = a.job_title || a.jobTitle || ("Job ID: " + (a.job_id || ""));
+        const company = a.company_name || a.company || a.company_id || "";
+        const loc = [a.city, a.state].filter(Boolean).join(", ");
+        const appliedAt = a.applied_at || a.appliedAt || "";
+        const status = a.status || "Applied";
+
+        const statusPillClass =
+          String(status).toLowerCase() === "rejected" ? "bad" :
+          (String(status).toLowerCase() === "accepted" ? "good" : "");
+
+        return `
+          <div class="card">
+            <div class="card-top">
+              <div>
+                <div class="title">${escapeHtml(title)}</div>
+                <div class="subline">
+                  ${company ? `<span class="pill">${escapeHtml(company)}</span>` : ``}
+                  ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
+                  ${appliedAt ? `<span class="pill">${escapeHtml(appliedAt)}</span>` : ``}
+                </div>
+              </div>
+              <div>
+                <span class="pill ${statusPillClass}">${escapeHtml(status)}</span>
+              </div>
+            </div>
+
+            ${renderTracker(status)}
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadApplications(){
+      const session = requireJobSeeker();
+      if (!session) return;
+
+      qs("#appsList").innerHTML = `<div class="muted">Loading…</div>`;
+      qs("#appsNote").textContent = "Loading your applications…";
+
+      // This endpoint does not exist yet — we fail gracefully and show a clean placeholder.
+      try{
+        const res = await apiPost("list_my_applications", { session_token: session.session_token });
+
+        if (res && res.ok && Array.isArray(res.applications)){
+          qs("#appsNote").textContent = "Here are your applications:";
+          renderApps(res.applications);
+          return;
+        }
+
+        // If endpoint isn't implemented yet, your backend will return unknown action.
+        qs("#appsNote").textContent = "Applications will appear here after you apply to a job.";
+        renderApps([]);
+      } catch (e){
+        qs("#appsNote").textContent = "Applications will appear here after you apply to a job.";
+        renderApps([]);
+      }
+    }
+
+    function init(){
+      // Gate
+      const session = requireJobSeeker();
+      if (!session) return;
+
+      // Who am I
+      const email = session.email || "";
+      const user = session.username || "";
+      qs("#whoami").textContent = (email || user) ? (`Signed in as ${email || user}`) : "Signed in.";
+
+      // Account menu
+      qs("#acctBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        const wrap = qs("#acctWrap");
+        const open = wrap.classList.toggle("open");
+        qs("#acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
+      });
+
+      qs("#logoutBtn").addEventListener("click", () => {
+        try{
+          if (window.QH && typeof QH.clearSession === "function") QH.clearSession();
+          else localStorage.removeItem("qh_session");
+        }catch(e){ /* ignore */ }
+        closeAccountMenu();
+        window.location.href = "/";
+      });
+
+      document.addEventListener("click", (e) => {
+        const wrap = qs("#acctWrap");
+        if (wrap && !wrap.contains(e.target)) closeAccountMenu();
+      });
+
+      qs("#refreshBtn").addEventListener("click", loadApplications);
+
+      loadApplications();
+    }
+
+    init();
+  </script>
+</body>
+</html>
