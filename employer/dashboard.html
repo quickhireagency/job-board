@@ -763,16 +763,72 @@
   document.getElementById("btnLoadEeo").addEventListener("click", loadEeo);
 
   // Applicants scaffold (until endpoint exists)
-  document.getElementById("btnLoadApplicants").addEventListener("click", async () => {
-    const box = document.getElementById("applicantsBox");
-    box.innerHTML = `
-      <div style="font-weight:1000;">Endpoint not enabled yet</div>
-      <div class="muted" style="margin-top:6px;">
-        We need to add a backend action like <code>list_employer_applicants</code>
-        that returns applications joined with job seeker contact info (email required, phone optional).
-      </div>
-    `;
+document.getElementById("btnLoadApplicants").addEventListener("click", async () => {
+  const box = document.getElementById("applicantsBox");
+  box.textContent = "Loading applicants…";
+
+  const res = await QH.apiPost("list_employer_applicants", {
+    session_token: session.session_token
   });
+
+  if (!res.ok) {
+    box.textContent = "Error loading applicants: " + (res.error || "");
+    return;
+  }
+
+  const rows = Array.isArray(res.applicants) ? res.applicants : [];
+  if (!rows.length) {
+    box.innerHTML = `<div class="muted">No applicants yet.</div>`;
+    return;
+  }
+
+  // simple, clean table
+  const escapeHtml = (s) => String(s == null ? "" : s)
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+  const tableRows = rows.map(r => {
+    const name = [r.candidate_first_name, r.candidate_last_name].filter(Boolean).join(" ").trim();
+    const email = r.candidate_email || "";
+    const phone = r.candidate_phone || ""; // optional, may be blank
+    const job = r.job_title || r.job_id || "";
+    const loc = [r.city, r.state].filter(Boolean).join(", ");
+    const status = r.status || "";
+    const applied = r.applied_at || "";
+
+    return `
+      <tr>
+        <td>${escapeHtml(job)}</td>
+        <td>${escapeHtml(loc)}</td>
+        <td>${escapeHtml(name)}</td>
+        <td>${escapeHtml(email)}</td>
+        <td>${escapeHtml(phone)}</td>
+        <td>${escapeHtml(status)}</td>
+        <td>${escapeHtml(applied)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  box.innerHTML = `
+    <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Job</th>
+          <th>Location</th>
+          <th>Candidate</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Status</th>
+          <th>Applied</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${tableRows}
+      </tbody>
+    </table>
+  `;
+});
 
   document.getElementById("btnPost").addEventListener("click", async () => {
     const job_title = document.getElementById("job_title").value.trim();
