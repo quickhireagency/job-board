@@ -224,7 +224,7 @@
       background: rgba(180,35,24,.08);
     }
 
-    /* EEO table */
+    /* Tables */
     table{
       width:100%;
       border-collapse:separate;
@@ -240,9 +240,47 @@
       text-align:left;
       font-size:12px;
       color: var(--text);
+      vertical-align:top;
     }
     th{ font-weight:1000; background: rgba(10,30,20,.04); }
     tr:last-child td{ border-bottom:none; }
+
+    /* Applicants controls */
+    .cell-compact{ white-space:nowrap; }
+    .app-status{
+      width:auto;
+      padding:6px 8px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.95);
+      font-weight:800;
+      font-size:12px;
+    }
+    .xbtn{
+      width:34px;
+      height:34px;
+      border-radius:10px;
+      border:1px solid rgba(10,30,20,.14);
+      background:rgba(255,255,255,.9);
+      cursor:pointer;
+      font-weight:1000;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 2px 10px rgba(0,0,0,.04);
+    }
+    .xbtn:hover{ border-color: rgba(10,30,20,.28); }
+    .xbtn.on{
+      border-color: rgba(180,35,24,.35);
+      background: rgba(180,35,24,.08);
+      color: rgba(180,35,24,.95);
+    }
+    tr.xoff td{
+      opacity:.75;
+    }
+    tr.xoff td:first-child{
+      position:relative;
+    }
 
     /* Footer logo + legal links (match index.html) */
     .qh-footer-logo-wrap{
@@ -311,7 +349,7 @@
         <div class="content">
           <div id="entBox" class="note">Loading…</div>
 
-          <!-- NEW: EEO Aggregate panel (Corporate only) -->
+          <!-- EEO Aggregate panel (Corporate only) -->
           <div class="hr"></div>
           <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
             <div style="font-weight:1000;">EEO Aggregate (Corporate)</div>
@@ -322,6 +360,8 @@
                 <option value="60">60</option>
                 <option value="90">90</option>
                 <option value="180">180</option>
+                <option value="270">270</option>
+                <option value="365">365</option>
               </select>
               <button class="btn" id="btnLoadEeo" type="button">Load EEO</button>
             </div>
@@ -370,17 +410,17 @@
             </div>
           </div>
 
-          <!-- NEW: Applicants panel scaffold -->
+          <!-- Applicants panel -->
           <div class="hr"></div>
           <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
             <div style="font-weight:1000;">Applicants</div>
             <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
           </div>
           <div class="muted" style="margin-top:6px;">
-            This will show applicants for your jobs (email required, phone optional). If phone is blank, it will be left blank.
+            Status starts at <b>Applied</b>. Employers can change status and mark applicants with an <b>X</b> (does not remove them).
           </div>
           <div id="applicantsBox" class="note" style="margin-top:10px;">
-           Click "Load Applicants" to see all applicants.
+            Click "Load Applicants" to see all applicants.
           </div>
         </div>
       </div>
@@ -663,6 +703,23 @@
 
   let __entitlements = null;
 
+  // Canonical status set (MUST start with Applied)
+  const APP_STATUS_OPTIONS = ["Applied","Reviewed","Interview","Offer","Hired","Rejected"];
+
+  function normalizeStatus(s){
+    const v = String(s || "").trim();
+    if (!v) return "Applied";
+    // Back-compat: treat "New" as Applied
+    if (v.toLowerCase() === "new") return "Applied";
+    // Pass through if already canonical
+    if (APP_STATUS_OPTIONS.indexOf(v) >= 0) return v;
+    // Common aliases
+    const low = v.toLowerCase();
+    if (low === "screening") return "Reviewed";
+    if (low === "accepted") return "Hired";
+    return v; // leave as-is if unknown; UI will still show it
+  }
+
   function renderEeoAggregate(agg){
     const eeoBox = document.getElementById("eeoBox");
     if (!agg) {
@@ -762,73 +819,187 @@
 
   document.getElementById("btnLoadEeo").addEventListener("click", loadEeo);
 
-  // Applicants scaffold (until endpoint exists)
-document.getElementById("btnLoadApplicants").addEventListener("click", async () => {
-  const box = document.getElementById("applicantsBox");
-  box.textContent = "Loading applicants…";
-
-  const res = await QH.apiPost("list_employer_applicants", {
-    session_token: session.session_token
-  });
-
-  if (!res.ok) {
-    box.textContent = "Error loading applicants: " + (res.error || "");
-    return;
-  }
-
-  const rows = Array.isArray(res.applicants) ? res.applicants : [];
-  if (!rows.length) {
-    box.innerHTML = `<div class="muted">No applicants yet.</div>`;
-    return;
-  }
-
-  // simple, clean table
+  // Helpers
   const escapeHtml = (s) => String(s == null ? "" : s)
     .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
     .replaceAll('"',"&quot;").replaceAll("'","&#039;");
 
-  const tableRows = rows.map(r => {
-    const name = [r.candidate_first_name, r.candidate_last_name].filter(Boolean).join(" ").trim();
-    const email = r.candidate_email || "";
-    const phone = r.candidate_phone || ""; // optional, may be blank
-    const job = r.job_title || r.job_id || "";
-    const loc = [r.city, r.state].filter(Boolean).join(", ");
-    const status = r.status || "";
-    const applied = r.applied_at || "";
+  function statusSelectHtml(current){
+    const cur = normalizeStatus(current);
+    const opts = APP_STATUS_OPTIONS.map(v => `<option value="${escapeHtml(v)}"${v===cur?" selected":""}>${escapeHtml(v)}</option>`).join("");
+    return `<select class="app-status" data-role="status">${opts}</select>`;
+  }
 
-    return `
-      <tr>
-        <td>${escapeHtml(job)}</td>
-        <td>${escapeHtml(loc)}</td>
-        <td>${escapeHtml(name)}</td>
-        <td>${escapeHtml(email)}</td>
-        <td>${escapeHtml(phone)}</td>
-        <td>${escapeHtml(status)}</td>
-        <td>${escapeHtml(applied)}</td>
-      </tr>
-    `;
-  }).join("");
+  // NOTE: These endpoints must be added in backend (public_api POST):
+  // - action: update_application_status  { session_token, application_id, status }
+  // - action: toggle_applicant_xoff      { session_token, application_id, x_off: "TRUE"/"FALSE" }
+  async function updateApplicationStatus(applicationId, newStatus){
+    const res = await QH.apiPost("update_application_status", {
+      session_token: session.session_token,
+      application_id: applicationId,
+      status: String(newStatus || "").trim()
+    });
+    return res;
+  }
 
-  box.innerHTML = `
-    <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
-    <table>
-      <thead>
-        <tr>
-          <th>Job</th>
-          <th>Location</th>
-          <th>Candidate</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Status</th>
-          <th>Applied</th>
+  async function toggleXOff(applicationId, xOffBool){
+    const res = await QH.apiPost("toggle_applicant_xoff", {
+      session_token: session.session_token,
+      application_id: applicationId,
+      x_off: xOffBool ? "TRUE" : "FALSE"
+    });
+    return res;
+  }
+
+  // Applicants
+  document.getElementById("btnLoadApplicants").addEventListener("click", async () => {
+    const box = document.getElementById("applicantsBox");
+    box.textContent = "Loading applicants…";
+
+    const res = await QH.apiPost("list_employer_applicants", {
+      session_token: session.session_token
+    });
+
+    if (!res.ok) {
+      box.textContent = "Error loading applicants: " + (res.error || "");
+      return;
+    }
+
+    const rows = Array.isArray(res.applicants) ? res.applicants : [];
+    if (!rows.length) {
+      box.innerHTML = `<div class="muted">No applicants yet.</div>`;
+      return;
+    }
+
+    // Expect backend to eventually include: is_x_off boolean (derived from Applications.notes_internal)
+    // Until then, treat missing as false.
+    const tableRows = rows.map(r => {
+      const name = [r.candidate_first_name, r.candidate_last_name].filter(Boolean).join(" ").trim();
+      const email = r.candidate_email || "";
+      const phone = r.candidate_phone || ""; // optional
+      const job = r.job_title || r.job_id || "";
+      const loc = [r.city, r.state].filter(Boolean).join(", ");
+      const status = normalizeStatus(r.status || "Applied");
+      const applied = r.applied_at || "";
+      const appId = String(r.application_id || "");
+      const xoff = !!r.is_x_off;
+
+      return `
+        <tr data-app-id="${escapeHtml(appId)}" class="${xoff ? "xoff":""}">
+          <td>${escapeHtml(job)}</td>
+          <td>${escapeHtml(loc)}</td>
+          <td>${escapeHtml(name)}</td>
+          <td>${escapeHtml(email)}</td>
+          <td>${escapeHtml(phone)}</td>
+          <td class="cell-compact">${statusSelectHtml(status)}</td>
+          <td>${escapeHtml(applied)}</td>
+          <td class="cell-compact">
+            <button class="xbtn ${xoff ? "on":""}" data-role="xoff" title="Mark with X (toggle)">${xoff ? "✖" : "X"}</button>
+          </td>
         </tr>
-      </thead>
-      <tbody>
-        ${tableRows}
-      </tbody>
-    </table>
-  `;
-});
+      `;
+    }).join("");
+
+    box.innerHTML = `
+      <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Job</th>
+            <th>Location</th>
+            <th>Candidate</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Status</th>
+            <th>Applied</th>
+            <th>X</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${tableRows}
+        </tbody>
+      </table>
+      <div class="muted" style="margin-top:10px;">
+        Status updates and X toggles require backend actions <code>update_application_status</code> and <code>toggle_applicant_xoff</code>.
+      </div>
+    `;
+
+    // Wire per-row actions (event delegation)
+    const table = box.querySelector("table");
+    if (!table) return;
+
+    table.addEventListener("change", async (ev) => {
+      const sel = ev.target;
+      if (!sel || sel.getAttribute("data-role") !== "status") return;
+
+      const tr = sel.closest("tr[data-app-id]");
+      if (!tr) return;
+
+      const appId = tr.getAttribute("data-app-id") || "";
+      const prev = sel.getAttribute("data-prev") || normalizeStatus(sel.value);
+      const next = normalizeStatus(sel.value);
+
+      // store previous before attempting update
+      sel.setAttribute("data-prev", prev);
+
+      // optimistic UI (already selected)
+      const r = await updateApplicationStatus(appId, next);
+      if (!r.ok) {
+        // revert selection
+        sel.value = prev;
+        QH.toast("Failed", r.error || "Could not update status.");
+        return;
+      }
+      sel.setAttribute("data-prev", next);
+      QH.toast("Updated", "Status set to " + next + ".");
+    });
+
+    table.addEventListener("click", async (ev) => {
+      const btn = ev.target;
+      if (!btn || btn.getAttribute("data-role") !== "xoff") return;
+
+      const tr = btn.closest("tr[data-app-id]");
+      if (!tr) return;
+
+      const appId = tr.getAttribute("data-app-id") || "";
+      const isOn = btn.classList.contains("on");
+      const nextOn = !isOn;
+
+      // optimistic UI
+      if (nextOn) {
+        btn.classList.add("on");
+        btn.textContent = "✖";
+        tr.classList.add("xoff");
+      } else {
+        btn.classList.remove("on");
+        btn.textContent = "X";
+        tr.classList.remove("xoff");
+      }
+
+      const r = await toggleXOff(appId, nextOn);
+      if (!r.ok) {
+        // revert UI
+        if (nextOn) {
+          btn.classList.remove("on");
+          btn.textContent = "X";
+          tr.classList.remove("xoff");
+        } else {
+          btn.classList.add("on");
+          btn.textContent = "✖";
+          tr.classList.add("xoff");
+        }
+        QH.toast("Failed", r.error || "Could not toggle X.");
+        return;
+      }
+
+      QH.toast("Saved", nextOn ? "Marked with X." : "X removed.");
+    });
+
+    // Initialize data-prev for status selects
+    box.querySelectorAll('select[data-role="status"]').forEach(sel => {
+      sel.setAttribute("data-prev", normalizeStatus(sel.value));
+    });
+  });
 
   document.getElementById("btnPost").addEventListener("click", async () => {
     const job_title = document.getElementById("job_title").value.trim();
