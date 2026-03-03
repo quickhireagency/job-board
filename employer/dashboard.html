@@ -229,7 +229,7 @@
       background: rgba(180,35,24,.08);
     }
 
-    /* Tables */
+    /* Tables (kept for EEO tables) */
     table{
       width:100%;
       border-collapse:separate;
@@ -250,39 +250,10 @@
     th{ font-weight:1000; background: rgba(10,30,20,.04); }
     tr:last-child td{ border-bottom:none; }
 
-    /* =========================================================
-       APPLICANTS TABLE FIX (prevents Status/X cut-off)
-       ONLY changes requested: wrapper scroll + sticky Status/X
-       ========================================================= */
-    .table-wrap{
-      width:100%;
-      overflow-x:auto;
-      -webkit-overflow-scrolling: touch;
-      border-radius:14px;
-    }
-    .table-wrap table{
-      min-width: 980px; /* keeps Status + X reachable */
-    }
-
-    th.sticky-r, td.sticky-r{
-      position: sticky;
-      right: 0;
-      background: rgba(255,255,255,.95);
-      z-index: 3;
-    }
-    th.sticky-r2, td.sticky-r2{
-      position: sticky;
-      right: 56px; /* width of X column */
-      background: rgba(255,255,255,.95);
-      z-index: 3;
-      border-left: 1px solid rgba(10,30,20,.10);
-    }
-
     /* Applicants controls */
-    .cell-compact{ white-space:nowrap; }
     .app-status{
       width:auto;
-      min-width: 130px; /* keeps dropdown usable */
+      min-width: 160px;
       padding:6px 8px;
       border-radius:10px;
       border:1px solid var(--line);
@@ -290,33 +261,11 @@
       font-weight:800;
       font-size:12px;
     }
-    .xbtn{
-      width:34px;
-      height:34px;
-      border-radius:10px;
-      border:1px solid rgba(10,30,20,.14);
-      background:rgba(255,255,255,.9);
-      cursor:pointer;
-      font-weight:1000;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow: 0 2px 10px rgba(0,0,0,.04);
-    }
-    .xbtn:hover{ border-color: rgba(10,30,20,.28); }
-    .xbtn.on{
-      border-color: rgba(180,35,24,.35);
-      background: rgba(180,35,24,.08);
-      color: rgba(180,35,24,.95);
-    }
-    tr.xoff td{
-      opacity:.75;
-    }
 
-    /* NEW: applicant card / resume preview */
+    /* NEW: applicant row (compact) + resume card */
     .app-row{
       display:grid;
-      grid-template-columns: 46px 220px 220px 1fr 180px;
+      grid-template-columns: 46px 1fr 1fr; /* checkbox | job | name */
       gap:10px;
       align-items:center;
       padding:10px;
@@ -325,6 +274,7 @@
       background: rgba(255,255,255,.92);
       box-shadow: 0 6px 16px rgba(16,24,40,.06);
     }
+    .app-row > div{ min-width:0; } /* critical so text can ellipsis */
     @media (max-width: 980px){
       .app-row{
         grid-template-columns: 46px 1fr;
@@ -332,6 +282,12 @@
       }
     }
     .app-row + .app-row{ margin-top:10px; }
+
+    .cell-compact{
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
 
     .chk{
       width:22px;
@@ -351,6 +307,7 @@
       background: rgba(180,35,24,.08);
       color: rgba(180,35,24,.95);
     }
+    .app-row.xoff{ opacity:.75; }
 
     .nameLink{
       font-weight:1000;
@@ -370,20 +327,13 @@
       display:none;
     }
     .app-card.open{ display:block; }
-    .cardGrid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .cardGrid{ grid-template-columns:1fr; }
-    }
+
     .mini{
       font-size:12px;
       color: var(--muted);
       line-height:1.4;
     }
+
     .resumeFrame{
       border:1px solid rgba(10,30,20,.14);
       border-radius:14px;
@@ -402,7 +352,7 @@
       .resumeFrame{ height:520px; }
     }
 
-    /* Form elements (missing in your original) */
+    /* Form elements */
     label{
       display:block;
       font-size:12px;
@@ -555,7 +505,7 @@
             <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
           </div>
           <div class="muted" style="margin-top:6px;">
-            Row shows only: <b>Job Title | Name | E-mail | Phone | Status</b>. Checkbox toggles <b>X-off</b>. Click candidate name to open the card.
+            Row shows only: <b>Job Title | Name</b>. Checkbox toggles <b>X-off</b>. Click candidate name <b>(click)</b> to open the card.
           </div>
           <div id="applicantsBox" class="note" style="margin-top:10px;">
             Click "Load Applicants" to see all applicants.
@@ -1004,11 +954,10 @@
       return;
     }
 
-    // Row spec: [checkbox] Job Title | Name (click) | Email | Phone | Status dropdown
     box.innerHTML = `
       <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
       <div class="muted" style="margin-bottom:10px;">
-        Click the candidate name to open the card (resume preview). Checkbox toggles X-off.
+        Click the candidate name <b>(click)</b> to open the card (resume preview). Checkbox toggles X-off.
       </div>
       <div id="appsRows"></div>
     `;
@@ -1023,10 +972,8 @@
       const status = normalizeStatus(r.status || "Applied");
       const xoff = !!r.is_x_off;
 
-      // Resume: backend provides resume_file_url (from Resumes sheet / Drive /preview)
       const resumeUrl = String(r.resume_file_url || "");
 
-      // Extra details for card
       const loc = [r.city, r.state].filter(Boolean).join(", ");
       const appliedAt = String(r.applied_at || "");
       const cover = String(r.cover_letter_text || "");
@@ -1037,14 +984,11 @@
             <div>
               <button class="chk ${xoff ? "on":""}" data-role="xoff" title="Cross off (X-off)">${xoff ? "☑" : "☐"}</button>
             </div>
+
             <div class="cell-compact" title="${escapeHtml(jobTitle)}"><b>${escapeHtml(jobTitle)}</b></div>
+
             <div class="cell-compact">
               <a href="#" class="nameLink" data-role="toggleCard">${escapeHtml(name)}</a>
-            </div>
-            <div class="cell-compact" title="${escapeHtml(email)}">${escapeHtml(email)}</div>
-            <div class="cell-compact">${escapeHtml(phone)}</div>
-            <div class="cell-compact">
-              ${statusSelectHtml(status)}
             </div>
           </div>
 
@@ -1059,6 +1003,7 @@
                   ${appliedAt ? ("<b>Applied:</b> " + escapeHtml(appliedAt) + "<br>") : ""}
                 </div>
               </div>
+
               <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                 <label class="mini" style="margin:0; font-weight:1000;">Status</label>
                 ${statusSelectHtml(status)}
@@ -1081,110 +1026,114 @@
       `;
     }).join("");
 
-    // Delegated handlers
-    box.addEventListener("change", async (ev) => {
-      const sel = ev.target;
-      if (!sel || sel.getAttribute("data-role") !== "status") return;
+    // Delegated handlers (avoid stacking duplicate listeners)
+    box.__qhBound = box.__qhBound || { change: false, click: false };
 
-      const wrapEl = sel.closest("[data-app-id]");
-      if (!wrapEl) return;
+    if (!box.__qhBound.change){
+      box.addEventListener("change", async (ev) => {
+        const sel = ev.target;
+        if (!sel || sel.getAttribute("data-role") !== "status") return;
 
-      const appId = wrapEl.getAttribute("data-app-id") || "";
-      const prev = sel.getAttribute("data-prev") || normalizeStatus(sel.value);
-      const next = normalizeStatus(sel.value);
-
-      sel.setAttribute("data-prev", prev);
-
-      const r = await updateApplicationStatus(appId, next);
-      if (!r.ok) {
-        sel.value = prev;
-        QH.toast("Failed", r.error || "Could not update status.");
-        return;
-      }
-
-      // Sync ALL status selects inside this applicant block
-      wrapEl.querySelectorAll('select[data-role="status"]').forEach(s2 => {
-        s2.value = next;
-        s2.setAttribute("data-prev", next);
-      });
-
-      QH.toast("Updated", "Status set to " + next + ".");
-    });
-
-    box.addEventListener("click", async (ev) => {
-      const t = ev.target;
-
-      // Toggle card by clicking name
-      if (t && t.getAttribute && t.getAttribute("data-role") === "toggleCard") {
-        ev.preventDefault();
-        const wrapEl = t.closest("[data-app-id]");
-        if (!wrapEl) return;
-        const card = wrapEl.querySelector("[data-card]");
-        if (!card) return;
-        card.classList.toggle("open");
-        return;
-      }
-
-      // Close card
-      if (t && t.getAttribute && t.getAttribute("data-role") === "closeCard") {
-        ev.preventDefault();
-        const wrapEl = t.closest("[data-app-id]");
-        if (!wrapEl) return;
-        const card = wrapEl.querySelector("[data-card]");
-        if (card) card.classList.remove("open");
-        return;
-      }
-
-      // X-off checkbox
-      if (t && t.getAttribute && t.getAttribute("data-role") === "xoff") {
-        ev.preventDefault();
-        const wrapEl = t.closest("[data-app-id]");
+        const wrapEl = sel.closest("[data-app-id]");
         if (!wrapEl) return;
 
         const appId = wrapEl.getAttribute("data-app-id") || "";
-        const row = wrapEl.querySelector(".app-row");
-        const isOn = t.classList.contains("on");
-        const nextOn = !isOn;
+        const prev = sel.getAttribute("data-prev") || normalizeStatus(sel.value);
+        const next = normalizeStatus(sel.value);
 
-        // optimistic UI: update all checkboxes in this block
-        wrapEl.querySelectorAll('[data-role="xoff"]').forEach(b => {
-          if (nextOn){
-            b.classList.add("on");
-            b.textContent = "☑";
-          } else {
-            b.classList.remove("on");
-            b.textContent = "☐";
-          }
-        });
-        if (row){
-          if (nextOn) row.classList.add("xoff");
-          else row.classList.remove("xoff");
-        }
+        sel.setAttribute("data-prev", prev);
 
-        const r = await toggleXOff(appId, nextOn);
+        const r = await updateApplicationStatus(appId, next);
         if (!r.ok) {
-          // revert
-          wrapEl.querySelectorAll('[data-role="xoff"]').forEach(b => {
-            if (nextOn){
-              b.classList.remove("on");
-              b.textContent = "☐";
-            } else {
-              b.classList.add("on");
-              b.textContent = "☑";
-            }
-          });
-          if (row){
-            if (nextOn) row.classList.remove("xoff");
-            else row.classList.add("xoff");
-          }
-          QH.toast("Failed", r.error || "Could not toggle X.");
+          sel.value = prev;
+          QH.toast("Failed", r.error || "Could not update status.");
           return;
         }
 
-        QH.toast("Saved", nextOn ? "Applicant crossed off." : "Cross-off removed.");
-        return;
-      }
-    });
+        // Sync ALL status selects inside this applicant block (only card has it now)
+        wrapEl.querySelectorAll('select[data-role="status"]').forEach(s2 => {
+          s2.value = next;
+          s2.setAttribute("data-prev", next);
+        });
+
+        QH.toast("Updated", "Status set to " + next + ".");
+      });
+      box.__qhBound.change = true;
+    }
+
+    if (!box.__qhBound.click){
+      box.addEventListener("click", async (ev) => {
+        const t = ev.target;
+
+        // Toggle card by clicking name
+        if (t && t.getAttribute && t.getAttribute("data-role") === "toggleCard") {
+          ev.preventDefault();
+          const wrapEl = t.closest("[data-app-id]");
+          if (!wrapEl) return;
+          const card = wrapEl.querySelector("[data-card]");
+          if (!card) return;
+          card.classList.toggle("open");
+          return;
+        }
+
+        // Close card
+        if (t && t.getAttribute && t.getAttribute("data-role") === "closeCard") {
+          ev.preventDefault();
+          const wrapEl = t.closest("[data-app-id]");
+          if (!wrapEl) return;
+          const card = wrapEl.querySelector("[data-card]");
+          if (card) card.classList.remove("open");
+          return;
+        }
+
+        // X-off checkbox
+        if (t && t.getAttribute && t.getAttribute("data-role") === "xoff") {
+          ev.preventDefault();
+          const wrapEl = t.closest("[data-app-id]");
+          if (!wrapEl) return;
+
+          const appId = wrapEl.getAttribute("data-app-id") || "";
+          const row = wrapEl.querySelector(".app-row");
+          const isOn = t.classList.contains("on");
+          const nextOn = !isOn;
+
+          // optimistic UI
+          if (nextOn){
+            t.classList.add("on");
+            t.textContent = "☑";
+          } else {
+            t.classList.remove("on");
+            t.textContent = "☐";
+          }
+          if (row){
+            if (nextOn) row.classList.add("xoff");
+            else row.classList.remove("xoff");
+          }
+
+          const r = await toggleXOff(appId, nextOn);
+          if (!r.ok) {
+            // revert
+            if (nextOn){
+              t.classList.remove("on");
+              t.textContent = "☐";
+            } else {
+              t.classList.add("on");
+              t.textContent = "☑";
+            }
+            if (row){
+              if (nextOn) row.classList.remove("xoff");
+              else row.classList.add("xoff");
+            }
+            QH.toast("Failed", r.error || "Could not toggle X.");
+            return;
+          }
+
+          QH.toast("Saved", nextOn ? "Applicant crossed off." : "Cross-off removed.");
+          return;
+        }
+      });
+      box.__qhBound.click = true;
+    }
 
     // Initialize data-prev for status selects
     box.querySelectorAll('select[data-role="status"]').forEach(sel => {
