@@ -127,6 +127,7 @@
       justify-content:center;
       text-decoration:none;
       white-space:nowrap;
+      position:relative;
     }
     .btn:hover{border-color: rgba(10,30,20,.28)}
     .btn.primary{
@@ -155,7 +156,9 @@
       margin-bottom:14px;
     }
     .notice h3{margin:0 0 8px 0; font-size:14px}
-    .notice ul{margin:0; padding-left:18px; color:var(--muted); font-size:13px}
+    .notice .muted{color:var(--muted); font-size:13px; line-height:1.45}
+    .notice .lines{margin-top:8px}
+    .notice .line{margin:4px 0}
     .notice .strong{color:var(--text); font-weight:900}
 
     /* Filter bar */
@@ -169,12 +172,12 @@
     }
     .filters-grid{
       display:grid;
-      grid-template-columns: 1.2fr .9fr .9fr .8fr .8fr;
+      grid-template-columns: 1.2fr .9fr .9fr .8fr;
       gap:10px;
       align-items:end;
     }
     @media (max-width: 1100px){
-      .filters-grid{grid-template-columns: 1fr 1fr 1fr}
+      .filters-grid{grid-template-columns: 1fr 1fr}
     }
     @media (max-width: 720px){
       .filters-grid{grid-template-columns: 1fr}
@@ -230,6 +233,10 @@
       overflow:hidden;
       min-height: 520px;
     }
+    @media (max-width: 980px){
+      .panel{min-height:auto}
+    }
+
     .panel-header{
       padding:14px 14px 10px;
       border-bottom:1px solid var(--line);
@@ -244,6 +251,10 @@
       max-height: calc(100vh - 320px);
       overflow:auto;
     }
+    @media (max-width: 980px){
+      .list{max-height: 52vh}
+    }
+
     .item{
       padding:12px 14px;
       border-bottom:1px solid rgba(10,30,20,.10);
@@ -295,6 +306,74 @@
       font-family: inherit;
       font-size:14px;
       line-height:1.45;
+    }
+
+    /* Verified badge image (detail panel only) */
+    .verified-badge-wrap{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin: 10px 0 0;
+    }
+    .verified-badge-img{
+      max-width: 240px;
+      width: 100%;
+      height: auto;
+      display:block;
+      object-fit: contain; /* no squishing */
+    }
+    @media (max-width: 980px){
+      .verified-badge-img{max-width: 220px;}
+    }
+
+    /* My Account dropdown */
+    .dropdown{
+      position:relative;
+      display:inline-flex;
+    }
+    .menu{
+      position:absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 180px;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display:none;
+      z-index: 50;
+    }
+    .menu a, .menu button{
+      width:100%;
+      border:none;
+      background:transparent;
+      text-align:left;
+      padding:10px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+      color: var(--text);
+      text-decoration:none;
+      display:block;
+    }
+    .menu a:hover, .menu button:hover{
+      background: rgba(43,134,214,.10);
+      text-decoration:none;
+    }
+    .menu .danger{
+      color: var(--danger);
+    }
+    .dropdown.open .menu{display:block}
+
+    /* Mobile: make detail open as full-width section */
+    .mobile-back{
+      display:none;
+    }
+    @media (max-width: 980px){
+      .mobile-back{
+        display:inline-flex;
+      }
     }
 
     /* Footer logo + extra links */
@@ -361,8 +440,20 @@
           <input id="searchInput" placeholder="Search jobs (keyword)..." />
         </div>
 
+        <!-- Help -->
+        <a class="btn" id="helpBtn" href="/help.html" target="_self">Help</a>
+
         <!-- Candidate auth entry point -->
         <button class="btn blue" id="loginBtn">Login / Sign Up</button>
+
+        <!-- My Account dropdown (candidate only; shown when logged in) -->
+        <div class="dropdown" id="acctWrap" style="display:none;">
+          <button class="btn blue" id="acctBtn" aria-haspopup="true" aria-expanded="false">My Account</button>
+          <div class="menu" id="acctMenu" role="menu" aria-label="My Account menu">
+            <a href="/candidate/dashboard.html" target="_self" role="menuitem">Dashboard</a>
+            <button class="danger" id="logoutBtn" type="button" role="menuitem">Logout</button>
+          </div>
+        </div>
 
         <!-- Employer portal entry point (separate UI) -->
         <a class="btn primary" id="employerBtn" href="/employer/dashboard.html">Employer Portal</a>
@@ -372,13 +463,14 @@
 
   <div class="wrap">
 
+    <!-- Welcome message (candidate-facing) -->
     <div class="notice">
-      <h3>Important (so purchases attach correctly):</h3>
-      <ul>
-        <li><span class="strong">Use the SAME E-mail</span> at Stripe checkout that you used when you signed up.</li>
-        <li>After payment, you must enter <span class="strong">E-mail + Username</span> — <span class="strong">both must match your account</span> or your purchase will not attach.</li>
-        <li>Candidates can browse jobs without logging in. <span class="strong">You must be logged in to apply.</span></li>
-      </ul>
+      <h3>Welcome to QuickHire™ Job Board — The fast, simple way to connect top talent with top employers.</h3>
+      <div class="muted lines">
+        <div class="line"><span class="strong">Candidates:</span> Browse open positions, apply in minutes, and track your application status from your dashboard.</div>
+        <div class="line"><span class="strong">Employers:</span> Post jobs, review applicants all in one place.</div>
+        <div class="line">Use the search and filters below to find the right opportunity.</div>
+      </div>
     </div>
 
     <!-- Filters -->
@@ -406,16 +498,11 @@
         </div>
 
         <div>
-          <label for="stateSel">State (dropdown)</label>
+          <label for="stateSel">State / Territory (dropdown)</label>
           <select id="stateSel">
             <option value="">Any</option>
-            <!-- US states -->
+            <!-- US states + territories -->
           </select>
-        </div>
-
-        <div>
-          <label for="stateInput">State (text)</label>
-          <input id="stateInput" placeholder="e.g., IN" maxlength="2" />
         </div>
       </div>
 
@@ -443,7 +530,7 @@
     </div>
 
     <div class="grid">
-      <div class="panel">
+      <div class="panel" id="listPanel">
         <div class="panel-header">
           <div>
             <h2>Jobs</h2>
@@ -456,13 +543,17 @@
         </div>
       </div>
 
-      <div class="panel">
+      <div class="panel" id="detailPanel">
         <div class="panel-header">
           <div>
             <h2>Overview</h2>
             <div class="meta" id="detailMeta">Select a job on the left</div>
           </div>
-          <button class="btn primary" id="applyBtn" disabled>Apply</button>
+
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button class="btn mobile-back" id="backBtn" type="button">Back</button>
+            <button class="btn primary" id="applyBtn" disabled>Apply</button>
+          </div>
         </div>
 
         <div class="detail" id="jobDetail">
@@ -679,8 +770,8 @@
       jobs: [],
       filtered: [],
       selectedJobId: "",
-      // FIX #2: use the shared session store used by /assets/app.js + /auth/login.html
-     session: (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {}),
+      // use the shared session store used by /assets/app.js + /auth/login.html
+      session: (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {}),
       geo: {
         enabled: false,
         lat: null,
@@ -742,16 +833,22 @@
       return 2 * R * Math.asin(Math.sqrt(a));
     }
 
-    // Basic US states dropdown
-    const US_STATES = [
-      "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+    // US states + required territories (USPS)
+    const US_STATES_AND_TERRITORIES = [
+      "AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
       "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
-      "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"
+      "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY",
+      "AS","GU","MP","PR","VI","UM"
     ];
 
     function initStates(){
       const sel = qs("#stateSel");
-      sel.innerHTML = `<option value="">Any</option>` + US_STATES.map(s => `<option value="${s}">${s}</option>`).join("");
+      sel.innerHTML = `<option value="">Any</option>` +
+        US_STATES_AND_TERRITORIES.map(s => `<option value="${s}">${s}</option>`).join("");
+    }
+
+    function isMobile(){
+      return window.matchMedia && window.matchMedia("(max-width: 980px)").matches;
     }
 
     // ----------------------------
@@ -812,10 +909,8 @@
       const workArrangement = (qs("#waSel").value || "").trim().toLowerCase();
       const city = (qs("#cityInput").value || "").trim().toLowerCase();
 
-      // state can come from dropdown or text; text wins if filled
-      const stateText = (qs("#stateInput").value || "").trim().toUpperCase();
-      const stateDrop = (qs("#stateSel").value || "").trim().toUpperCase();
-      const stateVal = stateText || stateDrop;
+      // State: dropdown only (no text input)
+      const stateVal = (qs("#stateSel").value || "").trim().toUpperCase();
 
       const radius = (qs("#radiusSel").value || "").trim();
       const radiusMiles = radius ? Number(radius) : null;
@@ -901,8 +996,23 @@
         el.addEventListener("click", () => {
           const id = el.getAttribute("data-job");
           state.selectedJobId = id;
+
+          // Update URL for /job/<job_id>/index.html (client-side support)
+          try{
+            const newPath = "/job/" + encodeURIComponent(id) + "/index.html";
+            window.history.pushState({ job_id: id }, "", newPath);
+          }catch(e){ /* ignore */ }
+
           renderJobs();
           renderSelectedJob(id);
+
+          // Mobile: open detail as full-width section by scrolling into view
+          if (isMobile()){
+            setTimeout(() => {
+              const dp = qs("#detailPanel");
+              if (dp) dp.scrollIntoView({ behavior:"smooth", block:"start" });
+            }, 50);
+          }
         });
       });
     }
@@ -934,11 +1044,11 @@
       const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
 
       setText(qs("#detailMeta"), (j.company_id ? `Company: ${j.company_id}` : "Job detail"));
-
       qs("#applyBtn").disabled = false;
 
       qs("#jobDetail").innerHTML = `
         <h1>${escapeHtml(j.job_title || "Untitled role")}</h1>
+
         <div class="row">
           ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
           ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
@@ -948,7 +1058,18 @@
           ${verified ? `<span class="pill verified">Verified Employer</span>` : ``}
         </div>
 
-        <div class="muted">Job ID: ${escapeHtml(j.job_id || "")}</div>
+        ${verified ? `
+          <div class="verified-badge-wrap" aria-label="Verified Employer badge">
+            <img
+              class="verified-badge-img"
+              src="/job-board/QuickHireVerifiedEmployerBadge.png"
+              alt="QuickHire™ Verified Employer"
+              loading="lazy"
+            />
+          </div>
+        ` : ``}
+
+        <div class="muted" style="margin-top:8px;">Job ID: ${escapeHtml(j.job_id || "")}</div>
 
         <div class="box" style="margin-top:14px;">
           <div class="muted" style="margin-bottom:6px; font-weight:900;">Description</div>
@@ -974,10 +1095,13 @@
     function goApply(){
       if (!state.selectedJobId) return;
 
+      // refresh session right before we decide
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+
       const applyUrl = PATHS.applyPage + "?job_id=" + encodeURIComponent(state.selectedJobId);
 
       // If not logged in as job seeker, force candidate login page with next=applyUrl
-      const sess = state.session || {};
       if (!sess.session_token || sess.role !== "job_seeker"){
         window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(applyUrl);
         return;
@@ -1005,9 +1129,11 @@
         // Reverse geocode to prefill city/state
         const place = await reverseGeocode(state.geo.lat, state.geo.lon);
         if (place && place.city) qs("#cityInput").value = place.city;
+
+        // only dropdown now
         if (place && place.state) {
-          qs("#stateInput").value = (place.state.length === 2 ? place.state.toUpperCase() : "");
-          if (US_STATES.includes((place.state||"").toUpperCase())) qs("#stateSel").value = place.state.toUpperCase();
+          const st = (place.state.length === 2 ? place.state.toUpperCase() : "");
+          if (st && US_STATES_AND_TERRITORIES.includes(st)) qs("#stateSel").value = st;
         }
 
         qs("#locNote").textContent = "Location captured. Radius filter will use this.";
@@ -1086,18 +1212,79 @@
     }
 
     // ----------------------------
+    // My Account dropdown (candidate only)
+    // ----------------------------
+    function syncAccountUi(){
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+      const isCandidate = !!sess.session_token && sess.role === "job_seeker";
+
+      const acctWrap = qs("#acctWrap");
+      const loginBtn = qs("#loginBtn");
+
+      if (isCandidate){
+        acctWrap.style.display = "inline-flex";
+        loginBtn.style.display = "none";
+      } else {
+        acctWrap.style.display = "none";
+        loginBtn.style.display = "inline-flex";
+      }
+    }
+
+    function closeAccountMenu(){
+      const wrap = qs("#acctWrap");
+      if (wrap) wrap.classList.remove("open");
+      const btn = qs("#acctBtn");
+      if (btn) btn.setAttribute("aria-expanded", "false");
+    }
+
+    // ----------------------------
     // Wire up
     // ----------------------------
     function init(){
       initStates();
+      syncAccountUi();
 
       // buttons
       qs("#loginBtn").addEventListener("click", () => {
-  const here = window.location.pathname + window.location.search;
-  window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
-});
+        const here = window.location.pathname + window.location.search;
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
+      });
 
       qs("#applyBtn").addEventListener("click", goApply);
+
+      // Mobile back button: scroll to list panel
+      qs("#backBtn").addEventListener("click", () => {
+        const lp = qs("#listPanel");
+        if (lp) lp.scrollIntoView({ behavior:"smooth", block:"start" });
+      });
+
+      // My Account dropdown toggle + logout
+      qs("#acctBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        const wrap = qs("#acctWrap");
+        if (!wrap) return;
+        const open = wrap.classList.toggle("open");
+        qs("#acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
+      });
+
+      qs("#logoutBtn").addEventListener("click", () => {
+        try{
+          if (window.QH && typeof QH.clearSession === "function") QH.clearSession();
+          else localStorage.removeItem("qh_session");
+        }catch(e){ /* ignore */ }
+        closeAccountMenu();
+        syncAccountUi();
+        const here = window.location.pathname + window.location.search;
+        window.location.href = "/?logged_out=1&next=" + encodeURIComponent(here);
+      });
+
+      // close menu on outside click
+      document.addEventListener("click", (e) => {
+        const wrap = qs("#acctWrap");
+        if (!wrap) return;
+        if (!wrap.contains(e.target)) closeAccountMenu();
+      });
 
       qs("#refreshBtn").addEventListener("click", loadJobs);
       qs("#clearFiltersBtn").addEventListener("click", () => {
@@ -1106,7 +1293,6 @@
         qs("#waSel").value = "";
         qs("#cityInput").value = "";
         qs("#stateSel").value = "";
-        qs("#stateInput").value = "";
         qs("#radiusSel").value = "";
         applyAllFiltersAndRender();
       });
@@ -1120,10 +1306,39 @@
       qs("#waSel").addEventListener("change", onChange);
       qs("#cityInput").addEventListener("input", onChange);
       qs("#stateSel").addEventListener("change", onChange);
-      qs("#stateInput").addEventListener("input", onChange);
       qs("#radiusSel").addEventListener("change", onChange);
 
-      loadJobs();
+      // Support /job/<job_id>/index.html if served
+      try{
+        const m = window.location.pathname.match(/^\/job\/([^\/]+)\/index\.html$/);
+        if (m && m[1]){
+          state.selectedJobId = decodeURIComponent(m[1]);
+        }
+      }catch(e){ /* ignore */ }
+
+      // Back/forward support
+      window.addEventListener("popstate", (evt) => {
+        const jobId = (evt && evt.state && evt.state.job_id) ? evt.state.job_id : "";
+        if (jobId){
+          state.selectedJobId = jobId;
+          renderJobs();
+          renderSelectedJob(jobId);
+        }
+      });
+
+      loadJobs().then(() => {
+        // if URL preselected job, render it after list loads
+        if (state.selectedJobId){
+          renderSelectedJob(state.selectedJobId);
+          renderJobs();
+          if (isMobile()){
+            setTimeout(() => {
+              const dp = qs("#detailPanel");
+              if (dp) dp.scrollIntoView({ behavior:"smooth", block:"start" });
+            }, 50);
+          }
+        }
+      });
     }
 
     init();
