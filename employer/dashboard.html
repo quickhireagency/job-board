@@ -128,6 +128,11 @@
       background: linear-gradient(135deg, rgba(43,154,94,.22), rgba(255,255,255,.95));
       color: #0b2a19;
     }
+    .btn[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+      filter:saturate(.9);
+    }
 
     .wrap{
       max-width:1200px;
@@ -307,9 +312,113 @@
     tr.xoff td{
       opacity:.75;
     }
-    tr.xoff td:first-child{
-      position:relative;
+
+    /* NEW: applicant card / resume preview */
+    .app-row{
+      display:grid;
+      grid-template-columns: 46px 220px 220px 1fr 180px;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 6px 16px rgba(16,24,40,.06);
     }
+    @media (max-width: 980px){
+      .app-row{
+        grid-template-columns: 46px 1fr;
+        grid-auto-rows:auto;
+      }
+    }
+    .app-row + .app-row{ margin-top:10px; }
+
+    .chk{
+      width:22px;
+      height:22px;
+      border-radius:8px;
+      border:1px solid rgba(10,30,20,.18);
+      background: rgba(255,255,255,.95);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:1000;
+      user-select:none;
+    }
+    .chk.on{
+      border-color: rgba(180,35,24,.35);
+      background: rgba(180,35,24,.08);
+      color: rgba(180,35,24,.95);
+    }
+
+    .nameLink{
+      font-weight:1000;
+      color: var(--blue);
+      cursor:pointer;
+      text-decoration:none;
+    }
+    .nameLink:hover{ text-decoration:underline; }
+
+    .app-card{
+      margin-top:10px;
+      padding:12px;
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:16px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 6px 18px rgba(16,24,40,.08);
+      display:none;
+    }
+    .app-card.open{ display:block; }
+    .cardGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .cardGrid{ grid-template-columns:1fr; }
+    }
+    .mini{
+      font-size:12px;
+      color: var(--muted);
+      line-height:1.4;
+    }
+    .resumeFrame{
+      border:1px solid rgba(10,30,20,.14);
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+      height: 640px;
+    }
+    .resumeFrame iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+      background:#fff;
+    }
+    @media (max-width: 700px){
+      .resumeFrame{ height:520px; }
+    }
+
+    /* Form elements (missing in your original) */
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:900;
+      margin:0 0 6px;
+    }
+    input, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      font-size:13px;
+      outline:none;
+    }
+    textarea{ min-height: 140px; resize: vertical; }
 
     /* Footer logo + legal links (match index.html) */
     .qh-footer-logo-wrap{
@@ -446,7 +555,7 @@
             <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
           </div>
           <div class="muted" style="margin-top:6px;">
-            Status starts at <b>Applied</b>. Employers can change status and mark applicants with an <b>X</b> (does not remove them).
+            Row shows only: <b>Job Title | Name | E-mail | Phone | Status</b>. Checkbox toggles <b>X-off</b>. Click candidate name to open the card.
           </div>
           <div id="applicantsBox" class="note" style="margin-top:10px;">
             Click "Load Applicants" to see all applicants.
@@ -738,15 +847,12 @@
   function normalizeStatus(s){
     const v = String(s || "").trim();
     if (!v) return "Applied";
-    // Back-compat: treat "New" as Applied
     if (v.toLowerCase() === "new") return "Applied";
-    // Pass through if already canonical
     if (APP_STATUS_OPTIONS.indexOf(v) >= 0) return v;
-    // Common aliases
     const low = v.toLowerCase();
     if (low === "screening") return "Reviewed";
     if (low === "accepted") return "Hired";
-    return v; // leave as-is if unknown; UI will still show it
+    return v;
   }
 
   function renderEeoAggregate(agg){
@@ -787,7 +893,6 @@
       await loadEntitlements();
     }
 
-    // Corporate gate
     if (!__entitlements || !__entitlements.eeo_export_included) {
       eeoBox.innerHTML = `
         <div style="font-weight:1000;">Corporate only</div>
@@ -841,7 +946,6 @@
       </div>
     `;
 
-    // Preload EEO panel state after entitlements load
     await loadEeo();
   }
   loadEntitlements();
@@ -859,25 +963,25 @@
     return `<select class="app-status" data-role="status">${opts}</select>`;
   }
 
-  // NOTE: These endpoints must be added in backend (public_api POST):
-  // - action: update_application_status  { session_token, application_id, status }
-  // - action: toggle_applicant_xoff      { session_token, application_id, x_off: "TRUE"/"FALSE" }
   async function updateApplicationStatus(applicationId, newStatus){
-    const res = await QH.apiPost("update_application_status", {
+    return await QH.apiPost("update_application_status", {
       session_token: session.session_token,
       application_id: applicationId,
       status: String(newStatus || "").trim()
     });
-    return res;
   }
 
   async function toggleXOff(applicationId, xOffBool){
-    const res = await QH.apiPost("toggle_applicant_xoff", {
+    return await QH.apiPost("toggle_applicant_xoff", {
       session_token: session.session_token,
       application_id: applicationId,
       x_off: xOffBool ? "TRUE" : "FALSE"
     });
-    return res;
+  }
+
+  function resumeIframeHtml(url){
+    if (!url) return `<div class="muted">No resume on file.</div>`;
+    return `<div class="resumeFrame"><iframe src="${escapeHtml(url)}" title="Resume Preview" referrerpolicy="no-referrer"></iframe></div>`;
   }
 
   // Applicants
@@ -900,130 +1004,186 @@
       return;
     }
 
-    // Expect backend to eventually include: is_x_off boolean (derived from Applications.notes_internal)
-    // Until then, treat missing as false.
-    const tableRows = rows.map(r => {
-      const name = [r.candidate_first_name, r.candidate_last_name].filter(Boolean).join(" ").trim();
-      const email = r.candidate_email || "";
-      const phone = r.candidate_phone || ""; // optional
-      const job = r.job_title || r.job_id || "";
-      const loc = [r.city, r.state].filter(Boolean).join(", ");
-      const status = normalizeStatus(r.status || "Applied");
-      const applied = r.applied_at || "";
+    // Row spec: [checkbox] Job Title | Name (click) | Email | Phone | Status dropdown
+    box.innerHTML = `
+      <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
+      <div class="muted" style="margin-bottom:10px;">
+        Click the candidate name to open the card (resume preview). Checkbox toggles X-off.
+      </div>
+      <div id="appsRows"></div>
+    `;
+
+    const wrap = box.querySelector("#appsRows");
+    wrap.innerHTML = rows.map(r => {
       const appId = String(r.application_id || "");
+      const name = [r.candidate_first_name, r.candidate_last_name].filter(Boolean).join(" ").trim() || "(Candidate)";
+      const email = String(r.candidate_email || "");
+      const phone = String(r.candidate_phone || "");
+      const jobTitle = String(r.job_title || r.job_id || "");
+      const status = normalizeStatus(r.status || "Applied");
       const xoff = !!r.is_x_off;
 
+      // Resume: backend provides resume_file_url (from Resumes sheet / Drive /preview)
+      const resumeUrl = String(r.resume_file_url || "");
+
+      // Extra details for card
+      const loc = [r.city, r.state].filter(Boolean).join(", ");
+      const appliedAt = String(r.applied_at || "");
+      const cover = String(r.cover_letter_text || "");
+
       return `
-        <tr data-app-id="${escapeHtml(appId)}" class="${xoff ? "xoff":""}">
-          <td>${escapeHtml(job)}</td>
-          <td>${escapeHtml(loc)}</td>
-          <td>${escapeHtml(name)}</td>
-          <td>${escapeHtml(email)}</td>
-          <td>${escapeHtml(phone)}</td>
-          <td class="cell-compact sticky-r2">${statusSelectHtml(status)}</td>
-          <td>${escapeHtml(applied)}</td>
-          <td class="cell-compact sticky-r">
-            <button class="xbtn ${xoff ? "on":""}" data-role="xoff" title="Mark with X (toggle)">${xoff ? "✖" : "X"}</button>
-          </td>
-        </tr>
+        <div class="app-row-wrap" data-app-id="${escapeHtml(appId)}">
+          <div class="app-row ${xoff ? "xoff":""}" data-row="1">
+            <div>
+              <button class="chk ${xoff ? "on":""}" data-role="xoff" title="Cross off (X-off)">${xoff ? "☑" : "☐"}</button>
+            </div>
+            <div class="cell-compact" title="${escapeHtml(jobTitle)}"><b>${escapeHtml(jobTitle)}</b></div>
+            <div class="cell-compact">
+              <a href="#" class="nameLink" data-role="toggleCard">${escapeHtml(name)}</a>
+            </div>
+            <div class="cell-compact" title="${escapeHtml(email)}">${escapeHtml(email)}</div>
+            <div class="cell-compact">${escapeHtml(phone)}</div>
+            <div class="cell-compact">
+              ${statusSelectHtml(status)}
+            </div>
+          </div>
+
+          <div class="app-card" data-card="1">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div>
+                <div style="font-weight:1000; font-size:14px;">${escapeHtml(name)}</div>
+                <div class="mini" style="margin-top:2px;">
+                  <b>Job:</b> ${escapeHtml(jobTitle)}${loc ? (" • " + escapeHtml(loc)) : ""}<br>
+                  ${email ? ("<b>Email:</b> " + escapeHtml(email) + "<br>") : ""}
+                  ${phone ? ("<b>Phone:</b> " + escapeHtml(phone) + "<br>") : ""}
+                  ${appliedAt ? ("<b>Applied:</b> " + escapeHtml(appliedAt) + "<br>") : ""}
+                </div>
+              </div>
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <label class="mini" style="margin:0; font-weight:1000;">Status</label>
+                ${statusSelectHtml(status)}
+                <button class="btn" data-role="closeCard" type="button">Close</button>
+              </div>
+            </div>
+
+            ${cover ? `<div class="hr"></div><div style="font-weight:1000; margin-bottom:6px;">Cover Letter</div><div class="mini">${escapeHtml(cover)}</div>` : ``}
+
+            <div class="hr"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div style="font-weight:1000;">Resume</div>
+              <div class="mini">${resumeUrl ? "Preview below." : "No resume on file."}</div>
+            </div>
+            <div style="margin-top:10px;">
+              ${resumeIframeHtml(resumeUrl)}
+            </div>
+          </div>
+        </div>
       `;
     }).join("");
 
-    box.innerHTML = `
-      <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Job</th>
-              <th>Location</th>
-              <th>Candidate</th>
-              <th>Email</th>
-              <th>Phone</th>
-              <th class="sticky-r2">Status</th>
-              <th>Applied</th>
-              <th class="sticky-r">X</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${tableRows}
-          </tbody>
-        </table>
-      </div>
-      <div class="muted" style="margin-top:10px;">
-        Review applicant details, update status, or mark an applicant for follow-up using the controls above.
-      </div>
-    `;
-
-    // Wire per-row actions (event delegation)
-    const table = box.querySelector("table");
-    if (!table) return;
-
-    table.addEventListener("change", async (ev) => {
+    // Delegated handlers
+    box.addEventListener("change", async (ev) => {
       const sel = ev.target;
       if (!sel || sel.getAttribute("data-role") !== "status") return;
 
-      const tr = sel.closest("tr[data-app-id]");
-      if (!tr) return;
+      const wrapEl = sel.closest("[data-app-id]");
+      if (!wrapEl) return;
 
-      const appId = tr.getAttribute("data-app-id") || "";
+      const appId = wrapEl.getAttribute("data-app-id") || "";
       const prev = sel.getAttribute("data-prev") || normalizeStatus(sel.value);
       const next = normalizeStatus(sel.value);
 
-      // store previous before attempting update
       sel.setAttribute("data-prev", prev);
 
-      // optimistic UI (already selected)
       const r = await updateApplicationStatus(appId, next);
       if (!r.ok) {
-        // revert selection
         sel.value = prev;
         QH.toast("Failed", r.error || "Could not update status.");
         return;
       }
-      sel.setAttribute("data-prev", next);
+
+      // Sync ALL status selects inside this applicant block
+      wrapEl.querySelectorAll('select[data-role="status"]').forEach(s2 => {
+        s2.value = next;
+        s2.setAttribute("data-prev", next);
+      });
+
       QH.toast("Updated", "Status set to " + next + ".");
     });
 
-    table.addEventListener("click", async (ev) => {
-      const btn = ev.target;
-      if (!btn || btn.getAttribute("data-role") !== "xoff") return;
+    box.addEventListener("click", async (ev) => {
+      const t = ev.target;
 
-      const tr = btn.closest("tr[data-app-id]");
-      if (!tr) return;
-
-      const appId = tr.getAttribute("data-app-id") || "";
-      const isOn = btn.classList.contains("on");
-      const nextOn = !isOn;
-
-      // optimistic UI
-      if (nextOn) {
-        btn.classList.add("on");
-        btn.textContent = "✖";
-        tr.classList.add("xoff");
-      } else {
-        btn.classList.remove("on");
-        btn.textContent = "X";
-        tr.classList.remove("xoff");
-      }
-
-      const r = await toggleXOff(appId, nextOn);
-      if (!r.ok) {
-        // revert UI
-        if (nextOn) {
-          btn.classList.remove("on");
-          btn.textContent = "X";
-          tr.classList.remove("xoff");
-        } else {
-          btn.classList.add("on");
-          btn.textContent = "✖";
-          tr.classList.add("xoff");
-        }
-        QH.toast("Failed", r.error || "Could not toggle X.");
+      // Toggle card by clicking name
+      if (t && t.getAttribute && t.getAttribute("data-role") === "toggleCard") {
+        ev.preventDefault();
+        const wrapEl = t.closest("[data-app-id]");
+        if (!wrapEl) return;
+        const card = wrapEl.querySelector("[data-card]");
+        if (!card) return;
+        card.classList.toggle("open");
         return;
       }
 
-      QH.toast("Saved", nextOn ? "Marked with X." : "X removed.");
+      // Close card
+      if (t && t.getAttribute && t.getAttribute("data-role") === "closeCard") {
+        ev.preventDefault();
+        const wrapEl = t.closest("[data-app-id]");
+        if (!wrapEl) return;
+        const card = wrapEl.querySelector("[data-card]");
+        if (card) card.classList.remove("open");
+        return;
+      }
+
+      // X-off checkbox
+      if (t && t.getAttribute && t.getAttribute("data-role") === "xoff") {
+        ev.preventDefault();
+        const wrapEl = t.closest("[data-app-id]");
+        if (!wrapEl) return;
+
+        const appId = wrapEl.getAttribute("data-app-id") || "";
+        const row = wrapEl.querySelector(".app-row");
+        const isOn = t.classList.contains("on");
+        const nextOn = !isOn;
+
+        // optimistic UI: update all checkboxes in this block
+        wrapEl.querySelectorAll('[data-role="xoff"]').forEach(b => {
+          if (nextOn){
+            b.classList.add("on");
+            b.textContent = "☑";
+          } else {
+            b.classList.remove("on");
+            b.textContent = "☐";
+          }
+        });
+        if (row){
+          if (nextOn) row.classList.add("xoff");
+          else row.classList.remove("xoff");
+        }
+
+        const r = await toggleXOff(appId, nextOn);
+        if (!r.ok) {
+          // revert
+          wrapEl.querySelectorAll('[data-role="xoff"]').forEach(b => {
+            if (nextOn){
+              b.classList.remove("on");
+              b.textContent = "☐";
+            } else {
+              b.classList.add("on");
+              b.textContent = "☑";
+            }
+          });
+          if (row){
+            if (nextOn) row.classList.remove("xoff");
+            else row.classList.add("xoff");
+          }
+          QH.toast("Failed", r.error || "Could not toggle X.");
+          return;
+        }
+
+        QH.toast("Saved", nextOn ? "Applicant crossed off." : "Cross-off removed.");
+        return;
+      }
     });
 
     // Initialize data-prev for status selects
