@@ -245,10 +245,39 @@
     th{ font-weight:1000; background: rgba(10,30,20,.04); }
     tr:last-child td{ border-bottom:none; }
 
+    /* =========================================================
+       APPLICANTS TABLE FIX (prevents Status/X cut-off)
+       ONLY changes requested: wrapper scroll + sticky Status/X
+       ========================================================= */
+    .table-wrap{
+      width:100%;
+      overflow-x:auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius:14px;
+    }
+    .table-wrap table{
+      min-width: 980px; /* keeps Status + X reachable */
+    }
+
+    th.sticky-r, td.sticky-r{
+      position: sticky;
+      right: 0;
+      background: rgba(255,255,255,.95);
+      z-index: 3;
+    }
+    th.sticky-r2, td.sticky-r2{
+      position: sticky;
+      right: 56px; /* width of X column */
+      background: rgba(255,255,255,.95);
+      z-index: 3;
+      border-left: 1px solid rgba(10,30,20,.10);
+    }
+
     /* Applicants controls */
     .cell-compact{ white-space:nowrap; }
     .app-status{
       width:auto;
+      min-width: 130px; /* keeps dropdown usable */
       padding:6px 8px;
       border-radius:10px;
       border:1px solid var(--line);
@@ -891,9 +920,9 @@
           <td>${escapeHtml(name)}</td>
           <td>${escapeHtml(email)}</td>
           <td>${escapeHtml(phone)}</td>
-          <td class="cell-compact">${statusSelectHtml(status)}</td>
+          <td class="cell-compact sticky-r2">${statusSelectHtml(status)}</td>
           <td>${escapeHtml(applied)}</td>
-          <td class="cell-compact">
+          <td class="cell-compact sticky-r">
             <button class="xbtn ${xoff ? "on":""}" data-role="xoff" title="Mark with X (toggle)">${xoff ? "✖" : "X"}</button>
           </td>
         </tr>
@@ -902,23 +931,25 @@
 
     box.innerHTML = `
       <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
-      <table>
-        <thead>
-          <tr>
-            <th>Job</th>
-            <th>Location</th>
-            <th>Candidate</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Status</th>
-            <th>Applied</th>
-            <th>X</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tableRows}
-        </tbody>
-      </table>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Job</th>
+              <th>Location</th>
+              <th>Candidate</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th class="sticky-r2">Status</th>
+              <th>Applied</th>
+              <th class="sticky-r">X</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+      </div>
       <div class="muted" style="margin-top:10px;">
         Status updates and X toggles require backend actions <code>update_application_status</code> and <code>toggle_applicant_xoff</code>.
       </div>
