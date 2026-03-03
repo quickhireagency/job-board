@@ -314,24 +314,6 @@
       line-height:1.45;
     }
 
-    /* Verified badge image (detail panel only) */
-    .verified-badge-wrap{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin: 10px 0 0;
-    }
-    .verified-badge-img{
-      max-width: 240px;
-      width: 100%;
-      height: auto;
-      display:block;
-      object-fit: contain; /* no squishing */
-    }
-    @media (max-width: 980px){
-      .verified-badge-img{max-width: 220px;}
-    }
-
     /* My Account dropdown */
     .dropdown{
       position:relative;
@@ -1111,17 +1093,6 @@
           ${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
           ${verified ? `<span class="pill verified">Verified Employer</span>` : ``}
         </div>
-
-        ${verified ? `
-          <div class="verified-badge-wrap" aria-label="Verified Employer badge">
-            <img
-              class="verified-badge-img"
-              src="/QuickHireVerifiedEmployerBadge.png"
-              alt="QuickHire™ Verified Employer"
-              loading="lazy"
-            />
-          </div>
-        ` : ``}
 
         <div class="muted" style="margin-top:8px;">Job ID: ${escapeHtml(j.job_id || "")}</div>
 
