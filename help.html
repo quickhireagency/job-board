@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QuickHire™ — Help</title>
+
+  <!-- Config (API base) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px;
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+      position:relative;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+    .btn.danger{
+      border-color: rgba(180,35,24,.35);
+      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
+      color: #3a0f0b;
+    }
+
+    /* My Account dropdown */
+    .dropdown{ position:relative; display:inline-flex; }
+    .menu{
+      position:absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 190px;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display:none;
+      z-index: 50;
+    }
+    .menu a, .menu button{
+      width:100%;
+      border:none;
+      background:transparent;
+      text-align:left;
+      padding:10px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+      color: var(--text);
+      text-decoration:none;
+      display:block;
+    }
+    .menu a:hover, .menu button:hover{
+      background: rgba(43,134,214,.10);
+      text-decoration:none;
+    }
+    .menu .danger{ color: var(--danger); }
+    .dropdown.open .menu{display:block}
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+
+    .content{padding:14px}
+    .muted{color:var(--muted); font-size:12px; line-height:1.45}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
+    }
+
+    .card{
+      background: rgba(255,255,255,.92);
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding:12px;
+      box-shadow: 0 6px 18px rgba(16,24,40,.08);
+    }
+
+    .k{
+      font-weight:1000;
+      margin:0 0 6px 0;
+      font-size:14px;
+    }
+    ul{margin:0; padding-left:18px}
+    li{margin:6px 0}
+
+    .callout{
+      background: rgba(43,134,214,.08);
+      border:1px solid rgba(43,134,214,.20);
+      border-radius: 16px;
+      padding:12px;
+    }
+
+    /* Footer (same as your standard block) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px;
+      width:auto;
+      display:block;
+    }
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Job Board</div>
+            <div class="sub">Help &amp; How-To</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="controls">
+        <a class="btn" href="/" target="_self">Back to Jobs</a>
+
+        <div class="dropdown" id="acctWrap">
+          <button class="btn blue" id="acctBtn" aria-haspopup="true" aria-expanded="false">My Account</button>
+          <div class="menu" id="acctMenu" role="menu" aria-label="My Account menu">
+            <a href="/candidate/dashboard.html" target="_self" role="menuitem">Dashboard</a>
+            <button class="danger" id="logoutBtn" type="button" role="menuitem">Logout</button>
+          </div>
+        </div>
+
+        <a class="btn primary" href="/employer/dashboard.html" target="_self">Employer Portal</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Help</h2>
+          <div class="meta">Quick instructions for candidates and employers</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="grid">
+          <div class="card callout">
+            <div class="k">Quick start</div>
+            <ul>
+              <li><strong>Candidates:</strong> browse jobs on the main Job Board, then log in to apply.</li>
+              <li><strong>Employers:</strong> use Employer Portal to manage postings and applicants.</li>
+              <li>If you get signed out, just log in again — your session is stored in your browser.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="k">How to search and filter jobs</div>
+            <ul>
+              <li>Use the keyword search at the top to filter by title/description keywords.</li>
+              <li>Use filters for category, work arrangement, city, and state/territory.</li>
+              <li>“Use My Location” can prefill your city/state and optionally apply a radius filter.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="k">How to create an account / log in</div>
+            <ul>
+              <li>Click <strong>Login / Sign Up</strong> on the Job Board.</li>
+              <li>Choose Candidate (Job Seeker) if you’re applying for jobs.</li>
+              <li>After you sign in, you can access your dashboard under <strong>My Account</strong>.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="k">How to apply</div>
+            <ul>
+              <li>Select a job from the list to view details.</li>
+              <li>Click <strong>Apply</strong>.</li>
+              <li>If you aren’t logged in, you’ll be taken to login first, then returned to continue.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="k">How to report a job</div>
+            <ul>
+              <li>Select a job and click <strong>Report Job</strong>.</li>
+              <li>Choose a reason and write a short message with what’s wrong.</li>
+              <li>Reports are reviewed by our team.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="k">Candidate Dashboard</div>
+            <ul>
+              <li>Go to <strong>My Account → Dashboard</strong> to see your applications.</li>
+              <li>You’ll see a visual progress tracker for each application (Applied → Reviewed → Interview → Offer → Accepted/Rejected).</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <div class="k">Need help?</div>
+            <div class="muted">
+              Email <a href="mailto:info@quickhire.agency">info@quickhire.agency</a> or call
+              <a href="tel:+13174421437">(317) 442-1437</a>.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <!-- QuickHire™ — Footer Block (Squarespace Code Block) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
+      </p>
+
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
+
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
+
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
+
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
+
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
+
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
+
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
+
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
+
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
+  </div>
+
+  <script>
+    function qs(sel){ return document.querySelector(sel); }
+
+    function safeLoadSession(){
+      try{
+        if (window.QH && typeof QH.loadSession === "function") return QH.loadSession() || {};
+        return JSON.parse(localStorage.getItem("qh_session") || "null") || {};
+      }catch(e){
+        return {};
+      }
+    }
+
+    function closeAccountMenu(){
+      const wrap = qs("#acctWrap");
+      if (wrap) wrap.classList.remove("open");
+      const btn = qs("#acctBtn");
+      if (btn) btn.setAttribute("aria-expanded", "false");
+    }
+
+    function init(){
+      // My Account dropdown toggle
+      qs("#acctBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        const wrap = qs("#acctWrap");
+        const open = wrap.classList.toggle("open");
+        qs("#acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
+      });
+
+      // Logout
+      qs("#logoutBtn").addEventListener("click", () => {
+        try{
+          if (window.QH && typeof QH.clearSession === "function") QH.clearSession();
+          else localStorage.removeItem("qh_session");
+        }catch(e){ /* ignore */ }
+        closeAccountMenu();
+        window.location.href = "/";
+      });
+
+      document.addEventListener("click", (e) => {
+        const wrap = qs("#acctWrap");
+        if (wrap && !wrap.contains(e.target)) closeAccountMenu();
+      });
+
+      // If not logged in as candidate, dashboard link will still work (login will gate it there).
+      // Optional: we could hide the dropdown if no session; leaving visible keeps the UI consistent.
+      const s = safeLoadSession();
+      if (!s || !s.session_token || s.role !== "job_seeker") {
+        // keep visible, no special handling needed
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
