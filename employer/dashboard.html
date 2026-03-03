@@ -163,30 +163,6 @@
     .panel-header .meta{color:var(--muted); font-size:12px}
     .content{padding:16px}
 
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin:0 0 6px;
-      font-weight:800;
-      letter-spacing:.01em;
-    }
-    input, textarea{
-      width:100%;
-      padding:10px 12px;
-      border-radius: 12px;
-      border:1px solid var(--line);
-      background: rgba(255,255,255,.95);
-      color:var(--text);
-      outline:none;
-      font-size:14px;
-      font-family: var(--font);
-    }
-    textarea{
-      min-height: 140px;
-      resize: vertical;
-    }
-
     .muted{
       color:var(--muted);
       font-size:12px;
@@ -247,6 +223,26 @@
       color: rgba(180,35,24,.90);
       background: rgba(180,35,24,.08);
     }
+
+    /* EEO table */
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid rgba(10,30,20,.12);
+      background: rgba(255,255,255,.9);
+    }
+    th, td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(10,30,20,.10);
+      text-align:left;
+      font-size:12px;
+      color: var(--text);
+    }
+    th{ font-weight:1000; background: rgba(10,30,20,.04); }
+    tr:last-child td{ border-bottom:none; }
 
     /* Footer logo + legal links (match index.html) */
     .qh-footer-logo-wrap{
@@ -315,6 +311,23 @@
         <div class="content">
           <div id="entBox" class="note">Loading…</div>
 
+          <!-- NEW: EEO Aggregate panel (Corporate only) -->
+          <div class="hr"></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div style="font-weight:1000;">EEO Aggregate (Corporate)</div>
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+              <label class="muted" style="margin:0;">Days</label>
+              <select id="eeoDays" style="width:auto; padding:8px 10px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.95);">
+                <option value="30">30</option>
+                <option value="60">60</option>
+                <option value="90">90</option>
+                <option value="180">180</option>
+              </select>
+              <button class="btn" id="btnLoadEeo" type="button">Load EEO</button>
+            </div>
+          </div>
+          <div id="eeoBox" class="note" style="margin-top:10px;">Loading…</div>
+
           <div class="hr"></div>
           <div style="font-weight:1000; margin-bottom:6px;">Buy / Upgrade Plan</div>
           <div class="muted">
@@ -355,6 +368,19 @@
                 <a class="btn" href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Buy Verified</a>
               </div>
             </div>
+          </div>
+
+          <!-- NEW: Applicants panel scaffold -->
+          <div class="hr"></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div style="font-weight:1000;">Applicants</div>
+            <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
+          </div>
+          <div class="muted" style="margin-top:6px;">
+            This will show applicants for your jobs (email required, phone optional). If phone is blank, it will be left blank.
+          </div>
+          <div id="applicantsBox" class="note" style="margin-top:10px;">
+            Applicants endpoint not enabled yet.
           </div>
         </div>
       </div>
@@ -635,15 +661,85 @@
     window.location.href = "/";
   });
 
+  let __entitlements = null;
+
+  function renderEeoAggregate(agg){
+    const eeoBox = document.getElementById("eeoBox");
+    if (!agg) {
+      eeoBox.textContent = "No EEO data found.";
+      return;
+    }
+
+    function section(title, obj){
+      const rows = Object.keys(obj || {}).sort().map(k => {
+        return `<tr><td>${k}</td><td style="font-weight:1000;">${obj[k]}</td></tr>`;
+      }).join("") || `<tr><td colspan="2" class="muted">No data</td></tr>`;
+
+      return `
+        <div style="font-weight:1000; margin:10px 0 6px;">${title}</div>
+        <table>
+          <thead><tr><th>Category</th><th>Count</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    eeoBox.innerHTML = `
+      <div><b>Total (in range):</b> <span class="badge ok">${agg.total || 0}</span></div>
+      ${section("Race / Ethnicity", agg.race_ethnicity)}
+      ${section("Sex", agg.sex)}
+      ${section("Veteran Status", agg.veteran_status)}
+      ${section("Disability Status", agg.disability_status)}
+    `;
+  }
+
+  async function loadEeo(){
+    const eeoBox = document.getElementById("eeoBox");
+
+    if (!__entitlements){
+      eeoBox.textContent = "Loading entitlements…";
+      await loadEntitlements();
+    }
+
+    // Corporate gate
+    if (!__entitlements || !__entitlements.eeo_export_included) {
+      eeoBox.innerHTML = `
+        <div style="font-weight:1000;">Corporate only</div>
+        <div class="muted" style="margin-top:6px;">
+          Upgrade to <b>QuickHire Corporate</b> to unlock EEO aggregate reporting.
+        </div>
+      `;
+      return;
+    }
+
+    eeoBox.textContent = "Loading EEO aggregate…";
+    const days = document.getElementById("eeoDays").value || "30";
+
+    const res = await QH.apiGet("get_eeo_aggregate_for_employer", {
+      session_token: session.session_token,
+      days: days
+    });
+
+    if (!res.ok){
+      eeoBox.textContent = "Error loading EEO: " + (res.error || "");
+      return;
+    }
+
+    renderEeoAggregate(res.aggregate);
+  }
+
   async function loadEntitlements() {
     const res = await QH.apiGet("get_employer_entitlements", { session_token: session.session_token });
     const box = document.getElementById("entBox");
 
     if (!res.ok) {
       box.textContent = "Error loading entitlements: " + (res.error || "");
+      __entitlements = null;
       return;
     }
     const e = res.entitlements || {};
+    __entitlements = e;
+
     const planName = e.plan_name || "(none yet)";
     const planId = e.plan_id || "(none)";
     const verified = e.is_verified ? "YES" : "NO";
@@ -658,8 +754,25 @@
         If you just paid, go to <a href="/billing/success/">/billing/success/</a> and CLAIM using the SAME E-mail + Username.
       </div>
     `;
+
+    // Preload EEO panel state after entitlements load
+    await loadEeo();
   }
   loadEntitlements();
+
+  document.getElementById("btnLoadEeo").addEventListener("click", loadEeo);
+
+  // Applicants scaffold (until endpoint exists)
+  document.getElementById("btnLoadApplicants").addEventListener("click", async () => {
+    const box = document.getElementById("applicantsBox");
+    box.innerHTML = `
+      <div style="font-weight:1000;">Endpoint not enabled yet</div>
+      <div class="muted" style="margin-top:6px;">
+        We need to add a backend action like <code>list_employer_applicants</code>
+        that returns applications joined with job seeker contact info (email required, phone optional).
+      </div>
+    `;
+  });
 
   document.getElementById("btnPost").addEventListener("click", async () => {
     const job_title = document.getElementById("job_title").value.trim();
