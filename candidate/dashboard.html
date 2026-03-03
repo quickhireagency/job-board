@@ -124,6 +124,11 @@
       background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
       color: #3a0f0b;
     }
+    .btn[disabled]{
+      opacity:.55;
+      cursor:not-allowed;
+      filter:saturate(.9);
+    }
 
     /* My Account dropdown */
     .dropdown{ position:relative; display:inline-flex; }
@@ -335,6 +340,40 @@
       color: rgba(180,35,24,.95);
     }
 
+    /* Resume panel */
+    .resume-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:space-between;
+    }
+    .resume-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .resume-frame{
+      margin-top:12px;
+      border:1px solid rgba(10,30,20,.14);
+      border-radius: 14px;
+      overflow:hidden;
+      background: rgba(255,255,255,.9);
+      box-shadow: 0 6px 18px rgba(16,24,40,.06);
+      display:none;
+    }
+    .resume-frame iframe{
+      width:100%;
+      height: 640px;
+      border:0;
+      display:block;
+      background: #fff;
+    }
+    @media (max-width: 700px){
+      .resume-frame iframe{ height: 520px; }
+    }
+
     /* Footer (same as your standard block) */
     .qh-footer-logo-wrap{
       display:flex;
@@ -400,6 +439,32 @@
     </div>
 
     <div class="grid">
+
+      <!-- NEW: My Resume -->
+      <div class="panel" id="resumePanel">
+        <div class="panel-header">
+          <div>
+            <h2>My Resume</h2>
+            <div class="meta" id="resumeMeta">Checking your resume…</div>
+          </div>
+          <div class="resume-actions">
+            <button class="btn blue" id="viewResumeBtn" type="button" disabled>View Resume</button>
+            <button class="btn primary" id="uploadResumeBtn" type="button">Upload / Replace Resume</button>
+            <input id="resumeFile" type="file" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" />
+          </div>
+        </div>
+        <div class="content">
+          <div class="muted" id="resumeNote">
+            You can upload or replace your resume at any time. If you apply to a job and have a resume on file, it will auto-populate on the Apply page.
+          </div>
+
+          <div class="resume-frame" id="resumeFrameWrap" aria-label="Resume preview">
+            <iframe id="resumeFrame" title="Resume Preview" referrerpolicy="no-referrer"></iframe>
+          </div>
+        </div>
+      </div>
+
+      <!-- Existing: My Applications -->
       <div class="panel">
         <div class="panel-header">
           <div>
@@ -643,23 +708,19 @@
       if (s === "accepted" || s === "hired") return { terminal: "accepted", idx: 5 };
 
       // Normalized
-      // You can map your sheet values later; defaults now:
       if (s === "new" || s === "applied") return { idx: 0 };
       if (s === "reviewed" || s === "screening") return { idx: 1 };
       if (s === "interview") return { idx: 2 };
       if (s === "offer") return { idx: 3 };
 
-      // fallback
       return { idx: 0 };
     }
 
     function renderTracker(status){
-      // Steps: Applied → Reviewed → Interview → Offer → Final
       const steps = ["Applied","Reviewed","Interview","Offer","Final"];
       const m = mapStatusToSteps(status);
 
       const finalLabel = m.terminal === "rejected" ? "Rejected" : (m.terminal === "accepted" ? "Accepted" : "Pending");
-      const finalClass = m.terminal === "rejected" ? "bad" : (m.terminal === "accepted" ? "done" : "");
       const activeIdx = typeof m.idx === "number" ? m.idx : 0;
 
       const html = steps.map((name, i) => {
@@ -703,7 +764,6 @@
     }
 
     async function apiPost(action, body){
-      // Prefer shared helper if present
       if (window.QH && typeof QH.apiPost === "function"){
         return await QH.apiPost(action, body);
       }
@@ -719,6 +779,161 @@
       qs("#appCount").textContent = String(n || 0);
     }
 
+    // ---------------------------
+    // Resume (NEW)
+    // ---------------------------
+    function setResumeUiState(state){
+      // state: { has, title, url, error, uploading }
+      const meta = qs("#resumeMeta");
+      const note = qs("#resumeNote");
+      const viewBtn = qs("#viewResumeBtn");
+      const frameWrap = qs("#resumeFrameWrap");
+      const frame = qs("#resumeFrame");
+      const uploadBtn = qs("#uploadResumeBtn");
+
+      const uploading = !!(state && state.uploading);
+      if (uploadBtn) uploadBtn.disabled = uploading;
+
+      if (state && state.error){
+        if (meta) meta.textContent = "Resume: error";
+        if (note) note.textContent = state.error;
+        if (viewBtn){ viewBtn.disabled = true; }
+        if (frameWrap){ frameWrap.style.display = "none"; }
+        if (frame){ frame.src = "about:blank"; }
+        return;
+      }
+
+      if (!state || !state.has){
+        if (meta) meta.textContent = "Resume: not on file";
+        if (note) note.textContent = "No resume on file yet. Upload one now — it will auto-populate when you apply to jobs.";
+        if (viewBtn){ viewBtn.disabled = true; }
+        if (frameWrap){ frameWrap.style.display = "none"; }
+        if (frame){ frame.src = "about:blank"; }
+        return;
+      }
+
+      if (meta) meta.textContent = "Resume: on file" + (state.title ? (" • " + state.title) : "");
+      if (note) note.textContent = "Resume on file. You can view it below or upload a newer version any time.";
+      if (viewBtn){ viewBtn.disabled = false; viewBtn.dataset.url = state.url || ""; }
+      if (frameWrap){ frameWrap.style.display = "none"; } // only open on View
+      if (frame){ frame.src = "about:blank"; }
+    }
+
+    async function loadMyResume(){
+      const session = requireJobSeeker();
+      if (!session) return;
+
+      setResumeUiState({ has:false, uploading:false, error:null });
+      qs("#resumeMeta").textContent = "Checking your resume…";
+      qs("#resumeNote").textContent = "Loading resume status…";
+
+      try{
+        // Uses backend GET: mode=public_api&action=get_my_active_resume&session_token=...
+        const res = await apiGet({
+          mode: "public_api",
+          action: "get_my_active_resume",
+          session_token: session.session_token
+        });
+
+        if (res && res.ok && res.has_resume && res.resume && res.resume.resume_file_url){
+          setResumeUiState({
+            has: true,
+            title: res.resume.resume_title || "",
+            url: res.resume.resume_file_url || "",
+            uploading: false
+          });
+          return;
+        }
+
+        // ok but no resume
+        setResumeUiState({ has:false, uploading:false });
+      }catch(e){
+        setResumeUiState({ has:false, uploading:false, error:"Unable to load resume right now. Please try Refresh." });
+      }
+    }
+
+    function openResumePreview(url){
+      const frameWrap = qs("#resumeFrameWrap");
+      const frame = qs("#resumeFrame");
+      if (!url){
+        setResumeUiState({ has:false, error:"Resume URL missing. Please re-upload your resume." });
+        return;
+      }
+      frame.src = url;
+      frameWrap.style.display = "block";
+      frameWrap.scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+
+    function readFileAsDataUrl(file){
+      return new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result || ""));
+        r.onerror = () => reject(new Error("File read failed."));
+        r.readAsDataURL(file);
+      });
+    }
+
+    async function handleResumeUpload(file){
+      const session = requireJobSeeker();
+      if (!session) return;
+
+      if (!file) return;
+
+      // Basic guard: 10MB to match backend
+      if (file.size > 10 * 1024 * 1024){
+        setResumeUiState({ has:false, error:"File too large. Max 10 MB." });
+        return;
+      }
+
+      const mime = String(file.type || "").trim();
+      const allowed = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      ];
+      if (mime && !allowed.includes(mime)){
+        setResumeUiState({ has:false, error:"Unsupported file type. Upload PDF, DOC, or DOCX." });
+        return;
+      }
+
+      // UI
+      qs("#resumeMeta").textContent = "Uploading…";
+      qs("#resumeNote").textContent = "Uploading your resume. Please keep this tab open.";
+      qs("#viewResumeBtn").disabled = true;
+      qs("#uploadResumeBtn").disabled = true;
+
+      try{
+        const dataUrl = await readFileAsDataUrl(file);
+        // dataUrl looks like "data:application/pdf;base64,AAAA..."
+        const comma = dataUrl.indexOf(",");
+        const base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
+
+        const res = await apiPost("resume_upload", {
+          session_token: session.session_token,
+          file_name: file.name || "resume",
+          mime_type: mime || "application/pdf",
+          file_base64: base64
+        });
+
+        if (!res || !res.ok){
+          const msg = (res && res.error) ? String(res.error) : "Upload failed. Please try again.";
+          setResumeUiState({ has:false, error: msg });
+          qs("#uploadResumeBtn").disabled = false;
+          return;
+        }
+
+        // Re-load resume to guarantee we use the on-file active record
+        await loadMyResume();
+        qs("#uploadResumeBtn").disabled = false;
+      }catch(err){
+        setResumeUiState({ has:false, error:"Upload failed. Please try again." });
+        qs("#uploadResumeBtn").disabled = false;
+      }
+    }
+
+    // ---------------------------
+    // Applications (existing)
+    // ---------------------------
     function renderApps(apps){
       const el = qs("#appsList");
       if (!apps || !apps.length){
@@ -768,7 +983,6 @@
       qs("#appsList").innerHTML = `<div class="muted">Loading…</div>`;
       qs("#appsNote").textContent = "Loading your applications…";
 
-      // This endpoint does not exist yet — we fail gracefully and show a clean placeholder.
       try{
         const res = await apiPost("list_my_applications", { session_token: session.session_token });
 
@@ -778,7 +992,6 @@
           return;
         }
 
-        // If endpoint isn't implemented yet, your backend will return unknown action.
         qs("#appsNote").textContent = "Applications will appear here after you apply to a job.";
         renderApps([]);
       } catch (e){
@@ -819,8 +1032,30 @@
         if (wrap && !wrap.contains(e.target)) closeAccountMenu();
       });
 
-      qs("#refreshBtn").addEventListener("click", loadApplications);
+      // Resume handlers (NEW)
+      qs("#viewResumeBtn").addEventListener("click", () => {
+        const url = String(qs("#viewResumeBtn").dataset.url || "");
+        openResumePreview(url);
+      });
 
+      qs("#uploadResumeBtn").addEventListener("click", () => {
+        qs("#resumeFile").value = "";
+        qs("#resumeFile").click();
+      });
+
+      qs("#resumeFile").addEventListener("change", async (e) => {
+        const file = e.target && e.target.files ? e.target.files[0] : null;
+        await handleResumeUpload(file);
+      });
+
+      // Refresh handlers
+      qs("#refreshBtn").addEventListener("click", () => {
+        loadMyResume();
+        loadApplications();
+      });
+
+      // Load initial
+      loadMyResume();
       loadApplications();
     }
 
