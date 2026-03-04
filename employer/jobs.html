@@ -730,32 +730,42 @@
   });
 
   // -------------------- KPIs --------------------
-  function computeKpis(){
-    const jobs = STATE.jobsRaw || [];
-    const active = jobs.filter(j=> normStatus(j.status) === "active").length;
-    const draft  = jobs.filter(j=> normStatus(j.status) === "draft").length;
-    document.getElementById("kpiActive").textContent = String(active);
-    document.getElementById("kpiDraft").textContent  = String(draft);
+ function computeKpis(){
+  const jobs = STATE.jobsRaw || [];
+  const active = jobs.filter(j=> normStatus(j.status) === "active").length;
+  const draft  = jobs.filter(j=> normStatus(j.status) === "draft").length;
 
-    // Applicants 7/30
-    let app7 = 0, app30 = 0;
-    const now = Date.now();
-    const msDay = 86400000;
+  document.getElementById("kpiActive").textContent = String(active);
+  document.getElementById("kpiDraft").textContent  = String(draft);
 
-    for (const arr of STATE.appsByJob.values()){
-      (arr||[]).forEach(a=>{
-        if (notesHasRemoved(a.notes_internal)) return; // removed candidates hidden
-        const dt = parseDate(a.applied_at || a.created_at || a.timestamp || a.date_applied);
-        if (!dt) return;
-        const ageDays = (now - dt.getTime()) / msDay;
-        if (ageDays <= 7) app7++;
-        if (ageDays <= 30) app30++;
-      });
-    }
-
-    document.getElementById("kpiApp7").textContent = String(app7);
-    document.getElementById("kpiApp30").textContent = String(app30);
+  // If we haven't loaded any applicants yet, show "—" (not 0)
+  if (STATE.appsByJob.size === 0){
+    document.getElementById("kpiApp7").textContent = "—";
+    document.getElementById("kpiApp30").textContent = "—";
+    return;
   }
+
+  let app7 = 0, app30 = 0;
+  const now = Date.now();
+  const msDay = 86400000;
+
+  for (const arr of STATE.appsByJob.values()){
+    (arr||[]).forEach(a=>{
+      if (notesHasRemoved(a.notes_internal)) return;
+
+      // Your backend returns applied_at (ISO string). Use it.
+      const dt = parseDate(a.applied_at);
+      if (!dt) return;
+
+      const ageDays = (now - dt.getTime()) / msDay;
+      if (ageDays <= 7) app7++;
+      if (ageDays <= 30) app30++;
+    });
+  }
+
+  document.getElementById("kpiApp7").textContent = String(app7);
+  document.getElementById("kpiApp30").textContent = String(app30);
+}
 
   // -------------------- Filtering/sorting --------------------
   function applyFiltersAndRender(){
@@ -1156,24 +1166,37 @@
   });
 
   // -------------------- KPI preload (so 7/30 works without clicking) --------------------
-  async function preloadApplicantsForKpis(){
-    // Sequential to avoid hammering Apps Script.
-    for (let i = 0; i < (STATE.jobsRaw || []).length; i++){
-      const jobId = String(STATE.jobsRaw[i].job_id || "");
-      if (!jobId) continue;
-      if (STATE.appsByJob.has(jobId)) continue;
+ async function preloadApplicantsForKpis(){
+  // Show loading indicator while we compute 7/30 KPIs
+  document.getElementById("kpiApp7").textContent = "…";
+  document.getElementById("kpiApp30").textContent = "…";
 
-      const res = await apiListEmployerApplicants(jobId);
-      if (res && res.ok){
-        const arr = Array.isArray(res.applicants) ? res.applicants : [];
-        STATE.appsByJob.set(jobId, arr);
-        const visibleCount = arr.filter(a => !notesHasRemoved(a.notes_internal)).length;
-        STATE.countsByJob.set(jobId, visibleCount);
-      }
+  // Sequential to avoid hammering Apps Script.
+  for (let i = 0; i < (STATE.jobsRaw || []).length; i++){
+    const jobId = String(STATE.jobsRaw[i].job_id || "");
+    if (!jobId) continue;
+    if (STATE.appsByJob.has(jobId)) continue;
+
+    const res = await apiListEmployerApplicants(jobId);
+    if (res && res.ok){
+      const arr = Array.isArray(res.applicants) ? res.applicants : [];
+      STATE.appsByJob.set(jobId, arr);
+
+      const visibleCount = arr.filter(a => !notesHasRemoved(a.notes_internal)).length;
+      STATE.countsByJob.set(jobId, visibleCount);
+    } else {
+      // Still set something so counts don't stay undefined
+      STATE.appsByJob.set(jobId, []);
+      STATE.countsByJob.set(jobId, 0);
     }
+
+    // Update KPIs as we go (so it never looks "stuck")
     computeKpis();
-    applyFiltersAndRender();
   }
+
+  // Final render after all counts are known
+  applyFiltersAndRender();
+}
 
   // -------------------- Refresh / init --------------------
   async function refreshAll({ keepSelected=null } = {}){
