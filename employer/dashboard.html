@@ -369,7 +369,30 @@
         <div class="content">
           <div id="entBox" class="note">Loading…</div>
 
-          <!-- EEO Aggregate panel (Corporate only) -->
+          <div class="hr"></div>
+          <div style="font-weight:1000; margin-bottom:6px;">Quick Actions</div>
+          <div class="muted">Post a job or manage your existing jobs.</div>
+
+          <div class="hr"></div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
+            <a class="btn blue" href="/employer/jobs.html">Manage Jobs</a>
+          </div>
+
+          <!-- Applicants panel -->
+          <div class="hr"></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div style="font-weight:1000;">Applicants</div>
+            <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
+          </div>
+          <div class="muted" style="margin-top:6px;">
+            Row shows only: <b>Job Title | Name</b>. Checkbox toggles <b>X-off</b>. Click candidate name to open card. Remove Candidate is inside the card.
+          </div>
+          <div id="applicantsBox" class="note" style="margin-top:10px;">
+            Click "Load Applicants" to see all applicants.
+          </div>
+
+          <!-- EEO Aggregate panel (Corporate only) — MOVED ABOVE BUY/UPGRADE -->
           <div class="hr"></div>
           <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
             <div style="font-weight:1000;">EEO Aggregate (Corporate)</div>
@@ -387,29 +410,6 @@
             </div>
           </div>
           <div id="eeoBox" class="note" style="margin-top:10px;">Loading…</div>
-
-          <div class="hr"></div>
-          <div style="font-weight:1000; margin-bottom:6px;">Quick Actions</div>
-          <div class="muted">Post a job or manage your existing jobs.</div>
-
-          <div class="hr"></div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
-            <a class="btn blue" href="/employer/jobs.html">Manage Jobs</a>
-          </div>
-
-          <!-- Applicants panel (MOVED ABOVE PLANS) -->
-          <div class="hr"></div>
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <div style="font-weight:1000;">Applicants</div>
-            <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
-          </div>
-          <div class="muted" style="margin-top:6px;">
-            Row shows only: <b>Job Title | Name</b>. Checkbox toggles <b>X-off</b>. Click candidate name to open card. Remove Candidate is inside the card.
-          </div>
-          <div id="applicantsBox" class="note" style="margin-top:10px;">
-            Click "Load Applicants" to see all applicants.
-          </div>
 
           <!-- Buy / Upgrade Plan -->
           <div class="hr"></div>
