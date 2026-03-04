@@ -1256,22 +1256,21 @@
       qs("#jobDetail").innerHTML = `
         <h1>${escapeHtml(j.job_title || "Untitled role")}</h1>
 
-        <!-- Top facts (order per your spec) -->
-        <div class="facts">
-          ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
-          ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
-          ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
-          ${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
-          ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
-        </div>
+    <!-- Top facts (order per your spec) -->
+<div class="facts">
+  ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
+  ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
+  ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
+  ${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
 
-        ${verified ? `
-          <img
-            class="verified-badge"
-            src="/QuickHireVerifiedEmployerBadge.png"
-            alt="QuickHire Verified Employer"
-            loading="lazy"
-          />` : ``}
+  ${verified ? `
+    <span class="pill verified-pill">
+      <img src="/QuickHireVerifiedEmployerBadge.png" alt="Verified Employer" />
+    </span>
+  ` : ``}
+
+  ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
+</div>
 
         <!-- Company block -->
         ${(companyName || companyLogo || companySite) ? `
