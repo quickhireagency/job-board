@@ -250,7 +250,8 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+        <!-- LOGO URL SWAP: top logo -> job board -->
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
             <div style="font-weight:1000; letter-spacing:.2px;">Candidate Sign Up</div>
@@ -473,9 +474,7 @@
           <div class="note">
             <div style="font-weight:1000; margin-bottom:6px;">Welcome to QuickHire™.</div>
             <div class="muted">
-              To keep your account running smoothly, please use the same <b>E-mail</b> and <b>Username</b> each time you sign up or log in.
-              <br><br>
-              If you ever purchase a service later, you’ll attach it to your account by claiming it using that same <b>E-mail + Username</b> on the success page.
+              Create your candidate account to apply for jobs, manage your applications, and upload your resume, all in one place.
             </div>
           </div>
 
@@ -589,7 +588,8 @@
 
     <footer class="qh-footer" aria-label="QuickHire footer">
       <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+        <!-- LOGO URL SWAP: footer logo -> main site -->
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
           <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
         </a>
       </div>
@@ -744,12 +744,11 @@
       first_name, last_name, email, username, phone, password,
       acks,
       signature_full_name,
-      eeo // <-- NEW payload
+      eeo
     });
 
     if (!res.ok) return QH.toast("Signup failed", res.error || "Try again.");
 
-    // Store richer session for UI use (email/username helpful on dashboard)
     QH.saveSession({
       role: "job_seeker",
       session_token: res.session_token,
@@ -760,13 +759,11 @@
 
     QH.toast("Account created", "You can now apply to jobs.");
 
-    // Redirect to next if provided, else home
     const next = new URLSearchParams(window.location.search).get("next");
     const safeNext = (next && next.startsWith("/")) ? next : "";
     window.location.href = safeNext || "/";
   });
 
-  // Enter-to-submit on password field
   document.getElementById("password").addEventListener("keydown", (e) => {
     if (e.key === "Enter") document.getElementById("btnSignup").click();
   });
