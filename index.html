@@ -316,6 +316,19 @@
       margin:10px 0 12px;
     }
 
+    /* Verified badge inside facts row - does NOT affect other pills */
+.verified-inline{
+  display:inline-flex;
+  align-items:center;
+  flex: 0 0 auto;         /* do not stretch */
+}
+
+.verified-badge{
+  height:64px;            /* <<< change ONLY this number to resize */
+  width:auto;
+  display:block;
+}
+
     .detail .box{
       background: rgba(10,30,20,.04);
       border:1px solid rgba(10,30,20,.12);
@@ -331,18 +344,6 @@
       font-size:14px;
       line-height:1.45;
     }
-
-/* Verified badge (right) */
-.verified-badge{
-  display:inline-block;   /* not a full-width block */
-  width:48px;             /* don't stretch */
-  height:48px;            /* <<< THIS is the size knob */
-  max-height:48px;
-  max-width:48px;        /* safety so it never becomes a banner */
-  margin:0;               /* no extra spacing */
-  vertical-align:middle;
-  object-fit:contain;
-}
 
     /* Company block (right) */
     .company-block{
@@ -1269,7 +1270,7 @@ ${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
 ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
 
 ${verified ? `
-  <span class="pill verified-pill">
+  <span class="verified-inline">
     <img class="verified-badge" src="/QuickHireVerifiedEmployerBadge.png" alt="Verified Employer" />
   </span>
 ` : ``}
