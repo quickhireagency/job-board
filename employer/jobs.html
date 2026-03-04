@@ -1504,6 +1504,31 @@ document.getElementById("btnExportCsv").addEventListener("click", ()=>{
 });
 
 /* ----------------------------- Refresh / init ----------------------------- */
+async function preloadApplicantsForKpis(){
+  // Loads applicants for each job so KPI 7/30 day counts work without clicking jobs.
+  // Runs sequentially to avoid hammering Apps Script.
+  for (let i = 0; i < (STATE.jobsRaw || []).length; i++){
+    const jobId = String(STATE.jobsRaw[i].job_id || "");
+    if (!jobId) continue;
+
+    // If already cached, skip
+    if (STATE.appsByJob.has(jobId)) continue;
+
+    const r = await apiListApplicants(jobId);
+    if (r && r.ok){
+      const arr = Array.isArray(r.applicants) ? r.applicants : [];
+      STATE.appsByJob.set(jobId, arr);
+
+      // IMPORTANT: removed candidates are tracked in notes_internal as REMOVED:true
+      const visibleCount = arr.filter(a => !String(a.notes_internal || "").toLowerCase().includes("removed:true")).length;
+      STATE.countsByJob.set(jobId, visibleCount);
+    }
+  }
+
+  // Now KPIs can compute real totals
+  computeKpis();
+}
+  
 async function refreshAll({ keepSelected=null } = {}){
   const r = await apiListJobs();
   if (!r.ok){
@@ -1524,8 +1549,11 @@ async function refreshAll({ keepSelected=null } = {}){
     }
   });
 
-  computeKpis();
-  applyFiltersAndRender();
+computeKpis();
+applyFiltersAndRender();
+
+// NEW: preload applicants so KPI (7/30 days) works immediately
+await preloadApplicantsForKpis();
 
   // keep selection if requested
   if (keepSelected){
