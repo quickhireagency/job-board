@@ -892,48 +892,71 @@ document.getElementById("btnViewDrafts").addEventListener("click", ()=>{
  * If you already have a different endpoint, swap the string in one place below.
  */
 async function apiListJobs(){
-  const res = await QH.apiGet("list_jobs", { limit: 1000 });
-  if (!res || !res.ok) return { ok:false, error: (res && res.error) ? res.error : "Unable to load jobs" };
-  const all = Array.isArray(res.jobs) ? res.jobs : [];
-  const mine = all.filter(j => String(j.employer_id||"") === String(session.employer_id||""));
-  return { ok:true, jobs: mine };
+  try{
+    // Use the employer-specific endpoint that actually exists in your backend
+    const res = await QH.apiPost("list_employer_jobs", {
+      session_token: session.session_token,
+      search: "",
+      status: "",          // all
+      sort: "updated_desc",
+      limit: 500
+    });
+
+    if (!res || !res.ok) {
+      return { ok:false, error: (res && res.error) ? res.error : "Unable to load employer jobs" };
+    }
+
+    const mine = Array.isArray(res.jobs) ? res.jobs : [];
+    return { ok:true, jobs: mine };
+  }catch(err){
+    return { ok:false, error: String(err && err.message ? err.message : err) };
+  }
 }
 
 async function apiListApplicants(job_id){
-  // Try 1: list_applications
-  let res = await QH.apiGet("list_applications", { job_id });
-  if (res && res.ok) {
-    const arr = res.applications || res.applicants || res.rows || [];
-    return { ok:true, applicants: Array.isArray(arr) ? arr : [] };
+  try{
+    // Use the employer-specific applicants endpoint that actually exists in your backend
+    const res = await QH.apiPost("list_employer_applicants", {
+      session_token: session.session_token,
+      job_id: job_id
+    });
+
+    if (res && res.ok){
+      const arr = res.applicants || [];
+      return { ok:true, applicants: Array.isArray(arr) ? arr : [] };
+    }
+
+    return { ok:false, error: (res && res.error) ? res.error : "Unable to load applicants" };
+  }catch(err){
+    return { ok:false, error: String(err && err.message ? err.message : err) };
   }
-  // Try 2: list_applicants
-  res = await QH.apiGet("list_applicants", { job_id });
-  if (res && res.ok) {
-    const arr = res.applicants || res.rows || [];
-    return { ok:true, applicants: Array.isArray(arr) ? arr : [] };
-  }
-  return { ok:false, error: (res && res.error) ? res.error : "Unable to load applicants" };
 }
 
-/**
- * Job status updates:
- * This calls an endpoint you may or may not have. If not present, see backend patch below.
- */
 async function apiSetJobStatus(job_id, status){
-  const res = await QH.apiPost("employer_job_set_status", { job_id, status });
-  if (res && res.ok) return res;
-  // fallback: try a generic update endpoint name if you have it
-  const res2 = await QH.apiPost("set_job_status", { job_id, status });
-  if (res2 && res2.ok) return res2;
-  return { ok:false, error: (res && res.error) ? res.error : (res2 && res2.error) ? res2.error : "Missing backend endpoint for job status" };
+  try{
+    const res = await QH.apiPost("employer_job_set_status", {
+      session_token: session.session_token,
+      job_id: job_id,
+      status: status
+    });
+    if (res && res.ok) return res;
+    return { ok:false, error: (res && res.error) ? res.error : "Failed to set job status" };
+  }catch(err){
+    return { ok:false, error: String(err && err.message ? err.message : err) };
+  }
 }
 
 async function apiDuplicateJob(job_id){
-  const res = await QH.apiPost("employer_job_duplicate", { job_id });
-  if (res && res.ok) return res;
-  const res2 = await QH.apiPost("duplicate_job", { job_id });
-  if (res2 && res2.ok) return res2;
-  return { ok:false, error: (res && res.error) ? res.error : (res2 && res2.error) ? res2.error : "Missing backend endpoint for duplicate job" };
+  try{
+    const res = await QH.apiPost("employer_job_duplicate", {
+      session_token: session.session_token,
+      job_id: job_id
+    });
+    if (res && res.ok) return res;
+    return { ok:false, error: (res && res.error) ? res.error : "Failed to duplicate job" };
+  }catch(err){
+    return { ok:false, error: String(err && err.message ? err.message : err) };
+  }
 }
 
 /* ----------------------------- KPIs ----------------------------- */
@@ -1248,7 +1271,7 @@ async function renderJobManager(jobId){
       return;
     }
     STATE.appsByJob.set(jobId, r.applicants || []);
-    STATE.countsByJob.set(jobId, (r.applicants || []).filter(a=> String(a.status||"").toLowerCase() !== "removed").length);
+    STATE.countsByJob.set(jobId, (r.applicants || []).filter(a => !String(a.notes_internal||"").toLowerCase().includes("removed:true")).length);
     computeKpis();
   }
 
