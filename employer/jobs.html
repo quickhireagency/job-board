@@ -742,29 +742,28 @@
 
 <script>
 /* =========================================================
-   QuickHire™ — Employer Jobs Command Center (Single Page)
-   - Uses existing QH session + QH.apiGet/apiPost helpers
-   - No messaging, no applicant "source"
-   - Candidate click calls existing candidate card flow if present
+   QuickHire™ — My Jobs (Backend-Matched)
+   BACKEND ACTIONS USED (POST):
+   - list_employer_jobs
+   - list_employer_applicants
+   - employer_job_set_status
+   - employer_job_duplicate
    ========================================================= */
 
-const session = QH.requireSession("employer");
-if (!session) throw new Error("No employer session");
+const sess = QH.requireSession("employer");
+if (!sess) throw new Error("No employer session");
 
+/* ----------------------------- State ----------------------------- */
 const STATE = {
   jobsRaw: [],
   jobsView: [],
   appsByJob: new Map(),     // job_id -> applicants array
-  countsByJob: new Map(),   // job_id -> applicantCount
+  countsByJob: new Map(),   // job_id -> visible applicant count (REMOVED:false)
   selectedJobId: null,
-  filters: {
-    search: "",
-    status: "",
-    dateDays: "",
-    sort: "updated_desc"
-  }
+  filters: { search:"", status:"", dateDays:"", sort:"updated_desc" }
 };
 
+/* ----------------------------- Tiny helpers ----------------------------- */
 function toast(title, msg){
   const el = document.getElementById("toast");
   document.getElementById("toastTitle").textContent = title || "";
@@ -777,12 +776,10 @@ function parseDate(x){
   if (!x) return null;
   const d = new Date(x);
   if (!isNaN(d.getTime())) return d;
-  // if it's a numeric timestamp string
   const n = Number(x);
   if (!isNaN(n) && n > 0) return new Date(n);
   return null;
 }
-
 function fmtDateShort(x){
   const d = parseDate(x);
   if (!d) return "—";
@@ -791,22 +788,20 @@ function fmtDateShort(x){
 
 function normStatus(s){
   const v = String(s||"").toLowerCase().trim();
-  if (!v) return "active"; // assume active if blank
+  if (!v) return "active";
   if (v === "live" || v === "open") return "active";
   if (v === "removed" || v === "deleted" || v === "soft_deleted") return "removed";
   if (v === "draft") return "draft";
   if (v === "closed" || v === "filled" || v === "paused") return "closed";
   if (v === "active") return "active";
-  return v; // keep unknown
+  return v;
 }
-
 function statusPill(status){
   const s = normStatus(status);
   const cls = (s==="active") ? "green" : (s==="draft" ? "yellow" : (s==="closed" ? "blue" : (s==="removed" ? "red" : "")));
   const label = (s==="active") ? "Active" : (s==="draft" ? "Draft" : (s==="closed" ? "Closed" : (s==="removed" ? "Removed" : s)));
   return `<span class="pill ${cls}">${QH.esc(label)}</span>`;
 }
-
 function jobLocation(job){
   const parts = [];
   const city = job.city || job.location_city || "";
@@ -815,6 +810,9 @@ function jobLocation(job){
   if (city || state) parts.push([city, state].filter(Boolean).join(", "));
   else if (loc) parts.push(loc);
   return parts.join(" ").trim() || "—";
+}
+function hasRemovedFlag(notes){
+  return String(notes||"").toLowerCase().includes("removed:true");
 }
 
 /* ----------------------------- Modal ----------------------------- */
@@ -827,9 +825,7 @@ function showConfirm({title, body, okText="Confirm", okDanger=true}){
   okBtn.textContent = okText;
   okBtn.className = okDanger ? "btn danger" : "btn green";
   back.style.display = "flex";
-  return new Promise((resolve)=>{
-    modalResolve = resolve;
-  });
+  return new Promise((resolve)=>{ modalResolve = resolve; });
 }
 function hideConfirm(result){
   const back = document.getElementById("modalBackdrop");
@@ -844,7 +840,7 @@ document.getElementById("modalBackdrop").addEventListener("click", (e)=>{
   if (e.target && e.target.id === "modalBackdrop") hideConfirm(false);
 });
 
-/* ----------------------------- Logout ----------------------------- */
+/* ----------------------------- Nav buttons ----------------------------- */
 document.getElementById("btnLogout").addEventListener("click", () => {
   QH.clearSession();
   window.location.href = "/";
@@ -880,83 +876,45 @@ document.getElementById("btnViewDrafts").addEventListener("click", ()=>{
   toast("Drafts", "Showing Draft jobs.");
 });
 
-/* ----------------------------- Data loads ----------------------------- */
-/**
- * We keep compatibility with your current endpoint usage:
- * - list_jobs: returns {ok, jobs:[...]}
- *
- * For applicants, we try (in order):
- * 1) list_applications?job_id=...  -> {ok, applications:[...]} or {ok, applicants:[...]}
- * 2) list_applicants?job_id=...    -> {ok, applicants:[...]}
- *
- * If you already have a different endpoint, swap the string in one place below.
- */
-async function apiListJobs(){
-  try{
-    // Use the employer-specific endpoint that actually exists in your backend
-    const res = await QH.apiPost("list_employer_jobs", {
-      session_token: session.session_token,
-      search: "",
-      status: "",          // all
-      sort: "updated_desc",
-      limit: 500
-    });
-
-    if (!res || !res.ok) {
-      return { ok:false, error: (res && res.error) ? res.error : "Unable to load employer jobs" };
-    }
-
-    const mine = Array.isArray(res.jobs) ? res.jobs : [];
-    return { ok:true, jobs: mine };
-  }catch(err){
-    return { ok:false, error: String(err && err.message ? err.message : err) };
-  }
+/* ----------------------------- Backend-matched API calls ----------------------------- */
+async function apiListEmployerJobs(){
+  const res = await QH.apiPost("list_employer_jobs", {
+    session_token: sess.session_token,
+    search: "",      // we do client-side filtering for UI responsiveness
+    status: "",      // all
+    sort: "updated_desc",
+    limit: 500
+  });
+  if (!res || !res.ok) return { ok:false, error: (res && res.error) ? res.error : "Unable to load jobs" };
+  return { ok:true, jobs: Array.isArray(res.jobs) ? res.jobs : [] };
 }
 
-async function apiListApplicants(job_id){
-  try{
-    // Use the employer-specific applicants endpoint that actually exists in your backend
-    const res = await QH.apiPost("list_employer_applicants", {
-      session_token: session.session_token,
-      job_id: job_id
-    });
-
-    if (res && res.ok){
-      const arr = res.applicants || [];
-      return { ok:true, applicants: Array.isArray(arr) ? arr : [] };
-    }
-
-    return { ok:false, error: (res && res.error) ? res.error : "Unable to load applicants" };
-  }catch(err){
-    return { ok:false, error: String(err && err.message ? err.message : err) };
-  }
+async function apiListEmployerApplicants(job_id){
+  const res = await QH.apiPost("list_employer_applicants", {
+    session_token: sess.session_token,
+    job_id
+  });
+  if (!res || !res.ok) return { ok:false, error: (res && res.error) ? res.error : "Unable to load applicants" };
+  return { ok:true, applicants: Array.isArray(res.applicants) ? res.applicants : [] };
 }
 
 async function apiSetJobStatus(job_id, status){
-  try{
-    const res = await QH.apiPost("employer_job_set_status", {
-      session_token: session.session_token,
-      job_id: job_id,
-      status: status
-    });
-    if (res && res.ok) return res;
-    return { ok:false, error: (res && res.error) ? res.error : "Failed to set job status" };
-  }catch(err){
-    return { ok:false, error: String(err && err.message ? err.message : err) };
-  }
+  const res = await QH.apiPost("employer_job_set_status", {
+    session_token: sess.session_token,
+    job_id,
+    status
+  });
+  if (res && res.ok) return res;
+  return { ok:false, error: (res && res.error) ? res.error : "Failed to set job status" };
 }
 
 async function apiDuplicateJob(job_id){
-  try{
-    const res = await QH.apiPost("employer_job_duplicate", {
-      session_token: session.session_token,
-      job_id: job_id
-    });
-    if (res && res.ok) return res;
-    return { ok:false, error: (res && res.error) ? res.error : "Failed to duplicate job" };
-  }catch(err){
-    return { ok:false, error: String(err && err.message ? err.message : err) };
-  }
+  const res = await QH.apiPost("employer_job_duplicate", {
+    session_token: sess.session_token,
+    job_id
+  });
+  if (res && res.ok) return res;
+  return { ok:false, error: (res && res.error) ? res.error : "Failed to duplicate job" };
 }
 
 /* ----------------------------- KPIs ----------------------------- */
@@ -968,26 +926,27 @@ function computeKpis(){
   document.getElementById("kpiActive").textContent = String(active);
   document.getElementById("kpiDraft").textContent  = String(draft);
 
-  // Applicants KPIs: we can only compute if we have loaded applicants per job.
-  // We'll compute from whatever we have in cache; if not loaded, show "—" until loaded.
+  // Applicants KPIs (7/30 days) computed from cached applicants (preloaded)
   let app7 = 0, app30 = 0;
-  let anyLoaded = false;
   const now = Date.now();
   const msDay = 24*60*60*1000;
 
-  for (const [jobId, arr] of STATE.appsByJob.entries()){
-    anyLoaded = true;
+  for (const arr of STATE.appsByJob.values()){
     (arr||[]).forEach(a=>{
-      // best-effort date keys
+      // Exclude removed candidates from KPI counts
+      if (hasRemovedFlag(a.notes_internal)) return;
+
       const dt = parseDate(a.applied_at || a.created_at || a.timestamp || a.date_applied);
       if (!dt) return;
+
       const ageDays = (now - dt.getTime()) / msDay;
       if (ageDays <= 7) app7++;
       if (ageDays <= 30) app30++;
     });
   }
-  document.getElementById("kpiApp7").textContent = anyLoaded ? String(app7) : "—";
-  document.getElementById("kpiApp30").textContent = anyLoaded ? String(app30) : "—";
+
+  document.getElementById("kpiApp7").textContent = String(app7);
+  document.getElementById("kpiApp30").textContent = String(app30);
 }
 
 /* ----------------------------- Filtering/sorting ----------------------------- */
@@ -999,12 +958,10 @@ function applyFiltersAndRender(){
 
   let rows = [...(STATE.jobsRaw || [])];
 
-  // Filter: status
   if (status){
     rows = rows.filter(j => normStatus(j.status) === status);
   }
 
-  // Filter: search
   if (search){
     rows = rows.filter(j=>{
       const hay = [
@@ -1016,16 +973,14 @@ function applyFiltersAndRender(){
     });
   }
 
-  // Filter: date
   if (dateDays && !isNaN(dateDays)){
     const cutoff = Date.now() - (dateDays * 24*60*60*1000);
     rows = rows.filter(j=>{
-      const d = parseDate(j.updated_at || j.modified_at || j.last_updated || j.created_at);
+      const d = parseDate(j.updated_at || j.modified_at || j.last_updated || j.created_at || j.posted_at);
       return d ? (d.getTime() >= cutoff) : false;
     });
   }
 
-  // Sort
   rows.sort((a,b)=>{
     if (sort === "title_asc"){
       const at = String(a.job_title || a.title || "").toLowerCase();
@@ -1042,9 +997,9 @@ function applyFiltersAndRender(){
       const bd = parseDate(b.created_at || b.posted_at);
       return (bd?bd.getTime():0) - (ad?ad.getTime():0);
     }
-    // updated_desc default
-    const ad = parseDate(a.updated_at || a.modified_at || a.last_updated || a.created_at);
-    const bd = parseDate(b.updated_at || b.modified_at || b.last_updated || b.created_at);
+    // updated_desc
+    const ad = parseDate(a.updated_at || a.modified_at || a.last_updated || a.created_at || a.posted_at);
+    const bd = parseDate(b.updated_at || b.modified_at || b.last_updated || b.created_at || b.posted_at);
     return (bd?bd.getTime():0) - (ad?ad.getTime():0);
   });
 
@@ -1084,9 +1039,8 @@ function renderJobsTable(){
           const st = normStatus(j.status);
           const apps = Number(STATE.countsByJob.get(jobId) || 0);
           const created = fmtDateShort(j.created_at || j.posted_at);
-          const updated = fmtDateShort(j.updated_at || j.modified_at || j.last_updated || j.created_at);
+          const updated = fmtDateShort(j.updated_at || j.modified_at || j.last_updated || j.created_at || j.posted_at);
 
-          // action buttons based on status
           const canClose = (st === "active");
           const canReopen = (st === "closed");
           const canRestore = (st === "removed");
@@ -1125,7 +1079,6 @@ function renderJobsTable(){
 
   wrap.innerHTML = html;
 
-  // Wire row actions
   wrap.querySelectorAll("tbody tr").forEach(tr=>{
     const jobId = tr.getAttribute("data-jobid");
     tr.querySelectorAll("[data-act]").forEach(el=>{
@@ -1212,14 +1165,11 @@ async function handleDuplicate(jobId){
   const res = await apiDuplicateJob(jobId);
   if (!res.ok) return toast("Error", res.error || "Failed to duplicate job");
 
-  // Try to navigate to edit page for new job if backend returns new_job_id
-  const newId = res.new_job_id || res.job_id_new || res.duplicated_job_id || "";
+  const newId = res.new_job_id || "";
   toast("Duplicated", "Draft created.");
-
   await refreshAll({ keepSelected: newId || null });
 
   if (newId){
-    // Open edit in same tab
     window.location.href = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(newId)}`;
   }
 }
@@ -1262,16 +1212,17 @@ async function renderJobManager(jobId){
     return;
   }
 
-  // Load applicants (cached)
   if (!STATE.appsByJob.has(jobId)){
     body.innerHTML = `<div class="muted">Loading applicants…</div>`;
-    const r = await apiListApplicants(jobId);
+    const r = await apiListEmployerApplicants(jobId);
     if (!r.ok){
       body.innerHTML = `<div class="note">Applicants could not be loaded.<div class="muted" style="margin-top:6px;">${QH.esc(r.error || "")}</div></div>`;
       return;
     }
-    STATE.appsByJob.set(jobId, r.applicants || []);
-    STATE.countsByJob.set(jobId, (r.applicants || []).filter(a => !String(a.notes_internal||"").toLowerCase().includes("removed:true")).length);
+
+    const arr = r.applicants || [];
+    STATE.appsByJob.set(jobId, arr);
+    STATE.countsByJob.set(jobId, arr.filter(a => !hasRemovedFlag(a.notes_internal)).length);
     computeKpis();
   }
 
@@ -1279,13 +1230,14 @@ async function renderJobManager(jobId){
   const title = QH.esc(job.job_title || job.title || "(untitled)");
   const loc = QH.esc(jobLocation(job));
   const created = fmtDateShort(job.created_at || job.posted_at);
-  const updated = fmtDateShort(job.updated_at || job.modified_at || job.last_updated || job.created_at);
+  const updated = fmtDateShort(job.updated_at || job.modified_at || job.last_updated || job.created_at || job.posted_at);
+
   const apps = (STATE.appsByJob.get(jobId) || []);
-  const appsCount = Number(STATE.countsByJob.get(jobId) || apps.length || 0);
+  const appsVisible = apps.filter(a => !hasRemovedFlag(a.notes_internal));
+  const appsCount = Number(STATE.countsByJob.get(jobId) || appsVisible.length || 0);
 
   const editHref = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(jobId)}`;
 
-  // Applicant filter controls inside panel
   const mgrHtml = `
     <div class="jobMgrHeader">
       <div>
@@ -1308,12 +1260,11 @@ async function renderJobManager(jobId){
 
     <div class="filters" style="margin-bottom:10px;">
       <div>
-        <label for="aStatus">Applicant Status</label>
+        <label for="aStatus">Applicant Filter</label>
         <select id="aStatus">
-          <option value="">All</option>
-          <option value="applied">Applied</option>
-          <option value="withdrawn">Withdrawn</option>
-          <option value="removed">Removed</option>
+          <option value="">Visible (default)</option>
+          <option value="all">All (including removed)</option>
+          <option value="removed">Removed only</option>
         </select>
       </div>
       <div>
@@ -1326,16 +1277,15 @@ async function renderJobManager(jobId){
       </div>
       <div style="grid-column: span 2;">
         <label for="aSearch">Search</label>
-        <input id="aSearch" placeholder="Candidate name or email (if available)">
+        <input id="aSearch" placeholder="Candidate name or email">
       </div>
     </div>
 
-    <div id="appsWrap">${renderApplicantsTable(apps)}</div>
+    <div id="appsWrap">${renderApplicantsTable(appsVisible)}</div>
   `;
 
   body.innerHTML = mgrHtml;
 
-  // Wire manager buttons
   const closeBtn = document.getElementById("mgrClose");
   if (closeBtn) closeBtn.addEventListener("click", ()=>handleClose(jobId));
   const reopenBtn = document.getElementById("mgrReopen");
@@ -1345,19 +1295,25 @@ async function renderJobManager(jobId){
   const restoreBtn = document.getElementById("mgrRestore");
   if (restoreBtn) restoreBtn.addEventListener("click", ()=>handleRestore(jobId));
 
-  // Wire applicant filters
   const aStatus = document.getElementById("aStatus");
   const aDate = document.getElementById("aDate");
   const aSearch = document.getElementById("aSearch");
+
   const applyApps = ()=>{
-    const stv = (aStatus.value||"").toLowerCase().trim();
+    const mode = (aStatus.value||"").toLowerCase().trim();
     const dd = aDate.value ? Number(aDate.value) : 0;
     const s = (aSearch.value||"").toLowerCase().trim();
+
     let filtered = [...apps];
 
-    if (stv){
-      filtered = filtered.filter(a => String(a.status||"").toLowerCase().trim() === stv);
-    }
+    // mode filter
+    if (!mode){
+      filtered = filtered.filter(a => !hasRemovedFlag(a.notes_internal)); // default visible
+    } else if (mode === "removed"){
+      filtered = filtered.filter(a => hasRemovedFlag(a.notes_internal));
+    } // "all" leaves list untouched
+
+    // date filter
     if (dd && !isNaN(dd)){
       const cutoff = Date.now() - dd*24*60*60*1000;
       filtered = filtered.filter(a=>{
@@ -1365,9 +1321,13 @@ async function renderJobManager(jobId){
         return dt ? dt.getTime() >= cutoff : false;
       });
     }
+
+    // search filter
     if (s){
       filtered = filtered.filter(a=>{
         const hay = [
+          a.candidate_first_name, a.candidate_last_name,
+          a.candidate_email, a.candidate_phone,
           a.name, a.full_name, a.candidate_name,
           a.email, a.candidate_email
         ].filter(Boolean).join(" ").toLowerCase();
@@ -1379,7 +1339,8 @@ async function renderJobManager(jobId){
     wireApplicantClicks();
   };
 
-  [aStatus, aDate].forEach(el=> el.addEventListener("change", applyApps));
+  aStatus.addEventListener("change", applyApps);
+  aDate.addEventListener("change", applyApps);
   aSearch.addEventListener("input", ()=>{ clearTimeout(aSearch._t); aSearch._t=setTimeout(applyApps, 180); });
 
   wireApplicantClicks();
@@ -1390,21 +1351,24 @@ function renderApplicantsTable(apps){
     return `<div class="note">No applicants yet.</div>`;
   }
 
-  // best-effort pick fields
   const rows = apps.map(a=>{
-    const name = a.name || a.full_name || a.candidate_name || "(candidate)";
-    const email = a.email || a.candidate_email || "";
-    const status = String(a.status || "applied");
+    const fn = a.candidate_first_name || "";
+    const ln = a.candidate_last_name || "";
+    const name = (String(fn + " " + ln).trim()) || a.name || a.full_name || a.candidate_name || "(candidate)";
+    const email = a.candidate_email || a.email || a.candidate_email || "";
     const applied = fmtDateShort(a.applied_at || a.created_at || a.timestamp || a.date_applied);
 
-    // keep the full applicant JSON embedded (safe) for click open
+    const isRemoved = hasRemovedFlag(a.notes_internal);
+    const statusLabel = isRemoved ? "Removed" : "Active";
+    const statusP = `<span class="pill ${isRemoved ? "red" : "green"}">${QH.esc(statusLabel)}</span>`;
+
     const payload = encodeURIComponent(JSON.stringify(a));
 
     return `
       <tr data-app="${payload}">
         <td><b>${QH.esc(name)}</b>${email ? `<div class="muted">${QH.esc(email)}</div>` : ``}</td>
         <td>${QH.esc(applied)}</td>
-        <td>${statusPill(status)}</td>
+        <td>${statusP}</td>
       </tr>
     `;
   }).join("");
@@ -1418,9 +1382,7 @@ function renderApplicantsTable(apps){
           <th style="width:20%;">Status</th>
         </tr>
       </thead>
-      <tbody>
-        ${rows}
-      </tbody>
+      <tbody>${rows}</tbody>
     </table>
     <div class="muted" style="margin-top:8px;">Tip: click a candidate to open the candidate card.</div>
   `;
@@ -1443,19 +1405,14 @@ function wireApplicantClicks(){
   });
 }
 
-/**
- * IMPORTANT: preserve your existing candidate-card flow.
- * - If you already defined a global function, we call it:
- *    window.QH_openCandidateCard(applicant, { job_id })
- * - If not present, we provide a harmless fallback (alert) so page still works.
- */
 function openCandidateCardExisting(applicant){
   if (typeof window.QH_openCandidateCard === "function"){
     window.QH_openCandidateCard(applicant, { job_id: STATE.selectedJobId });
     return;
   }
-  // Fallback (won't break anything)
-  const name = applicant.name || applicant.full_name || applicant.candidate_name || "Candidate";
+  const fn = applicant.candidate_first_name || "";
+  const ln = applicant.candidate_last_name || "";
+  const name = (String(fn + " " + ln).trim()) || applicant.name || applicant.full_name || applicant.candidate_name || "Candidate";
   toast("Candidate", `Open candidate card not found. Clicked: ${name}`);
 }
 
@@ -1483,7 +1440,6 @@ function buildCsv(jobs){
   });
   return lines.join("\n");
 }
-
 document.getElementById("btnExportCsv").addEventListener("click", ()=>{
   const jobs = STATE.jobsView || [];
   if (!jobs.length){
@@ -1503,65 +1459,60 @@ document.getElementById("btnExportCsv").addEventListener("click", ()=>{
   toast("Export", "CSV downloaded.");
 });
 
-/* ----------------------------- Refresh / init ----------------------------- */
+/* ----------------------------- KPI Preload (fixes KPI 7/30 days) ----------------------------- */
 async function preloadApplicantsForKpis(){
-  // Loads applicants for each job so KPI 7/30 day counts work without clicking jobs.
-  // Runs sequentially to avoid hammering Apps Script.
+  // sequential to avoid hammering Apps Script
   for (let i = 0; i < (STATE.jobsRaw || []).length; i++){
     const jobId = String(STATE.jobsRaw[i].job_id || "");
     if (!jobId) continue;
-
-    // If already cached, skip
     if (STATE.appsByJob.has(jobId)) continue;
 
-    const r = await apiListApplicants(jobId);
+    const r = await apiListEmployerApplicants(jobId);
     if (r && r.ok){
       const arr = Array.isArray(r.applicants) ? r.applicants : [];
       STATE.appsByJob.set(jobId, arr);
-
-      // IMPORTANT: removed candidates are tracked in notes_internal as REMOVED:true
-      const visibleCount = arr.filter(a => !String(a.notes_internal || "").toLowerCase().includes("removed:true")).length;
-      STATE.countsByJob.set(jobId, visibleCount);
+      STATE.countsByJob.set(jobId, arr.filter(a => !hasRemovedFlag(a.notes_internal)).length);
     }
   }
-
-  // Now KPIs can compute real totals
   computeKpis();
+  renderJobsTable(); // refresh counts column after preload
 }
-  
+
+/* ----------------------------- Refresh / init ----------------------------- */
 async function refreshAll({ keepSelected=null } = {}){
-  const r = await apiListJobs();
+  const wrap = document.getElementById("jobsWrap");
+  wrap.innerHTML = `<div class="muted">Loading…</div>`;
+
+  const r = await apiListEmployerJobs();
   if (!r.ok){
-    document.getElementById("jobsWrap").innerHTML = `<div class="note">Error loading jobs.<div class="muted" style="margin-top:6px;">${QH.esc(r.error||"")}</div></div>`;
+    wrap.innerHTML = `<div class="note">Error loading jobs.<div class="muted" style="margin-top:6px;">${QH.esc(r.error||"")}</div></div>`;
     return;
   }
 
   STATE.jobsRaw = r.jobs || [];
-  // Clear counts; preserve cached applicants where possible
+
+  // Init counts quickly (0 until preload fills them)
   STATE.countsByJob = new Map();
   STATE.jobsRaw.forEach(j=>{
     const jobId = String(j.job_id||"");
-    if (STATE.appsByJob.has(jobId)){
-      const apps = STATE.appsByJob.get(jobId) || [];
-      STATE.countsByJob.set(jobId, apps.filter(a=> String(a.status||"").toLowerCase() !== "removed").length);
-    } else {
-      STATE.countsByJob.set(jobId, 0);
-    }
+    STATE.countsByJob.set(jobId, STATE.countsByJob.get(jobId) || 0);
   });
 
-computeKpis();
-applyFiltersAndRender();
+  // Immediate KPIs for jobs
+  computeKpis();
 
-// NEW: preload applicants so KPI (7/30 days) works immediately
-await preloadApplicantsForKpis();
+  // Render jobs (fast)
+  applyFiltersAndRender();
 
-  // keep selection if requested
+  // Now preload applicants to make KPI 7/30 + Applicants column real
+  await preloadApplicantsForKpis();
+
+  // Selection handling
   if (keepSelected){
     STATE.selectedJobId = keepSelected;
     syncMgrVisibility();
     await renderJobManager(keepSelected);
   } else if (STATE.selectedJobId){
-    // refresh current selection if still exists
     const exists = (STATE.jobsRaw||[]).some(j=> String(j.job_id||"") === String(STATE.selectedJobId));
     if (exists){
       syncMgrVisibility();
@@ -1574,11 +1525,11 @@ await preloadApplicantsForKpis();
 }
 
 (async function init(){
-  // Initial filter defaults
+  // Initial defaults
   fSort.value = "updated_desc";
   await refreshAll();
 
-  // Optional: pre-open job via querystring ?job_id=
+  // Optional open via ?job_id=
   try{
     const params = new URLSearchParams(location.search);
     const jobId = params.get("job_id");
@@ -1588,22 +1539,6 @@ await preloadApplicantsForKpis();
   }catch(e){}
 })();
 </script>
-
-<!-- =========================================================
-     BACKEND NOTE (READ THIS ONCE)
-     =========================================================
-     This page will work immediately for list + applicants IF you already have:
-       - apiGet("list_jobs")
-       - apiGet("list_applications") OR apiGet("list_applicants")
-
-     For status/duplicate buttons to work, your backend must support at least one of:
-       - apiPost("employer_job_set_status", {job_id, status})
-       - apiPost("set_job_status", {job_id, status})
-       - apiPost("employer_job_duplicate", {job_id})
-       - apiPost("duplicate_job", {job_id})
-
-     If you DON’T have those yet, paste these handler cases into your Apps Script doPost switch.
--->
 
 </body>
 </html>
