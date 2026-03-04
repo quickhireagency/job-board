@@ -204,6 +204,8 @@
       font-size: 12px;
     }
 
+    .hide{ display:none !important; }
+
     /* Footer logo + legal links (match index.html) */
     .qh-footer-logo-wrap{
       display:flex;
@@ -240,17 +242,18 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+        <!-- LOGO URL SWAP: top logo -> jobboard -->
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
             <div style="font-weight:1000; letter-spacing:.2px;">Payment Success</div>
-            <div class="sub">Claim your purchase</div>
+            <div class="sub">Attach your purchase</div>
           </div>
         </a>
       </div>
 
       <div class="controls">
-        <a class="btn" href="/">Back to Jobs</a>
+        <a class="btn" href="https://jobboard.quickhireagency.com/">Back to Jobs</a>
         <a class="btn blue" id="loginBtn" href="/auth/login.html">Login</a>
       </div>
     </div>
@@ -260,59 +263,60 @@
     <div class="panel">
       <div class="panel-header">
         <div>
-          <h2>IMPORTANT: Use the SAME E-mail + Username</h2>
-          <div class="meta">Most failed claims are email mismatches</div>
+          <h2>IMPORTANT: Use the same checkout email</h2>
+          <div class="meta">Pay with the same Stripe email as your QuickHire account email to avoid delays.</div>
         </div>
       </div>
 
       <div class="content">
         <div class="note">
-          <b>Do not change emails.</b> This will cause your purchase to not attach properly.
+          <b>Use the same email.</b> Your purchase will only attach if your Stripe checkout email matches your QuickHire account email.
           <ul style="margin:10px 0 0; padding-left:18px;">
-            <li>Use the <b>same E-mail</b> you used when you created your QuickHire account.</li>
-            <li>Use the <b>same Username</b> you used when you created your QuickHire account.</li>
-            <li>If you used a different email at checkout, your purchase may not attach automatically.</li>
+            <li>This page uses your Stripe <b>Checkout Session ID</b> (<code>cs_...</code>) to attach your plan or add-on.</li>
+            <li>If you are logged in, we auto-check the email on your account.</li>
+            <li>If you are not logged in, you must enter the same <b>E-mail + Username</b> for your QuickHire employer account.</li>
           </ul>
         </div>
 
         <div class="hr"></div>
 
         <div class="grid">
-          <!-- Claim -->
+          <!-- Attach -->
           <div class="panel">
             <div class="panel-header">
               <div>
-                <h2>Claim Purchase</h2>
-                <div class="meta">Attach your plan / add-on</div>
+                <h2>Attach Purchase</h2>
+                <div class="meta">Uses session_id from the URL</div>
               </div>
             </div>
 
             <div class="content">
-              <label for="ptype">Purchase Type</label>
-              <select id="ptype">
-                <option value="employer_plan">Employer Plan (Local/Business/Corporate)</option>
-                <option value="verified_addon">Verified Employer Add-on</option>
-              </select>
-
-              <div style="height:10px;"></div>
-
-              <label for="email">E-mail (must match checkout + signup)</label>
-              <input id="email" placeholder="you@example.com"/>
-
-              <div style="height:10px;"></div>
-
-              <label for="username">Username (must match signup)</label>
-              <input id="username" placeholder="yourusername"/>
+              <label for="sessionId">Stripe Session ID</label>
+              <input id="sessionId" placeholder="cs_..." readonly />
 
               <div class="hr"></div>
 
-              <button class="btn green" id="btnClaim">Claim Now</button>
+              <!-- Logged out attach -->
+              <div id="manualBlock" class="hide">
+                <label for="email">Employer E-mail (must match Stripe checkout)</label>
+                <input id="email" placeholder="you@example.com"/>
+
+                <div style="height:10px;"></div>
+
+                <label for="username">Employer Username</label>
+                <input id="username" placeholder="yourusername"/>
+
+                <div class="hr"></div>
+              </div>
+
+              <button class="btn green" id="btnAttach" type="button">Attach Now</button>
+
               <div class="muted" style="margin-top:8px;">
-                If it says “no purchase found”, you almost always used the wrong email at checkout.
+                If you see “email mismatch”, you paid with a different email than your QuickHire employer account.
               </div>
 
               <div class="hr"></div>
-              <div id="claimOut" class="muted"></div>
+              <div id="attachOut" class="muted"></div>
             </div>
           </div>
 
@@ -321,13 +325,13 @@
             <div class="panel-header">
               <div>
                 <h2>Plan Links</h2>
-                <div class="meta">Open Stripe Payment Links</div>
+                <div class="meta">Stripe Payment Links</div>
               </div>
             </div>
 
             <div class="content">
               <div class="muted">
-                These open Stripe Payment Links. After paying, come back here and Claim.
+                If you need to purchase again, use the correct link below. Then you will be returned here with your <code>session_id</code>.
               </div>
 
               <div class="hr"></div>
@@ -457,7 +461,8 @@
 
     <footer class="qh-footer" aria-label="QuickHire footer">
       <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+        <!-- LOGO URL SWAP: footer logo -> main site -->
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
           <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
         </a>
       </div>
@@ -543,37 +548,77 @@
   </div>
 
 <script>
-  // Keep login link returning here (optional but helpful)
   (function () {
     const here = window.location.pathname + window.location.search;
     const loginBtn = document.getElementById("loginBtn");
     if (loginBtn) loginBtn.href = "/auth/login.html?next=" + encodeURIComponent(here);
+
+    const qs = new URLSearchParams(window.location.search);
+    const sessionId = (qs.get("session_id") || "").trim();
+    const sessionEl = document.getElementById("sessionId");
+    if (sessionEl) sessionEl.value = sessionId;
+
+    // Show manual block only if NOT logged in
+    const manualBlock = document.getElementById("manualBlock");
+    const sess = (typeof QH !== "undefined" && QH.getSession) ? QH.getSession() : null;
+    const isLoggedIn = !!(sess && sess.session_token);
+    if (!isLoggedIn && manualBlock) manualBlock.classList.remove("hide");
+
+    // If missing session_id, hard stop
+    if (!sessionId || sessionId.indexOf("cs_") !== 0) {
+      const out = document.getElementById("attachOut");
+      if (out) out.innerHTML = "❌ Missing <code>session_id</code>. Please return to this page using Stripe’s success link.";
+      const btn = document.getElementById("btnAttach");
+      if (btn) btn.disabled = true;
+    }
   })();
 
-  document.getElementById("btnClaim").addEventListener("click", async () => {
-    const purchase_type = document.getElementById("ptype").value;
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const username = document.getElementById("username").value.trim().toLowerCase();
+  document.getElementById("btnAttach").addEventListener("click", async () => {
+    const out = document.getElementById("attachOut");
+    const qs = new URLSearchParams(window.location.search);
+    const session_id = (qs.get("session_id") || "").trim();
 
-    if (!email || !username) return QH.toast("Missing info", "Enter E-mail and Username.");
+    if (!session_id || session_id.indexOf("cs_") !== 0) {
+      if (out) out.innerHTML = "❌ Missing <code>session_id</code>.";
+      return QH.toast("Missing session_id", "Your Stripe success link must include session_id.");
+    }
 
-    const res = await QH.apiPost("claim_purchase", { purchase_type, email, username });
-    const out = document.getElementById("claimOut");
+    const sess = QH.getSession ? QH.getSession() : null;
+    const isLoggedIn = !!(sess && sess.session_token);
+
+    const payload = { session_id };
+    if (isLoggedIn) {
+      payload.session_token = sess.session_token; // backend will use session email
+    } else {
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const username = document.getElementById("username").value.trim().toLowerCase();
+      if (!email || !username) return QH.toast("Missing info", "Enter E-mail and Username.");
+      payload.email = email;
+      payload.username = username;
+    }
+
+    // NEW backend endpoint we will add next:
+    const res = await QH.apiPost("claim_purchase_by_session", payload);
 
     if (!res.ok) {
-      out.textContent = "❌ " + (res.error || "Claim failed.");
-      return QH.toast("Claim failed", res.error || "Try again.");
+      const msg = res.error || "Attach failed.";
+      if (out) out.innerHTML = "❌ " + QH.esc(msg);
+      return QH.toast("Attach failed", msg);
     }
 
-    out.innerHTML = "✅ " + (res.message ? QH.esc(res.message) : "Claimed.");
-    QH.toast("Claimed", res.message || "Success.");
+    const msg = res.message || "Attached successfully.";
+    if (out) out.innerHTML = "✅ " + QH.esc(msg);
 
-    // Helpful redirect suggestion:
-    if (purchase_type === "employer_plan" || purchase_type === "verified_addon") {
-      out.innerHTML += "<div style='margin-top:10px;'><a href='/auth/login.html'>Login</a> → Employer Dashboard</div>";
-    } else {
-      out.innerHTML += "<div style='margin-top:10px;'><a href='/'>Back to Job Board</a></div>";
+    // Show warning/upgrade message if backend provided it
+    if (res.warning) {
+      if (out) out.innerHTML += "<div style='margin-top:10px;' class='muted'>⚠️ " + QH.esc(res.warning) + "</div>";
     }
+
+    QH.toast("Attached", msg);
+
+    // Redirect target from backend (employer dashboard)
+    const redirectTo = (res.redirect_to && String(res.redirect_to).startsWith("/")) ? res.redirect_to : "/employer/dashboard.html";
+    setTimeout(() => { window.location.href = redirectTo; }, 900);
   });
 </script>
 </body>
