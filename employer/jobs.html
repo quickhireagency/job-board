@@ -128,6 +128,12 @@
       background: linear-gradient(135deg, rgba(43,154,94,.22), rgba(255,255,255,.95));
       color: #0b2a19;
     }
+    .btn.small{ padding:7px 10px; border-radius:10px; font-size:12px; box-shadow:none; }
+    .btn.icon{ gap:8px; }
+    .btn.ghost{
+      background: rgba(255,255,255,.6);
+      box-shadow:none;
+    }
 
     .wrap{
       max-width:1200px;
@@ -142,6 +148,38 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
+
+    .kpis{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:10px;
+      margin: 0 0 14px;
+    }
+    @media (min-width: 900px){
+      .kpis{ grid-template-columns: repeat(4, 1fr); }
+    }
+    .kpi{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 12px;
+      box-shadow: 0 6px 18px rgba(16,24,40,.06);
+    }
+    .kpi .label{ font-size:12px; color:var(--muted); font-weight:900; letter-spacing:.02em; }
+    .kpi .val{ font-size:22px; font-weight:1000; margin-top:4px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      align-items:start;
+    }
+    @media (min-width: 980px){
+      .grid.open{
+        grid-template-columns: 1.45fr 1fr;
+      }
+    }
+
     .panel-header{
       padding:14px 14px 10px;
       border-bottom:1px solid var(--line);
@@ -161,7 +199,7 @@
       font-weight:800;
       letter-spacing:.01em;
     }
-    input{
+    input, select{
       width:100%;
       padding:10px 12px;
       border-radius: 12px;
@@ -171,6 +209,27 @@
       outline:none;
       font-size:14px;
       font-family: var(--font);
+    }
+
+    .filters{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-bottom:12px;
+    }
+    @media (min-width: 900px){
+      .filters{
+        grid-template-columns: 1.4fr .9fr .9fr .9fr;
+        gap:10px;
+        align-items:end;
+      }
+    }
+    .filters .actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      margin-top:2px;
     }
 
     .muted{
@@ -191,7 +250,7 @@
       padding:12px;
     }
 
-    .badge{
+    .pill{
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -202,7 +261,128 @@
       font-size:11px;
       font-weight:800;
       color: var(--muted);
-      margin-left:6px;
+      white-space:nowrap;
+    }
+    .pill.green{ border-color: rgba(31,122,74,.25); background: rgba(43,154,94,.10); color:#0b2a19; }
+    .pill.blue{ border-color: rgba(27,111,184,.25); background: rgba(43,134,214,.10); color:#0b2540; }
+    .pill.yellow{ border-color: rgba(255,214,107,.35); background: rgba(255,214,107,.18); color:#3a2a00; }
+    .pill.red{ border-color: rgba(180,35,24,.25); background: rgba(180,35,24,.08); color:#4a0f0a; }
+
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:16px;
+      background: rgba(255,255,255,.92);
+    }
+    thead th{
+      text-align:left;
+      font-size:12px;
+      color:var(--muted);
+      padding:10px 10px;
+      border-bottom:1px solid var(--line);
+      background: rgba(255,255,255,.92);
+      font-weight:1000;
+      letter-spacing:.02em;
+      white-space:nowrap;
+    }
+    tbody td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(10,30,20,.10);
+      vertical-align:middle;
+      font-size:13px;
+    }
+    tbody tr:hover{ background: rgba(43,154,94,.05); }
+    tbody tr:last-child td{ border-bottom:none; }
+
+    .titleLink{
+      color:inherit;
+      text-decoration:none;
+      font-weight:1000;
+    }
+    .titleLink:hover{ text-decoration:underline; }
+
+    .rowActions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    /* Right panel */
+    .jobMgrHeader{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:10px;
+    }
+    .jobMgrHeader h3{
+      margin:0;
+      font-size:14px;
+      line-height:1.2;
+      font-weight:1000;
+    }
+    .jobMgrHeader .sub{
+      margin-top:4px;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .jobMgrBtns{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .drawerClose{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      cursor:pointer;
+    }
+
+    /* Modal */
+    .modal-backdrop{
+      position:fixed; inset:0;
+      background: rgba(11,27,18,.55);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
+      padding: 18px;
+    }
+    .modal{
+      width:min(560px, 100%);
+      background: rgba(255,255,255,.96);
+      border:1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,.25);
+      overflow:hidden;
+    }
+    .modal .mh{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .modal .mh h4{ margin:0; font-size:14px; }
+    .modal .mb{
+      padding: 14px;
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .modal .mf{
+      padding: 12px 14px 14px;
+      border-top: 1px solid var(--line);
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
     /* Footer logo + legal links (match Employer Dashboard) */
@@ -233,6 +413,19 @@
       color: var(--blue);
       text-decoration:underline;
     }
+
+    .toast{ position: fixed; left: 16px; bottom: 16px; z-index: 100; display:none; }
+    .toast.show{ display:block; }
+    .toast .t{
+      background: rgba(255,255,255,.95);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 12px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.15);
+      min-width: 260px;
+      max-width: 360px;
+    }
+    .toast .m{ color: var(--muted); font-size: 12px; margin-top: 4px; }
   </style>
 </head>
 
@@ -241,11 +434,12 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+        <!-- LOGO LINK SWAP (GLOBAL RULE): TOP LOGO -> JOB BOARD -->
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
-            <div style="font-weight:1000; letter-spacing:.2px;">My Live Jobs</div>
-            <div class="sub">Manage your active postings</div>
+            <div style="font-weight:1000; letter-spacing:.2px;">My Jobs</div>
+            <div class="sub">Manage postings, applicants, and status</div>
           </div>
         </a>
       </div>
@@ -254,31 +448,103 @@
         <a class="btn" href="/">Public Job Board</a>
         <a class="btn blue" href="/employer/dashboard.html">Dashboard</a>
         <a class="btn green" href="/employer/post-job.html">Post a Job</a>
+        <button class="btn" id="btnViewDrafts" title="Filter to Draft jobs">View Drafts</button>
         <button class="btn danger" id="btnLogout">Logout</button>
       </div>
     </div>
   </div>
 
   <div class="wrap">
-    <div class="panel">
-      <div class="panel-header">
-        <div>
-          <h2>Your Live Jobs</h2>
-          <div class="meta">This shows only jobs currently marked live/open.</div>
+
+    <!-- KPI cards -->
+    <div class="kpis" aria-label="Job KPIs">
+      <div class="kpi"><div class="label">Active Jobs</div><div class="val" id="kpiActive">—</div></div>
+      <div class="kpi"><div class="label">Draft Jobs</div><div class="val" id="kpiDraft">—</div></div>
+      <div class="kpi"><div class="label">Applicants (7 days)</div><div class="val" id="kpiApp7">—</div></div>
+      <div class="kpi"><div class="label">Applicants (30 days)</div><div class="val" id="kpiApp30">—</div></div>
+    </div>
+
+    <div class="grid" id="grid">
+
+      <!-- LEFT: Jobs table -->
+      <div class="panel" aria-label="Jobs panel">
+        <div class="panel-header">
+          <div>
+            <h2>My Jobs</h2>
+            <div class="meta">Search, filter, export, and open a job to manage applicants.</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+            <button class="btn" id="btnExportCsv">Export CSV</button>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="filters">
+            <div>
+              <label for="fSearch">Search</label>
+              <input id="fSearch" placeholder="Title, location, or Job ID">
+            </div>
+
+            <div>
+              <label for="fStatus">Status</label>
+              <select id="fStatus">
+                <option value="">All</option>
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+                <option value="closed">Closed</option>
+                <option value="removed">Removed</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="fDate">Date</label>
+              <select id="fDate">
+                <option value="">Any time</option>
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+              </select>
+              <div class="muted" style="margin-top:6px;">Applies to <b>updated</b> date.</div>
+            </div>
+
+            <div>
+              <label for="fSort">Sort</label>
+              <select id="fSort">
+                <option value="updated_desc">Newest updated</option>
+                <option value="created_desc">Newest created</option>
+                <option value="apps_desc">Most applicants</option>
+                <option value="title_asc">Title A–Z</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="filters">
+            <div class="actions" style="grid-column:1/-1;">
+              <button class="btn" id="btnApply">Apply</button>
+              <button class="btn ghost" id="btnReset">Reset</button>
+            </div>
+          </div>
+
+          <div id="jobsWrap">
+            <div class="muted">Loading…</div>
+          </div>
         </div>
       </div>
 
-      <div class="content">
-        <label for="search">Search within your jobs</label>
-        <input id="search" placeholder="Search title/description">
-
-        <div style="margin-top:10px;">
-          <button class="btn" id="btnSearch">Search</button>
+      <!-- RIGHT: Job Manager panel (starts hidden) -->
+      <div class="panel" id="jobMgr" style="display:none;" aria-label="Job Manager">
+        <div class="panel-header">
+          <div class="drawerClose" id="btnCloseMgr" title="Close job manager">
+            <span style="font-weight:1000;">Job Manager</span>
+            <span class="pill" style="margin-left:8px;">Open</span>
+          </div>
+          <div class="muted">Click a candidate to open the existing candidate card.</div>
         </div>
 
-        <div class="hr"></div>
-        <div id="list" class="muted">Loading…</div>
+        <div class="content">
+          <div id="jobMgrBody" class="muted">Select a job to load applicants.</div>
+        </div>
       </div>
+
     </div>
 
     <!-- Footer (same pattern as Employer Dashboard) -->
@@ -363,17 +629,6 @@
         letter-spacing: 0.02em;
       }
 
-      .qh-powered{
-        text-align:center;
-        margin-top: 10px;
-        font-weight:900;
-        letter-spacing:.02em;
-      }
-      .qh-powered a{
-        color: var(--blue);
-        text-decoration:underline;
-      }
-
       .qh-footer > *:last-child,
       .qh-footer-legal > *:last-child{
         margin-bottom: 0 !important;
@@ -383,7 +638,8 @@
 
     <footer class="qh-footer" aria-label="QuickHire footer">
       <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+        <!-- LOGO LINK SWAP (GLOBAL RULE): FOOTER LOGO -> MAIN SITE -->
+        <a href="https://www.quickhire.agency/" target="_self" rel="noopener">
           <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
         </a>
       </div>
@@ -465,48 +721,838 @@
       })();
     </script>
 
-    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+    <div id="toast" class="toast"><div class="t"><div style="font-weight:1000" id="toastTitle"></div><div class="m" id="toastMsg"></div></div></div>
+
+  </div>
+
+  <!-- Confirm modal -->
+  <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-label="Confirm dialog">
+    <div class="modal">
+      <div class="mh">
+        <h4 id="modalTitle">Confirm</h4>
+        <button class="btn small" id="modalX">Close</button>
+      </div>
+      <div class="mb" id="modalBody">—</div>
+      <div class="mf">
+        <button class="btn" id="modalCancel">Cancel</button>
+        <button class="btn danger" id="modalOk">Confirm</button>
+      </div>
+    </div>
   </div>
 
 <script>
-const session = QH.requireSession("employer");
-if (!session) throw new Error("No session");
+/* =========================================================
+   QuickHire™ — Employer Jobs Command Center (Single Page)
+   - Uses existing QH session + QH.apiGet/apiPost helpers
+   - No messaging, no applicant "source"
+   - Candidate click calls existing candidate card flow if present
+   ========================================================= */
 
+const session = QH.requireSession("employer");
+if (!session) throw new Error("No employer session");
+
+const STATE = {
+  jobsRaw: [],
+  jobsView: [],
+  appsByJob: new Map(),     // job_id -> applicants array
+  countsByJob: new Map(),   // job_id -> applicantCount
+  selectedJobId: null,
+  filters: {
+    search: "",
+    status: "",
+    dateDays: "",
+    sort: "updated_desc"
+  }
+};
+
+function toast(title, msg){
+  const el = document.getElementById("toast");
+  document.getElementById("toastTitle").textContent = title || "";
+  document.getElementById("toastMsg").textContent = msg || "";
+  el.classList.add("show");
+  setTimeout(()=> el.classList.remove("show"), 2600);
+}
+
+function parseDate(x){
+  if (!x) return null;
+  const d = new Date(x);
+  if (!isNaN(d.getTime())) return d;
+  // if it's a numeric timestamp string
+  const n = Number(x);
+  if (!isNaN(n) && n > 0) return new Date(n);
+  return null;
+}
+
+function fmtDateShort(x){
+  const d = parseDate(x);
+  if (!d) return "—";
+  return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"numeric"});
+}
+
+function normStatus(s){
+  const v = String(s||"").toLowerCase().trim();
+  if (!v) return "active"; // assume active if blank
+  if (v === "live" || v === "open") return "active";
+  if (v === "removed" || v === "deleted" || v === "soft_deleted") return "removed";
+  if (v === "draft") return "draft";
+  if (v === "closed" || v === "filled" || v === "paused") return "closed";
+  if (v === "active") return "active";
+  return v; // keep unknown
+}
+
+function statusPill(status){
+  const s = normStatus(status);
+  const cls = (s==="active") ? "green" : (s==="draft" ? "yellow" : (s==="closed" ? "blue" : (s==="removed" ? "red" : "")));
+  const label = (s==="active") ? "Active" : (s==="draft" ? "Draft" : (s==="closed" ? "Closed" : (s==="removed" ? "Removed" : s)));
+  return `<span class="pill ${cls}">${QH.esc(label)}</span>`;
+}
+
+function jobLocation(job){
+  const parts = [];
+  const city = job.city || job.location_city || "";
+  const state = job.state || job.location_state || "";
+  const loc = job.location || "";
+  if (city || state) parts.push([city, state].filter(Boolean).join(", "));
+  else if (loc) parts.push(loc);
+  return parts.join(" ").trim() || "—";
+}
+
+/* ----------------------------- Modal ----------------------------- */
+let modalResolve = null;
+function showConfirm({title, body, okText="Confirm", okDanger=true}){
+  const back = document.getElementById("modalBackdrop");
+  document.getElementById("modalTitle").textContent = title || "Confirm";
+  document.getElementById("modalBody").textContent = body || "";
+  const okBtn = document.getElementById("modalOk");
+  okBtn.textContent = okText;
+  okBtn.className = okDanger ? "btn danger" : "btn green";
+  back.style.display = "flex";
+  return new Promise((resolve)=>{
+    modalResolve = resolve;
+  });
+}
+function hideConfirm(result){
+  const back = document.getElementById("modalBackdrop");
+  back.style.display = "none";
+  if (modalResolve) modalResolve(result);
+  modalResolve = null;
+}
+document.getElementById("modalX").addEventListener("click", ()=>hideConfirm(false));
+document.getElementById("modalCancel").addEventListener("click", ()=>hideConfirm(false));
+document.getElementById("modalOk").addEventListener("click", ()=>hideConfirm(true));
+document.getElementById("modalBackdrop").addEventListener("click", (e)=>{
+  if (e.target && e.target.id === "modalBackdrop") hideConfirm(false);
+});
+
+/* ----------------------------- Logout ----------------------------- */
 document.getElementById("btnLogout").addEventListener("click", () => {
   QH.clearSession();
   window.location.href = "/";
 });
 
-async function loadMyJobs() {
-  const search = document.getElementById("search").value.trim();
-  const res = await QH.apiGet("list_jobs", { search, limit: 200 });
+/* ----------------------------- Filters UI ----------------------------- */
+const fSearch = document.getElementById("fSearch");
+const fStatus = document.getElementById("fStatus");
+const fDate   = document.getElementById("fDate");
+const fSort   = document.getElementById("fSort");
 
-  const list = document.getElementById("list");
-  if (!res.ok) {
-    list.textContent = "Error: " + (res.error || "");
-    return;
-  }
+document.getElementById("btnApply").addEventListener("click", ()=>{
+  STATE.filters.search = (fSearch.value||"").trim();
+  STATE.filters.status = fStatus.value || "";
+  STATE.filters.dateDays = fDate.value || "";
+  STATE.filters.sort = fSort.value || "updated_desc";
+  applyFiltersAndRender();
+});
 
-  const jobs = (res.jobs || []).filter(j => String(j.employer_id || "") === String(session.employer_id || ""));
-  if (!jobs.length) {
-    list.innerHTML = "<div class='note'>No live jobs found.</div>";
-    return;
-  }
+document.getElementById("btnReset").addEventListener("click", ()=>{
+  fSearch.value = "";
+  fStatus.value = "";
+  fDate.value = "";
+  fSort.value = "updated_desc";
+  STATE.filters = { search:"", status:"", dateDays:"", sort:"updated_desc" };
+  applyFiltersAndRender();
+});
 
-  list.innerHTML = jobs.map(j => `
-    <div class="note" style="margin-bottom:10px;">
-      <div><b>${QH.esc(j.job_title || "(untitled)")}</b></div>
-      <div class="muted">${QH.esc(j.city || "")}${j.state ? ", " + QH.esc(j.state) : ""}</div>
-      <div class="muted">Job ID: <span class="badge">${QH.esc(j.job_id || "")}</span></div>
-      <div class="muted" style="margin-top:10px;">
-        <a class="btn" href="/?job_id=${encodeURIComponent(j.job_id || "")}">View on Job Board</a>
-      </div>
-    </div>
-  `).join("");
+document.getElementById("btnViewDrafts").addEventListener("click", ()=>{
+  fStatus.value = "draft";
+  STATE.filters.status = "draft";
+  applyFiltersAndRender();
+  toast("Drafts", "Showing Draft jobs.");
+});
+
+/* ----------------------------- Data loads ----------------------------- */
+/**
+ * We keep compatibility with your current endpoint usage:
+ * - list_jobs: returns {ok, jobs:[...]}
+ *
+ * For applicants, we try (in order):
+ * 1) list_applications?job_id=...  -> {ok, applications:[...]} or {ok, applicants:[...]}
+ * 2) list_applicants?job_id=...    -> {ok, applicants:[...]}
+ *
+ * If you already have a different endpoint, swap the string in one place below.
+ */
+async function apiListJobs(){
+  const res = await QH.apiGet("list_jobs", { limit: 1000 });
+  if (!res || !res.ok) return { ok:false, error: (res && res.error) ? res.error : "Unable to load jobs" };
+  const all = Array.isArray(res.jobs) ? res.jobs : [];
+  const mine = all.filter(j => String(j.employer_id||"") === String(session.employer_id||""));
+  return { ok:true, jobs: mine };
 }
 
-document.getElementById("btnSearch").addEventListener("click", loadMyJobs);
-loadMyJobs();
+async function apiListApplicants(job_id){
+  // Try 1: list_applications
+  let res = await QH.apiGet("list_applications", { job_id });
+  if (res && res.ok) {
+    const arr = res.applications || res.applicants || res.rows || [];
+    return { ok:true, applicants: Array.isArray(arr) ? arr : [] };
+  }
+  // Try 2: list_applicants
+  res = await QH.apiGet("list_applicants", { job_id });
+  if (res && res.ok) {
+    const arr = res.applicants || res.rows || [];
+    return { ok:true, applicants: Array.isArray(arr) ? arr : [] };
+  }
+  return { ok:false, error: (res && res.error) ? res.error : "Unable to load applicants" };
+}
+
+/**
+ * Job status updates:
+ * This calls an endpoint you may or may not have. If not present, see backend patch below.
+ */
+async function apiSetJobStatus(job_id, status){
+  const res = await QH.apiPost("employer_job_set_status", { job_id, status });
+  if (res && res.ok) return res;
+  // fallback: try a generic update endpoint name if you have it
+  const res2 = await QH.apiPost("set_job_status", { job_id, status });
+  if (res2 && res2.ok) return res2;
+  return { ok:false, error: (res && res.error) ? res.error : (res2 && res2.error) ? res2.error : "Missing backend endpoint for job status" };
+}
+
+async function apiDuplicateJob(job_id){
+  const res = await QH.apiPost("employer_job_duplicate", { job_id });
+  if (res && res.ok) return res;
+  const res2 = await QH.apiPost("duplicate_job", { job_id });
+  if (res2 && res2.ok) return res2;
+  return { ok:false, error: (res && res.error) ? res.error : (res2 && res2.error) ? res2.error : "Missing backend endpoint for duplicate job" };
+}
+
+/* ----------------------------- KPIs ----------------------------- */
+function computeKpis(){
+  const jobs = STATE.jobsRaw || [];
+  const active = jobs.filter(j=> normStatus(j.status) === "active").length;
+  const draft  = jobs.filter(j=> normStatus(j.status) === "draft").length;
+
+  document.getElementById("kpiActive").textContent = String(active);
+  document.getElementById("kpiDraft").textContent  = String(draft);
+
+  // Applicants KPIs: we can only compute if we have loaded applicants per job.
+  // We'll compute from whatever we have in cache; if not loaded, show "—" until loaded.
+  let app7 = 0, app30 = 0;
+  let anyLoaded = false;
+  const now = Date.now();
+  const msDay = 24*60*60*1000;
+
+  for (const [jobId, arr] of STATE.appsByJob.entries()){
+    anyLoaded = true;
+    (arr||[]).forEach(a=>{
+      // best-effort date keys
+      const dt = parseDate(a.applied_at || a.created_at || a.timestamp || a.date_applied);
+      if (!dt) return;
+      const ageDays = (now - dt.getTime()) / msDay;
+      if (ageDays <= 7) app7++;
+      if (ageDays <= 30) app30++;
+    });
+  }
+  document.getElementById("kpiApp7").textContent = anyLoaded ? String(app7) : "—";
+  document.getElementById("kpiApp30").textContent = anyLoaded ? String(app30) : "—";
+}
+
+/* ----------------------------- Filtering/sorting ----------------------------- */
+function applyFiltersAndRender(){
+  const search = (STATE.filters.search || "").toLowerCase();
+  const status = STATE.filters.status || "";
+  const dateDays = STATE.filters.dateDays ? Number(STATE.filters.dateDays) : 0;
+  const sort = STATE.filters.sort || "updated_desc";
+
+  let rows = [...(STATE.jobsRaw || [])];
+
+  // Filter: status
+  if (status){
+    rows = rows.filter(j => normStatus(j.status) === status);
+  }
+
+  // Filter: search
+  if (search){
+    rows = rows.filter(j=>{
+      const hay = [
+        j.job_title, j.title,
+        j.location, j.city, j.state,
+        j.job_id
+      ].filter(Boolean).join(" ").toLowerCase();
+      return hay.includes(search);
+    });
+  }
+
+  // Filter: date
+  if (dateDays && !isNaN(dateDays)){
+    const cutoff = Date.now() - (dateDays * 24*60*60*1000);
+    rows = rows.filter(j=>{
+      const d = parseDate(j.updated_at || j.modified_at || j.last_updated || j.created_at);
+      return d ? (d.getTime() >= cutoff) : false;
+    });
+  }
+
+  // Sort
+  rows.sort((a,b)=>{
+    if (sort === "title_asc"){
+      const at = String(a.job_title || a.title || "").toLowerCase();
+      const bt = String(b.job_title || b.title || "").toLowerCase();
+      return at.localeCompare(bt);
+    }
+    if (sort === "apps_desc"){
+      const ac = Number(STATE.countsByJob.get(String(a.job_id||"")) || 0);
+      const bc = Number(STATE.countsByJob.get(String(b.job_id||"")) || 0);
+      return bc - ac;
+    }
+    if (sort === "created_desc"){
+      const ad = parseDate(a.created_at || a.posted_at);
+      const bd = parseDate(b.created_at || b.posted_at);
+      return (bd?bd.getTime():0) - (ad?ad.getTime():0);
+    }
+    // updated_desc default
+    const ad = parseDate(a.updated_at || a.modified_at || a.last_updated || a.created_at);
+    const bd = parseDate(b.updated_at || b.modified_at || b.last_updated || b.created_at);
+    return (bd?bd.getTime():0) - (ad?ad.getTime():0);
+  });
+
+  STATE.jobsView = rows;
+  renderJobsTable();
+  syncMgrVisibility();
+}
+
+/* ----------------------------- Render: Jobs table ----------------------------- */
+function renderJobsTable(){
+  const wrap = document.getElementById("jobsWrap");
+  const rows = STATE.jobsView || [];
+
+  if (!rows.length){
+    wrap.innerHTML = `<div class="note">No jobs match your filters.</div>`;
+    return;
+  }
+
+  const html = `
+    <table aria-label="Jobs table">
+      <thead>
+        <tr>
+          <th style="width:28%;">Title</th>
+          <th style="width:16%;">Location</th>
+          <th style="width:10%;">Status</th>
+          <th style="width:10%;">Applicants</th>
+          <th style="width:12%;">Created</th>
+          <th style="width:12%;">Updated</th>
+          <th style="width:12%; text-align:right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows.map(j=>{
+          const jobId = String(j.job_id || "");
+          const title = QH.esc(j.job_title || j.title || "(untitled)");
+          const loc = QH.esc(jobLocation(j));
+          const st = normStatus(j.status);
+          const apps = Number(STATE.countsByJob.get(jobId) || 0);
+          const created = fmtDateShort(j.created_at || j.posted_at);
+          const updated = fmtDateShort(j.updated_at || j.modified_at || j.last_updated || j.created_at);
+
+          // action buttons based on status
+          const canClose = (st === "active");
+          const canReopen = (st === "closed");
+          const canRestore = (st === "removed");
+          const canRemove = (st !== "removed");
+
+          const editHref = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(jobId)}`;
+
+          return `
+            <tr data-jobid="${QH.esc(jobId)}">
+              <td>
+                <a class="titleLink" href="#" data-act="open">${title}</a>
+                <div class="muted" style="margin-top:4px;">Job ID: <span class="pill">${QH.esc(jobId)}</span></div>
+              </td>
+              <td>${loc}</td>
+              <td>${statusPill(j.status)}</td>
+              <td><b>${apps}</b></td>
+              <td>${QH.esc(created)}</td>
+              <td>${QH.esc(updated)}</td>
+              <td style="text-align:right;">
+                <div class="rowActions">
+                  <button class="btn small" data-act="open">View</button>
+                  <a class="btn small" href="${editHref}">Edit</a>
+                  <button class="btn small" data-act="dup">Duplicate</button>
+                  ${canClose ? `<button class="btn small blue" data-act="close">Close</button>` : ``}
+                  ${canReopen ? `<button class="btn small green" data-act="reopen">Reopen</button>` : ``}
+                  ${canRemove ? `<button class="btn small danger" data-act="remove">Remove</button>` : ``}
+                  ${canRestore ? `<button class="btn small green" data-act="restore">Restore</button>` : ``}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+
+  wrap.innerHTML = html;
+
+  // Wire row actions
+  wrap.querySelectorAll("tbody tr").forEach(tr=>{
+    const jobId = tr.getAttribute("data-jobid");
+    tr.querySelectorAll("[data-act]").forEach(el=>{
+      el.addEventListener("click", async (e)=>{
+        e.preventDefault();
+        const act = el.getAttribute("data-act");
+        if (act === "open") return openJobManager(jobId);
+        if (act === "dup") return handleDuplicate(jobId);
+        if (act === "close") return handleClose(jobId);
+        if (act === "reopen") return handleReopen(jobId);
+        if (act === "remove") return handleRemove(jobId);
+        if (act === "restore") return handleRestore(jobId);
+      });
+    });
+  });
+}
+
+/* ----------------------------- Job actions ----------------------------- */
+async function handleClose(jobId){
+  const ok = await showConfirm({
+    title: "Close this job?",
+    body: "Candidates can no longer apply to this job while it’s closed.",
+    okText: "Close Job",
+    okDanger: false
+  });
+  if (!ok) return;
+  const res = await apiSetJobStatus(jobId, "closed");
+  if (!res.ok) return toast("Error", res.error || "Failed to close job");
+  toast("Closed", "Job closed.");
+  await refreshAll({ keepSelected: jobId });
+}
+
+async function handleReopen(jobId){
+  const ok = await showConfirm({
+    title: "Reopen this job?",
+    body: "This job will become active again and visible to candidates.",
+    okText: "Reopen Job",
+    okDanger: false
+  });
+  if (!ok) return;
+  const res = await apiSetJobStatus(jobId, "active");
+  if (!res.ok) return toast("Error", res.error || "Failed to reopen job");
+  toast("Reopened", "Job active.");
+  await refreshAll({ keepSelected: jobId });
+}
+
+async function handleRemove(jobId){
+  const ok = await showConfirm({
+    title: "Remove this job?",
+    body: "This will hide the job from candidates. You can restore it later.",
+    okText: "Remove Job",
+    okDanger: true
+  });
+  if (!ok) return;
+  const res = await apiSetJobStatus(jobId, "removed");
+  if (!res.ok) return toast("Error", res.error || "Failed to remove job");
+  toast("Removed", "Job removed (soft).");
+  await refreshAll({ keepSelected: jobId });
+}
+
+async function handleRestore(jobId){
+  const ok = await showConfirm({
+    title: "Restore this job?",
+    body: "This will restore the job as a draft (recommended) so you can review before publishing.",
+    okText: "Restore as Draft",
+    okDanger: false
+  });
+  if (!ok) return;
+  const res = await apiSetJobStatus(jobId, "draft");
+  if (!res.ok) return toast("Error", res.error || "Failed to restore job");
+  toast("Restored", "Job restored as draft.");
+  await refreshAll({ keepSelected: jobId });
+}
+
+async function handleDuplicate(jobId){
+  const ok = await showConfirm({
+    title: "Duplicate this job?",
+    body: "We’ll create a copy as a Draft so you can edit it before publishing.",
+    okText: "Duplicate",
+    okDanger: false
+  });
+  if (!ok) return;
+
+  const res = await apiDuplicateJob(jobId);
+  if (!res.ok) return toast("Error", res.error || "Failed to duplicate job");
+
+  // Try to navigate to edit page for new job if backend returns new_job_id
+  const newId = res.new_job_id || res.job_id_new || res.duplicated_job_id || "";
+  toast("Duplicated", "Draft created.");
+
+  await refreshAll({ keepSelected: newId || null });
+
+  if (newId){
+    // Open edit in same tab
+    window.location.href = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(newId)}`;
+  }
+}
+
+/* ----------------------------- Job Manager (right panel) ----------------------------- */
+function syncMgrVisibility(){
+  const mgr = document.getElementById("jobMgr");
+  const grid = document.getElementById("grid");
+  if (STATE.selectedJobId){
+    mgr.style.display = "";
+    grid.classList.add("open");
+  } else {
+    mgr.style.display = "none";
+    grid.classList.remove("open");
+  }
+}
+
+document.getElementById("btnCloseMgr").addEventListener("click", ()=>{
+  STATE.selectedJobId = null;
+  document.getElementById("jobMgrBody").innerHTML = `<div class="muted">Select a job to load applicants.</div>`;
+  syncMgrVisibility();
+});
+
+async function openJobManager(jobId){
+  STATE.selectedJobId = jobId;
+  syncMgrVisibility();
+  await renderJobManager(jobId);
+}
+
+function findJob(jobId){
+  return (STATE.jobsRaw || []).find(j => String(j.job_id||"") === String(jobId)) || null;
+}
+
+async function renderJobManager(jobId){
+  const job = findJob(jobId);
+  const body = document.getElementById("jobMgrBody");
+
+  if (!job){
+    body.innerHTML = `<div class="note">Job not found.</div>`;
+    return;
+  }
+
+  // Load applicants (cached)
+  if (!STATE.appsByJob.has(jobId)){
+    body.innerHTML = `<div class="muted">Loading applicants…</div>`;
+    const r = await apiListApplicants(jobId);
+    if (!r.ok){
+      body.innerHTML = `<div class="note">Applicants could not be loaded.<div class="muted" style="margin-top:6px;">${QH.esc(r.error || "")}</div></div>`;
+      return;
+    }
+    STATE.appsByJob.set(jobId, r.applicants || []);
+    STATE.countsByJob.set(jobId, (r.applicants || []).filter(a=> String(a.status||"").toLowerCase() !== "removed").length);
+    computeKpis();
+  }
+
+  const st = normStatus(job.status);
+  const title = QH.esc(job.job_title || job.title || "(untitled)");
+  const loc = QH.esc(jobLocation(job));
+  const created = fmtDateShort(job.created_at || job.posted_at);
+  const updated = fmtDateShort(job.updated_at || job.modified_at || job.last_updated || job.created_at);
+  const apps = (STATE.appsByJob.get(jobId) || []);
+  const appsCount = Number(STATE.countsByJob.get(jobId) || apps.length || 0);
+
+  const editHref = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(jobId)}`;
+
+  // Applicant filter controls inside panel
+  const mgrHtml = `
+    <div class="jobMgrHeader">
+      <div>
+        <h3>${title}</h3>
+        <div class="sub">
+          ${statusPill(job.status)} &nbsp; • &nbsp; ${loc} &nbsp; • &nbsp; Applicants: <b>${appsCount}</b><br/>
+          <span class="muted">Created: ${QH.esc(created)} &nbsp; • &nbsp; Updated: ${QH.esc(updated)}</span>
+        </div>
+      </div>
+      <div class="jobMgrBtns">
+        <a class="btn small" href="${editHref}">Edit</a>
+        ${st==="active" ? `<button class="btn small blue" id="mgrClose">Close</button>` : ``}
+        ${st==="closed" ? `<button class="btn small green" id="mgrReopen">Reopen</button>` : ``}
+        ${st!=="removed" ? `<button class="btn small danger" id="mgrRemove">Remove</button>` : ``}
+        ${st==="removed" ? `<button class="btn small green" id="mgrRestore">Restore</button>` : ``}
+      </div>
+    </div>
+
+    <div class="hr"></div>
+
+    <div class="filters" style="margin-bottom:10px;">
+      <div>
+        <label for="aStatus">Applicant Status</label>
+        <select id="aStatus">
+          <option value="">All</option>
+          <option value="applied">Applied</option>
+          <option value="withdrawn">Withdrawn</option>
+          <option value="removed">Removed</option>
+        </select>
+      </div>
+      <div>
+        <label for="aDate">Date</label>
+        <select id="aDate">
+          <option value="">Any time</option>
+          <option value="7">Last 7 days</option>
+          <option value="30">Last 30 days</option>
+        </select>
+      </div>
+      <div style="grid-column: span 2;">
+        <label for="aSearch">Search</label>
+        <input id="aSearch" placeholder="Candidate name or email (if available)">
+      </div>
+    </div>
+
+    <div id="appsWrap">${renderApplicantsTable(apps)}</div>
+  `;
+
+  body.innerHTML = mgrHtml;
+
+  // Wire manager buttons
+  const closeBtn = document.getElementById("mgrClose");
+  if (closeBtn) closeBtn.addEventListener("click", ()=>handleClose(jobId));
+  const reopenBtn = document.getElementById("mgrReopen");
+  if (reopenBtn) reopenBtn.addEventListener("click", ()=>handleReopen(jobId));
+  const removeBtn = document.getElementById("mgrRemove");
+  if (removeBtn) removeBtn.addEventListener("click", ()=>handleRemove(jobId));
+  const restoreBtn = document.getElementById("mgrRestore");
+  if (restoreBtn) restoreBtn.addEventListener("click", ()=>handleRestore(jobId));
+
+  // Wire applicant filters
+  const aStatus = document.getElementById("aStatus");
+  const aDate = document.getElementById("aDate");
+  const aSearch = document.getElementById("aSearch");
+  const applyApps = ()=>{
+    const stv = (aStatus.value||"").toLowerCase().trim();
+    const dd = aDate.value ? Number(aDate.value) : 0;
+    const s = (aSearch.value||"").toLowerCase().trim();
+    let filtered = [...apps];
+
+    if (stv){
+      filtered = filtered.filter(a => String(a.status||"").toLowerCase().trim() === stv);
+    }
+    if (dd && !isNaN(dd)){
+      const cutoff = Date.now() - dd*24*60*60*1000;
+      filtered = filtered.filter(a=>{
+        const dt = parseDate(a.applied_at || a.created_at || a.timestamp || a.date_applied);
+        return dt ? dt.getTime() >= cutoff : false;
+      });
+    }
+    if (s){
+      filtered = filtered.filter(a=>{
+        const hay = [
+          a.name, a.full_name, a.candidate_name,
+          a.email, a.candidate_email
+        ].filter(Boolean).join(" ").toLowerCase();
+        return hay.includes(s);
+      });
+    }
+
+    document.getElementById("appsWrap").innerHTML = renderApplicantsTable(filtered);
+    wireApplicantClicks();
+  };
+
+  [aStatus, aDate].forEach(el=> el.addEventListener("change", applyApps));
+  aSearch.addEventListener("input", ()=>{ clearTimeout(aSearch._t); aSearch._t=setTimeout(applyApps, 180); });
+
+  wireApplicantClicks();
+}
+
+function renderApplicantsTable(apps){
+  if (!apps || !apps.length){
+    return `<div class="note">No applicants yet.</div>`;
+  }
+
+  // best-effort pick fields
+  const rows = apps.map(a=>{
+    const name = a.name || a.full_name || a.candidate_name || "(candidate)";
+    const email = a.email || a.candidate_email || "";
+    const status = String(a.status || "applied");
+    const applied = fmtDateShort(a.applied_at || a.created_at || a.timestamp || a.date_applied);
+
+    // keep the full applicant JSON embedded (safe) for click open
+    const payload = encodeURIComponent(JSON.stringify(a));
+
+    return `
+      <tr data-app="${payload}">
+        <td><b>${QH.esc(name)}</b>${email ? `<div class="muted">${QH.esc(email)}</div>` : ``}</td>
+        <td>${QH.esc(applied)}</td>
+        <td>${statusPill(status)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  return `
+    <table aria-label="Applicants table">
+      <thead>
+        <tr>
+          <th style="width:60%;">Candidate</th>
+          <th style="width:20%;">Applied</th>
+          <th style="width:20%;">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rows}
+      </tbody>
+    </table>
+    <div class="muted" style="margin-top:8px;">Tip: click a candidate to open the candidate card.</div>
+  `;
+}
+
+function wireApplicantClicks(){
+  const body = document.getElementById("jobMgrBody");
+  if (!body) return;
+  body.querySelectorAll("tbody tr[data-app]").forEach(tr=>{
+    tr.style.cursor = "pointer";
+    tr.addEventListener("click", ()=>{
+      try{
+        const raw = decodeURIComponent(tr.getAttribute("data-app")||"");
+        const applicant = JSON.parse(raw);
+        openCandidateCardExisting(applicant);
+      }catch(e){
+        toast("Error", "Could not open candidate.");
+      }
+    });
+  });
+}
+
+/**
+ * IMPORTANT: preserve your existing candidate-card flow.
+ * - If you already defined a global function, we call it:
+ *    window.QH_openCandidateCard(applicant, { job_id })
+ * - If not present, we provide a harmless fallback (alert) so page still works.
+ */
+function openCandidateCardExisting(applicant){
+  if (typeof window.QH_openCandidateCard === "function"){
+    window.QH_openCandidateCard(applicant, { job_id: STATE.selectedJobId });
+    return;
+  }
+  // Fallback (won't break anything)
+  const name = applicant.name || applicant.full_name || applicant.candidate_name || "Candidate";
+  toast("Candidate", `Open candidate card not found. Clicked: ${name}`);
+}
+
+/* ----------------------------- Export CSV ----------------------------- */
+function csvEscape(v){
+  const s = String(v ?? "");
+  if (/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+  return s;
+}
+function buildCsv(jobs){
+  const headers = ["job_id","job_title","location","status","created_at","updated_at","applicants_count"];
+  const lines = [headers.join(",")];
+  jobs.forEach(j=>{
+    const jobId = String(j.job_id||"");
+    const row = [
+      jobId,
+      j.job_title || j.title || "",
+      jobLocation(j),
+      normStatus(j.status),
+      j.created_at || j.posted_at || "",
+      j.updated_at || j.modified_at || j.last_updated || "",
+      Number(STATE.countsByJob.get(jobId) || 0)
+    ].map(csvEscape).join(",");
+    lines.push(row);
+  });
+  return lines.join("\n");
+}
+
+document.getElementById("btnExportCsv").addEventListener("click", ()=>{
+  const jobs = STATE.jobsView || [];
+  if (!jobs.length){
+    toast("Export", "Nothing to export.");
+    return;
+  }
+  const csv = buildCsv(jobs);
+  const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `quickhire_my_jobs_${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  toast("Export", "CSV downloaded.");
+});
+
+/* ----------------------------- Refresh / init ----------------------------- */
+async function refreshAll({ keepSelected=null } = {}){
+  const r = await apiListJobs();
+  if (!r.ok){
+    document.getElementById("jobsWrap").innerHTML = `<div class="note">Error loading jobs.<div class="muted" style="margin-top:6px;">${QH.esc(r.error||"")}</div></div>`;
+    return;
+  }
+
+  STATE.jobsRaw = r.jobs || [];
+  // Clear counts; preserve cached applicants where possible
+  STATE.countsByJob = new Map();
+  STATE.jobsRaw.forEach(j=>{
+    const jobId = String(j.job_id||"");
+    if (STATE.appsByJob.has(jobId)){
+      const apps = STATE.appsByJob.get(jobId) || [];
+      STATE.countsByJob.set(jobId, apps.filter(a=> String(a.status||"").toLowerCase() !== "removed").length);
+    } else {
+      STATE.countsByJob.set(jobId, 0);
+    }
+  });
+
+  computeKpis();
+  applyFiltersAndRender();
+
+  // keep selection if requested
+  if (keepSelected){
+    STATE.selectedJobId = keepSelected;
+    syncMgrVisibility();
+    await renderJobManager(keepSelected);
+  } else if (STATE.selectedJobId){
+    // refresh current selection if still exists
+    const exists = (STATE.jobsRaw||[]).some(j=> String(j.job_id||"") === String(STATE.selectedJobId));
+    if (exists){
+      syncMgrVisibility();
+      await renderJobManager(STATE.selectedJobId);
+    } else {
+      STATE.selectedJobId = null;
+      syncMgrVisibility();
+    }
+  }
+}
+
+(async function init(){
+  // Initial filter defaults
+  fSort.value = "updated_desc";
+  await refreshAll();
+
+  // Optional: pre-open job via querystring ?job_id=
+  try{
+    const params = new URLSearchParams(location.search);
+    const jobId = params.get("job_id");
+    if (jobId){
+      await openJobManager(jobId);
+    }
+  }catch(e){}
+})();
 </script>
+
+<!-- =========================================================
+     BACKEND NOTE (READ THIS ONCE)
+     =========================================================
+     This page will work immediately for list + applicants IF you already have:
+       - apiGet("list_jobs")
+       - apiGet("list_applications") OR apiGet("list_applicants")
+
+     For status/duplicate buttons to work, your backend must support at least one of:
+       - apiPost("employer_job_set_status", {job_id, status})
+       - apiPost("set_job_status", {job_id, status})
+       - apiPost("employer_job_duplicate", {job_id})
+       - apiPost("duplicate_job", {job_id})
+
+     If you DON’T have those yet, paste these handler cases into your Apps Script doPost switch.
+-->
+
 </body>
 </html>
