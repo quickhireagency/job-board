@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>QuickHire™ — Reset Password</title>
 
-  <!-- Match index pages: include config + app (safe; does not change endpoints) -->
+  <!-- Match index pages: include config + app -->
   <script src="/config/config.js"></script>
   <script src="/assets/app.js"></script>
 
@@ -140,9 +140,15 @@
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap:14px;
+      align-items:start;
     }
     @media (max-width: 980px){
       .grid2{grid-template-columns:1fr}
+      .brand{min-width:0}
+      .brand img{height:74px}
+      .qh-footer-logo{height:74px}
+      .controls{justify-content:flex-start}
+      .controls .btn{flex:1; min-width: 150px}
     }
 
     .panel{
@@ -179,6 +185,7 @@
       background: rgba(255,255,255,.95);
       color:var(--text);
       outline:none;
+      font-size:14px;
     }
 
     .hr{
@@ -239,16 +246,16 @@
       </div>
 
       <div class="controls">
-        <a class="btn blue" href="/auth/login.html">Login</a>
-        <a class="btn" href="/">Job Board</a>
+        <a class="btn blue" id="loginLink" href="/auth/login.html">Login</a>
+        <a class="btn" href="https://jobboard.quickhireagency.com/">Job Board</a>
       </div>
     </div>
   </div>
 
   <div class="wrap">
     <div class="notice">
-      <h3>Password reset</h3>
-      <p>Step 1: Request a reset link (we email you if your account exists). Step 2: Use the token from that email to set a new password.</p>
+      <h3>Forgot Password? Use your Username/E-mail and request a reset link.</h3>
+      <p>We’ll email you a reset link if your account exists. Then paste the token below to set a new password.</p>
     </div>
 
     <div class="grid2">
@@ -269,10 +276,10 @@
           <div class="hr"></div>
 
           <label for="login">Username / E-mail</label>
-          <input id="login" placeholder="username or email">
+          <input id="login" placeholder="username or email" autocomplete="username">
 
           <div class="hr"></div>
-          <button class="btn primary" id="btnRequest">Send reset link</button>
+          <button class="btn primary" id="btnRequest" type="button">Send reset link</button>
           <div id="reqOut" class="small" style="margin-top:10px;"></div>
         </div>
       </div>
@@ -291,10 +298,10 @@
           <div class="hr"></div>
 
           <label for="new_password">New Password</label>
-          <input id="new_password" type="password" placeholder="Minimum 8 characters">
+          <input id="new_password" type="password" placeholder="Minimum 8 characters" autocomplete="new-password">
 
           <div class="hr"></div>
-          <button class="btn primary" id="btnReset">Set new password</button>
+          <button class="btn primary" id="btnReset" type="button">Set new password</button>
           <div id="resetOut" class="small" style="margin-top:10px;"></div>
 
           <div class="hr"></div>
@@ -491,39 +498,95 @@
   </div>
 
   <script>
-    // Keep your logic exactly (only wrapped to avoid globals)
     (function(){
       const qs = new URLSearchParams(location.search);
-      const token = qs.get("token") || "";
-      if (token) document.getElementById("token").value = token;
+
+      // Prefill from query params:
+      // /auth/reset.html?role=job_seeker|employer&login=...&token=rst_...
+      const tokenQ = (qs.get("token") || "").trim();
+      const roleQ = (qs.get("role") || "").trim().toLowerCase();
+      const loginQ = (qs.get("login") || "").trim();
+      const nextQ  = (qs.get("next") || "").trim();
+
+      const roleEl = document.getElementById("role");
+      const loginEl = document.getElementById("login");
+      const tokenEl = document.getElementById("token");
+      const loginLink = document.getElementById("loginLink");
+
+      if (roleEl && (roleQ === "job_seeker" || roleQ === "employer")) roleEl.value = roleQ;
+      if (loginEl && loginQ) loginEl.value = loginQ;
+      if (tokenEl && tokenQ) tokenEl.value = tokenQ;
+
+      // Keep login link role-aware (and preserve next if supplied)
+      if (loginLink) {
+        const p = new URLSearchParams();
+        if (roleEl) p.set("role", String(roleEl.value || "job_seeker"));
+        if (nextQ && nextQ.startsWith("/")) p.set("next", nextQ);
+        loginLink.href = "/auth/login.html" + (p.toString() ? ("?" + p.toString()) : "");
+      }
+
+      // Update login link when role changes
+      if (roleEl && loginLink) {
+        roleEl.addEventListener("change", () => {
+          const p = new URLSearchParams();
+          p.set("role", String(roleEl.value || "job_seeker"));
+          if (nextQ && nextQ.startsWith("/")) p.set("next", nextQ);
+          loginLink.href = "/auth/login.html?" + p.toString();
+        });
+      }
+
+      function setOut(id, msg){
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(msg || "");
+      }
 
       document.getElementById("btnRequest").addEventListener("click", async () => {
-        const role = document.getElementById("role").value;
-        const login = document.getElementById("login").value.trim().toLowerCase();
+        const role = roleEl ? String(roleEl.value || "job_seeker") : "job_seeker";
+        const login = (loginEl ? String(loginEl.value || "") : "").trim().toLowerCase();
         if (!login) return QH.toast("Missing", "Enter your Username or E-mail.");
 
-        // frontend base = this page without query params
-        const reset_url_base = location.origin + "/auth/reset.html";
+        // IMPORTANT: backend requires reset_url_base; must match this page path on the current domain
+        const reset_url_base = location.origin + location.pathname; // safer than hardcoding /auth/reset.html
 
+        // QH.apiPost should send {mode:"public_api", action:...} as your app.js does
         const res = await QH.apiPost("request_password_reset", { role, login, reset_url_base });
-        document.getElementById("reqOut").textContent = res.message || (res.ok ? "Sent." : (res.error || "Error"));
-        if (res.ok) QH.toast("If your account exists…", "A reset link was sent to your email.");
+
+        // Backend intentionally returns ok:true even if user doesn't exist (no leak)
+        setOut("reqOut", res.message || (res.ok ? "If your account exists, a reset link has been sent." : (res.error || "Error")));
+        if (res.ok) QH.toast("Check your email", "If your account exists, a reset link has been sent.");
+        else QH.toast("Error", res.error || "Unable to send reset link.");
       });
 
       document.getElementById("btnReset").addEventListener("click", async () => {
-        const token = document.getElementById("token").value.trim();
-        const new_password = document.getElementById("new_password").value;
+        const token = (tokenEl ? String(tokenEl.value || "") : "").trim();
+        const new_password = String(document.getElementById("new_password").value || "");
 
         if (!token) return QH.toast("Missing", "Token is required.");
         if (!new_password || new_password.length < 8) return QH.toast("Password", "Password must be 8 characters or more.");
 
         const res = await QH.apiPost("reset_password", { token, new_password });
-        document.getElementById("resetOut").textContent = res.ok ? "Password updated. You can now login." : (res.error || "Error");
 
-        if (res.ok) {
-          QH.toast("Success", "Password updated. Redirecting to login…");
-          setTimeout(() => location.href = "/auth/login.html", 800);
+        if (!res.ok) {
+          setOut("resetOut", res.error || "Error");
+          return QH.toast("Reset failed", res.error || "Unable to reset password.");
         }
+
+        setOut("resetOut", "Password updated. You can now login.");
+        QH.toast("Success", "Password updated. Redirecting to login…");
+
+        // Redirect to login with role preserved
+        const p = new URLSearchParams();
+        if (roleEl) p.set("role", String(roleEl.value || "job_seeker"));
+        if (nextQ && nextQ.startsWith("/")) p.set("next", nextQ);
+        setTimeout(() => location.href = "/auth/login.html?" + p.toString(), 800);
+      });
+
+      // Enter-to-submit (token field submits reset; login field submits request)
+      document.getElementById("login").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("btnRequest").click();
+      });
+      document.getElementById("new_password").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("btnReset").click();
       });
     })();
   </script>
