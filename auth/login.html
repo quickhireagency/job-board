@@ -129,9 +129,16 @@
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap:14px;
+      align-items:start;
     }
     @media (max-width: 980px){
       .grid{grid-template-columns:1fr}
+      .brand{min-width:0}
+      .brand img{height:74px}
+      .qh-footer-logo{height:74px}
+      .controls{justify-content:flex-start}
+      .btn{flex:1}
+      .controls .btn{min-width: 150px}
     }
 
     .panel{
@@ -187,12 +194,17 @@
       border-radius:14px;
       padding:12px;
     }
-    code{
-      background: rgba(0,0,0,.05);
-      padding: 2px 6px;
-      border-radius: 6px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
+
+    /* Forgot link row */
+    .forgot-row{
+      display:flex;
+      justify-content:flex-end;
+      margin-top:10px;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .forgot-row a{
+      font-weight:800;
     }
 
     /* Footer logo + legal links (match index.html) */
@@ -231,7 +243,8 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+        <!-- LOGO URL SWAP: top logo goes to job board -->
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
             <div style="font-weight:1000; letter-spacing:.2px;">Login</div>
@@ -241,7 +254,7 @@
       </div>
 
       <div class="controls">
-        <a class="btn" href="/">Back to Jobs</a>
+        <a class="btn" href="https://jobboard.quickhireagency.com/">Back to Jobs</a>
         <a class="btn blue" id="candidateSignupBtn" href="/auth/signup-job-seeker.html">Candidate Sign Up</a>
         <a class="btn primary" id="employerSignupBtn" href="/auth/signup-employer.html">Employer Sign Up</a>
       </div>
@@ -269,32 +282,30 @@
           <div style="height:10px;"></div>
 
           <label for="login">Username/E-mail</label>
-          <input id="login" placeholder="Enter your username OR your email"/>
+          <input id="login" placeholder="Enter your username OR your email" autocomplete="username"/>
 
           <div style="height:10px;"></div>
 
           <label for="password">Password</label>
-          <input id="password" type="password" placeholder="Password"/>
+          <input id="password" type="password" placeholder="Password" autocomplete="current-password"/>
 
           <div class="hr"></div>
-          <button class="btn primary" id="btnLogin">Login</button>
+          <button class="btn primary" id="btnLogin" type="button">Login</button>
 
-          <div class="hr"></div>
-          <div class="muted">
-            Forgot password? Use your Username/E-mail and request a reset inside the UI (we’ll add that next).
+          <div class="forgot-row">
+            <a id="forgotLink" href="/auth/reset.html">Forgot password?</a>
           </div>
         </div>
       </div>
 
-      <!-- Purchases -->
- <div class="note">
-  <div style="font-weight:1000; margin-bottom:6px;">Welcome to QuickHire™.</div>
-  <div class="muted">
-    To keep your account running smoothly, please use the same <b>E-mail</b> and <b>Username</b> each time you sign up or log in.
-    <br><br>
-    If you ever purchase a service later, you’ll attach it to your account by claiming it using that same <b>E-mail + Username</b> on the success page.
-  </div>
-</div>
+      <!-- Welcome / Message (no payments language) -->
+      <div class="note">
+        <div style="font-weight:1000; margin-bottom:6px;">Welcome to QuickHire™.</div>
+        <div class="muted">
+          Sign in with your Username or E-mail to manage your account and applications.
+        </div>
+      </div>
+    </div>
 
     <!-- Footer (same as index.html) -->
     <style>
@@ -398,7 +409,8 @@
 
     <footer class="qh-footer" aria-label="QuickHire footer">
       <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+        <!-- LOGO URL SWAP: footer logo goes to main site -->
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
           <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
         </a>
       </div>
@@ -484,13 +496,29 @@
   </div>
 
 <script>
-  // Preserve Apply/return flows: keep signup links carrying ?next=...
   (function () {
-    const next = new URLSearchParams(window.location.search).get("next");
-    const safeNext = (next && next.startsWith("/")) ? next : "";
-    const here = window.location.pathname + window.location.search;
+    // --- Role preselect logic ---
+    // Priority: ?role=... > localStorage > default job_seeker
+    const params = new URLSearchParams(window.location.search);
+    const roleParam = (params.get("role") || "").trim().toLowerCase();
+    const storedRole = (localStorage.getItem("qh_login_role") || "").trim().toLowerCase();
+    const roleEl = document.getElementById("role");
 
-    // If no next, default to coming back here
+    const isValidRole = (r) => (r === "job_seeker" || r === "employer");
+    const initialRole = isValidRole(roleParam) ? roleParam : (isValidRole(storedRole) ? storedRole : "job_seeker");
+    if (roleEl) roleEl.value = initialRole;
+
+    // Persist when user changes
+    if (roleEl) {
+      roleEl.addEventListener("change", () => {
+        const v = String(roleEl.value || "").trim();
+        if (isValidRole(v)) localStorage.setItem("qh_login_role", v);
+      });
+    }
+
+    // --- Signup links carry ?next and lock role correctly ---
+    const next = params.get("next");
+    const safeNext = (next && next.startsWith("/")) ? next : "";
     const nextParam = encodeURIComponent(safeNext || "/");
 
     const cand = document.getElementById("candidateSignupBtn");
@@ -498,7 +526,23 @@
     if (cand) cand.href = "/auth/signup-job-seeker.html?next=" + nextParam;
     if (emp) emp.href = "/auth/signup-employer.html?next=" + nextParam;
 
-    // Ensure toast container exists (QH.toast uses it)
+    // --- Forgot password link carries role + typed login (for convenience) ---
+    const forgot = document.getElementById("forgotLink");
+    const loginInput = document.getElementById("login");
+
+    function updateForgotHref() {
+      const role = roleEl ? String(roleEl.value || "job_seeker") : "job_seeker";
+      const login = loginInput ? String(loginInput.value || "").trim() : "";
+      const qs = new URLSearchParams();
+      qs.set("role", role);
+      if (login) qs.set("login", login);
+      if (safeNext) qs.set("next", safeNext);
+      if (forgot) forgot.href = "/auth/reset.html?" + qs.toString();
+    }
+
+    if (roleEl) roleEl.addEventListener("change", updateForgotHref);
+    if (loginInput) loginInput.addEventListener("input", updateForgotHref);
+    updateForgotHref();
   })();
 
   document.getElementById("btnLogin").addEventListener("click", async () => {
