@@ -282,15 +282,20 @@
     }
     .item .sub{color:var(--muted); font-size:12px; display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
 
-    .pill{
-      border:1px solid rgba(10,30,20,.14);
-      border-radius:999px;
-      padding:2px 8px;
-      font-size:11px;
-      color:var(--muted);
-      background: rgba(255,255,255,.75);
-      font-weight:800;
-    }
+.pill{
+  border:1px solid rgba(10,30,20,.14);
+  border-radius:999px;
+  padding:2px 8px;
+  font-size:11px;
+  color:var(--muted);
+  background: rgba(255,255,255,.75);
+  font-weight:800;
+  display:inline-flex;
+  align-items:center;
+  line-height:1;
+  white-space:nowrap;
+}
+    
     .pill.verified{
       border-color: rgba(31,122,74,.35);
       color: rgba(31,122,74,.95);
@@ -309,12 +314,13 @@
     .detail h1{margin:0 0 8px 0; font-size:18px}
 
     /* right-side top facts row */
-    .detail .facts{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin:10px 0 12px;
-    }
+.detail .facts{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:10px 0 12px;
+  align-items:center;
+}
 
     /* Verified badge inside facts row - does NOT affect other pills */
 .verified-inline{
