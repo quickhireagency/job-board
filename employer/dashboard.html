@@ -1,4 +1,3 @@
-```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -12,7 +11,6 @@
 
   <style>
     :root{
-      /* Match index.html palette */
       --bg1:#f7fbf7;
       --bg2:#f1fff6;
       --card:#ffffff;
@@ -53,7 +51,7 @@
     a{color:var(--blue); text-decoration:none}
     a:hover{text-decoration:underline}
 
-    /* Top bar (match index) */
+    /* Top bar */
     .topbar{
       position:sticky; top:0; z-index:10;
       background: rgba(255,255,255,.85);
@@ -73,11 +71,7 @@
       min-width: 280px;
     }
     .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
-    .brand img{
-      height:102px; /* 3x larger */
-      width:auto;
-      display:block;
-    }
+    .brand img{ height:102px; width:auto; display:block; }
     .brand .sub{
       font-size:12px;
       color:var(--muted);
@@ -129,11 +123,7 @@
       background: linear-gradient(135deg, rgba(43,154,94,.22), rgba(255,255,255,.95));
       color: #0b2a19;
     }
-    .btn[disabled]{
-      opacity:.55;
-      cursor:not-allowed;
-      filter:saturate(.9);
-    }
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; filter:saturate(.9); }
 
     .wrap{
       max-width:1200px;
@@ -169,16 +159,8 @@
     .panel-header .meta{color:var(--muted); font-size:12px}
     .content{padding:16px}
 
-    .muted{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.35;
-    }
-    .hr{
-      height:1px;
-      background: rgba(10,30,20,.12);
-      margin:12px 0;
-    }
+    .muted{ color:var(--muted); font-size:12px; line-height:1.35; }
+    .hr{ height:1px; background: rgba(10,30,20,.12); margin:12px 0; }
 
     .note{
       background: rgba(10,30,20,.04);
@@ -187,14 +169,8 @@
       padding:12px;
     }
 
-    .row2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-    }
-    @media (max-width: 720px){
-      .row2{grid-template-columns:1fr}
-    }
+    .row2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    @media (max-width: 720px){ .row2{grid-template-columns:1fr} }
 
     .plans{
       display:grid;
@@ -202,9 +178,7 @@
       gap:10px;
       margin-top:10px;
     }
-    @media (max-width: 980px){
-      .plans{grid-template-columns:1fr}
-    }
+    @media (max-width: 980px){ .plans{grid-template-columns:1fr} }
 
     .badge{
       display:inline-flex;
@@ -230,27 +204,6 @@
       background: rgba(180,35,24,.08);
     }
 
-    /* Tables (kept for EEO tables) */
-    table{
-      width:100%;
-      border-collapse:separate;
-      border-spacing:0;
-      overflow:hidden;
-      border-radius:14px;
-      border:1px solid rgba(10,30,20,.12);
-      background: rgba(255,255,255,.9);
-    }
-    th, td{
-      padding:10px 10px;
-      border-bottom:1px solid rgba(10,30,20,.10);
-      text-align:left;
-      font-size:12px;
-      color: var(--text);
-      vertical-align:top;
-    }
-    th{ font-weight:1000; background: rgba(10,30,20,.04); }
-    tr:last-child td{ border-bottom:none; }
-
     /* Applicants controls */
     .app-status{
       width:auto;
@@ -263,10 +216,10 @@
       font-size:12px;
     }
 
-    /* NEW: applicant row (compact) + resume card */
+    /* applicant row + resume card */
     .app-row{
       display:grid;
-      grid-template-columns: 46px 1fr 1fr; /* checkbox | job | name */
+      grid-template-columns: 46px 1fr 1fr;
       gap:10px;
       align-items:center;
       padding:10px;
@@ -275,12 +228,9 @@
       background: rgba(255,255,255,.92);
       box-shadow: 0 6px 16px rgba(16,24,40,.06);
     }
-    .app-row > div{ min-width:0; } /* critical so text can ellipsis */
+    .app-row > div{ min-width:0; }
     @media (max-width: 980px){
-      .app-row{
-        grid-template-columns: 46px 1fr;
-        grid-auto-rows:auto;
-      }
+      .app-row{ grid-template-columns: 46px 1fr; grid-auto-rows:auto; }
     }
     .app-row + .app-row{ margin-top:10px; }
 
@@ -329,11 +279,7 @@
     }
     .app-card.open{ display:block; }
 
-    .mini{
-      font-size:12px;
-      color: var(--muted);
-      line-height:1.4;
-    }
+    .mini{ font-size:12px; color: var(--muted); line-height:1.4; }
 
     .resumeFrame{
       border:1px solid rgba(10,30,20,.14);
@@ -349,9 +295,7 @@
       display:block;
       background:#fff;
     }
-    @media (max-width: 700px){
-      .resumeFrame{ height:520px; }
-    }
+    @media (max-width: 700px){ .resumeFrame{ height:520px; } }
 
     /* Form elements */
     label{
@@ -371,23 +315,10 @@
     }
     textarea{ min-height: 140px; resize: vertical; }
 
-    /* Footer logo + legal links (match index.html) */
-    .qh-footer-logo-wrap{
-      display:flex;
-      justify-content:center;
-      margin: 14px 0 8px;
-    }
-    .qh-footer-logo-wrap a{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      text-decoration:none;
-    }
-    .qh-footer-logo{
-      height:102px; /* 3x larger */
-      width:auto;
-      display:block;
-    }
+    /* Footer logo + legal links */
+    .qh-footer-logo-wrap{ display:flex; justify-content:center; margin: 14px 0 8px; }
+    .qh-footer-logo-wrap a{ display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+    .qh-footer-logo{ height:102px; width:auto; display:block; }
 
     .qh-powered{
       text-align:center;
@@ -395,10 +326,7 @@
       font-weight:900;
       letter-spacing:.02em;
     }
-    .qh-powered a{
-      color: var(--blue);
-      text-decoration:underline;
-    }
+    .qh-powered a{ color: var(--blue); text-decoration:underline; }
   </style>
 </head>
 
@@ -418,7 +346,6 @@
       </div>
 
       <div class="controls">
-        <!-- Employer topbar nav -->
         <a class="btn" href="/employer/dashboard.html">Dashboard</a>
         <a class="btn blue" href="/employer/jobs.html">My Jobs</a>
         <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
@@ -430,7 +357,7 @@
 
   <div class="wrap">
     <div class="grid">
-      <!-- Subscription / Plans -->
+      <!-- Subscription / Applicants / Plans -->
       <div class="panel">
         <div class="panel-header">
           <div>
@@ -466,13 +393,25 @@
           <div class="muted">Post a job or manage your existing jobs.</div>
 
           <div class="hr"></div>
-
-          <!-- Keep existing Post Job logic intact; add Manage Jobs button -->
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
             <a class="btn blue" href="/employer/jobs.html">Manage Jobs</a>
           </div>
 
+          <!-- Applicants panel (MOVED ABOVE PLANS) -->
+          <div class="hr"></div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div style="font-weight:1000;">Applicants</div>
+            <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
+          </div>
+          <div class="muted" style="margin-top:6px;">
+            Row shows only: <b>Job Title | Name</b>. Checkbox toggles <b>X-off</b>. Click candidate name to open card. Remove Candidate is inside the card.
+          </div>
+          <div id="applicantsBox" class="note" style="margin-top:10px;">
+            Click "Load Applicants" to see all applicants.
+          </div>
+
+          <!-- Buy / Upgrade Plan -->
           <div class="hr"></div>
           <div style="font-weight:1000; margin-bottom:6px;">Buy / Upgrade Plan</div>
           <div class="muted">
@@ -519,23 +458,10 @@
               </div>
             </div>
           </div>
-
-          <!-- Applicants panel -->
-          <div class="hr"></div>
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <div style="font-weight:1000;">Applicants</div>
-            <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
-          </div>
-          <div class="muted" style="margin-top:6px;">
-            Row shows only: <b>Job Title | Name</b>. Checkbox toggles <b>X-off</b>. Click candidate name <b>(click)</b> to open the card.
-          </div>
-          <div id="applicantsBox" class="note" style="margin-top:10px;">
-            Click "Load Applicants" to see all applicants.
-          </div>
         </div>
       </div>
 
-      <!-- Post job (keep existing logic; left intact) -->
+      <!-- Post job (kept) -->
       <div class="panel">
         <div class="panel-header">
           <div>
@@ -813,8 +739,6 @@
   });
 
   let __entitlements = null;
-
-  // Canonical status set (MUST start with Applied)
   const APP_STATUS_OPTIONS = ["Applied","Reviewed","Interview","Offer","Hired","Rejected"];
 
   function normalizeStatus(s){
@@ -922,7 +846,6 @@
     await loadEeo();
   }
   loadEntitlements();
-
   document.getElementById("btnLoadEeo").addEventListener("click", loadEeo);
 
   // Helpers
@@ -952,7 +875,16 @@
     });
   }
 
-  // --- Resume URL normalization (fixes 404 when backend returns view/download links) ---
+  // NEW: remove candidate (soft remove from view only)
+  async function removeCandidate(applicationId){
+    return await QH.apiPost("remove_candidate", {
+      session_token: session.session_token,
+      application_id: applicationId,
+      remove: "TRUE"
+    });
+  }
+
+  // Resume URL normalization
   function normalizeResumeUrl(url){
     const u = String(url || "").trim();
     if (!u) return "";
@@ -993,7 +925,7 @@
     box.innerHTML = `
       <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
       <div class="muted" style="margin-bottom:10px;">
-        Click the candidate name <b>(click)</b> to open the card (resume preview). Checkbox toggles X-off.
+        Click the candidate name to open the card (resume preview). Checkbox toggles X-off.
       </div>
       <div id="appsRows"></div>
     `;
@@ -1007,9 +939,7 @@
       const jobTitle = String(r.job_title || r.job_id || "");
       const status = normalizeStatus(r.status || "Applied");
       const xoff = !!r.is_x_off;
-
       const resumeUrl = normalizeResumeUrl(String(r.resume_file_url || ""));
-
       const loc = [r.city, r.state].filter(Boolean).join(", ");
       const appliedAt = String(r.applied_at || "");
       const cover = String(r.cover_letter_text || "");
@@ -1043,6 +973,7 @@
               <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
                 <label class="mini" style="margin:0; font-weight:1000;">Status</label>
                 ${statusSelectHtml(status)}
+                <button class="btn danger" data-role="removeCandidate" type="button">Remove Candidate</button>
                 <button class="btn" data-role="closeCard" type="button">Close</button>
               </div>
             </div>
@@ -1062,7 +993,8 @@
       `;
     }).join("");
 
-    box.__qhBound = box.__qhBound || { change: false, click: false };
+    // Delegated handlers
+    box.__qhBound = box.__qhBound || { change:false, click:false };
 
     if (!box.__qhBound.change){
       box.addEventListener("change", async (ev) => {
@@ -1075,7 +1007,6 @@
         const appId = wrapEl.getAttribute("data-app-id") || "";
         const prev = sel.getAttribute("data-prev") || normalizeStatus(sel.value);
         const next = normalizeStatus(sel.value);
-
         sel.setAttribute("data-prev", prev);
 
         const r = await updateApplicationStatus(appId, next);
@@ -1128,36 +1059,51 @@
           const isOn = t.classList.contains("on");
           const nextOn = !isOn;
 
-          if (nextOn){
-            t.classList.add("on");
-            t.textContent = "☑";
-          } else {
-            t.classList.remove("on");
-            t.textContent = "☐";
-          }
-          if (row){
-            if (nextOn) row.classList.add("xoff");
-            else row.classList.remove("xoff");
-          }
+          // optimistic UI
+          if (nextOn){ t.classList.add("on"); t.textContent = "☑"; }
+          else { t.classList.remove("on"); t.textContent = "☐"; }
+          if (row){ nextOn ? row.classList.add("xoff") : row.classList.remove("xoff"); }
 
           const r = await toggleXOff(appId, nextOn);
           if (!r.ok) {
-            if (nextOn){
-              t.classList.remove("on");
-              t.textContent = "☐";
-            } else {
-              t.classList.add("on");
-              t.textContent = "☑";
-            }
-            if (row){
-              if (nextOn) row.classList.remove("xoff");
-              else row.classList.add("xoff");
-            }
+            // revert
+            if (nextOn){ t.classList.remove("on"); t.textContent = "☐"; }
+            else { t.classList.add("on"); t.textContent = "☑"; }
+            if (row){ nextOn ? row.classList.remove("xoff") : row.classList.add("xoff"); }
             QH.toast("Failed", r.error || "Could not toggle X.");
             return;
           }
-
           QH.toast("Saved", nextOn ? "Applicant crossed off." : "Cross-off removed.");
+          return;
+        }
+
+        // NEW: Remove Candidate
+        if (t && t.getAttribute && t.getAttribute("data-role") === "removeCandidate") {
+          ev.preventDefault();
+          const wrapEl = t.closest("[data-app-id]");
+          if (!wrapEl) return;
+          const appId = wrapEl.getAttribute("data-app-id") || "";
+          if (!appId) return;
+
+          const ok = window.confirm(
+            "Remove this candidate from your Applicants view?\n\n" +
+            "This does NOT delete the application. It only hides it from your view.\n\n" +
+            "Click OK to remove."
+          );
+          if (!ok) return;
+
+          t.disabled = true;
+          const r = await removeCandidate(appId);
+          t.disabled = false;
+
+          if (!r.ok) {
+            QH.toast("Failed", r.error || "Could not remove candidate.");
+            return;
+          }
+
+          // Remove from DOM
+          wrapEl.remove();
+          QH.toast("Removed", "Candidate removed from your view.");
           return;
         }
       });
@@ -1213,4 +1159,3 @@
 </script>
 </body>
 </html>
-```
