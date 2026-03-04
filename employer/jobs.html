@@ -11,7 +11,6 @@
 
   <style>
     :root{
-      /* Match index.html palette (same as Employer Dashboard) */
       --bg1:#f7fbf7;
       --bg2:#f1fff6;
       --card:#ffffff;
@@ -52,7 +51,6 @@
     a{color:var(--blue); text-decoration:none}
     a:hover{text-decoration:underline}
 
-    /* Top bar (match Employer Dashboard) */
     .topbar{
       position:sticky; top:0; z-index:10;
       background: rgba(255,255,255,.85);
@@ -73,7 +71,7 @@
     }
     .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
     .brand img{
-      height:102px; /* 3x larger */
+      height:102px;
       width:auto;
       display:block;
     }
@@ -108,11 +106,6 @@
       white-space:nowrap;
     }
     .btn:hover{border-color: rgba(10,30,20,.28)}
-    .btn.primary{
-      border-color: rgba(31,122,74,.35);
-      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
-      color: #0b2a19;
-    }
     .btn.blue{
       border-color: rgba(27,111,184,.35);
       background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
@@ -129,11 +122,7 @@
       color: #0b2a19;
     }
     .btn.small{ padding:7px 10px; border-radius:10px; font-size:12px; box-shadow:none; }
-    .btn.icon{ gap:8px; }
-    .btn.ghost{
-      background: rgba(255,255,255,.6);
-      box-shadow:none;
-    }
+    .btn.ghost{ background: rgba(255,255,255,.6); box-shadow:none; }
 
     .wrap{
       max-width:1200px;
@@ -175,9 +164,7 @@
       align-items:start;
     }
     @media (min-width: 980px){
-      .grid.open{
-        grid-template-columns: 1.45fr 1fr;
-      }
+      .grid.open{ grid-template-columns: 1.45fr 1fr; }
     }
 
     .panel-header{
@@ -232,16 +219,8 @@
       margin-top:2px;
     }
 
-    .muted{
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.35;
-    }
-    .hr{
-      height:1px;
-      background: rgba(10,30,20,.12);
-      margin:12px 0;
-    }
+    .muted{ color:var(--muted); font-size:12px; line-height:1.35; }
+    .hr{ height:1px; background: rgba(10,30,20,.12); margin:12px 0; }
 
     .note{
       background: rgba(10,30,20,.04);
@@ -297,11 +276,7 @@
     tbody tr:hover{ background: rgba(43,154,94,.05); }
     tbody tr:last-child td{ border-bottom:none; }
 
-    .titleLink{
-      color:inherit;
-      text-decoration:none;
-      font-weight:1000;
-    }
+    .titleLink{ color:inherit; text-decoration:none; font-weight:1000; }
     .titleLink:hover{ text-decoration:underline; }
 
     .rowActions{
@@ -311,7 +286,6 @@
       justify-content:flex-end;
     }
 
-    /* Right panel */
     .jobMgrHeader{
       display:flex;
       justify-content:space-between;
@@ -335,7 +309,6 @@
       flex-wrap:wrap;
       justify-content:flex-end;
     }
-
     .drawerClose{
       display:inline-flex;
       align-items:center;
@@ -343,7 +316,6 @@
       cursor:pointer;
     }
 
-    /* Modal */
     .modal-backdrop{
       position:fixed; inset:0;
       background: rgba(11,27,18,.55);
@@ -385,35 +357,6 @@
       flex-wrap:wrap;
     }
 
-    /* Footer logo + legal links (match Employer Dashboard) */
-    .qh-footer-logo-wrap{
-      display:flex;
-      justify-content:center;
-      margin: 14px 0 8px;
-    }
-    .qh-footer-logo-wrap a{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      text-decoration:none;
-    }
-    .qh-footer-logo{
-      height:102px; /* 3x larger */
-      width:auto;
-      display:block;
-    }
-
-    .qh-powered{
-      text-align:center;
-      margin-top: 10px;
-      font-weight:900;
-      letter-spacing:.02em;
-    }
-    .qh-powered a{
-      color: var(--blue);
-      text-decoration:underline;
-    }
-
     .toast{ position: fixed; left: 16px; bottom: 16px; z-index: 100; display:none; }
     .toast.show{ display:block; }
     .toast .t{
@@ -430,11 +373,9 @@
 </head>
 
 <body>
-  <!-- Top Bar -->
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <!-- LOGO LINK SWAP (GLOBAL RULE): TOP LOGO -> JOB BOARD -->
         <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
@@ -456,7 +397,6 @@
 
   <div class="wrap">
 
-    <!-- KPI cards -->
     <div class="kpis" aria-label="Job KPIs">
       <div class="kpi"><div class="label">Active Jobs</div><div class="val" id="kpiActive">—</div></div>
       <div class="kpi"><div class="label">Draft Jobs</div><div class="val" id="kpiDraft">—</div></div>
@@ -466,7 +406,6 @@
 
     <div class="grid" id="grid">
 
-      <!-- LEFT: Jobs table -->
       <div class="panel" aria-label="Jobs panel">
         <div class="panel-header">
           <div>
@@ -530,7 +469,6 @@
         </div>
       </div>
 
-      <!-- RIGHT: Job Manager panel (starts hidden) -->
       <div class="panel" id="jobMgr" style="display:none;" aria-label="Job Manager">
         <div class="panel-header">
           <div class="drawerClose" id="btnCloseMgr" title="Close job manager">
@@ -547,172 +485,7 @@
 
     </div>
 
-    <!-- Footer (same pattern as Employer Dashboard) -->
-    <style>
-      footer,
-      #footer,
-      .sqs-footer,
-      .Footer,
-      .Footer-inner,
-      .footer-sections,
-      .footer-sections .page-section,
-      .footer-sections .content-wrapper,
-      .footer-sections .content,
-      .footer-sections .sqs-layout,
-      .footer-sections .sqs-row,
-      .footer-sections .sqs-col-12,
-      .footer-sections .sqs-block,
-      .footer-sections .sqs-block-content{
-        padding-bottom: 0 !important;
-        margin-bottom: 0 !important;
-      }
-
-      .footer-sections .sqs-block:last-child,
-      .footer-sections .sqs-block-content:last-child{
-        padding-bottom: 0 !important;
-        margin-bottom: 0 !important;
-      }
-
-      .page-section:last-of-type{
-        padding-bottom: 0 !important;
-        margin-bottom: 0 !important;
-      }
-
-      .qh-footer{
-        max-width: 1100px;
-        margin: 0 auto !important;
-        padding: 0 !important;
-        box-sizing: border-box;
-      }
-      .qh-footer, .qh-footer *{ box-sizing: border-box; }
-
-      .qh-footer-grid{
-        display: grid;
-        grid-template-columns: 1fr;
-        gap: 22px;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      @media (min-width: 900px){
-        .qh-footer-grid{
-          grid-template-columns: 1.2fr 1fr 1fr;
-          gap: 26px;
-        }
-      }
-
-      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
-      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
-      .qh-footer a{ text-decoration: underline; }
-
-      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
-      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
-
-      .qh-footer-legal{
-        margin: 18px 0 0;
-        padding: 14px 0 0;
-        border-top: 1px solid rgba(0,0,0,0.15);
-      }
-
-      .qh-footer-links{
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px 18px;
-        align-items: center;
-        justify-content:center;
-        margin: 10px 0 0;
-        padding: 0;
-      }
-
-      .qh-badge{
-        margin: 10px 0 0;
-        font-weight: 700;
-        letter-spacing: 0.02em;
-      }
-
-      .qh-footer > *:last-child,
-      .qh-footer-legal > *:last-child{
-        margin-bottom: 0 !important;
-        padding-bottom: 0 !important;
-      }
-    </style>
-
-    <footer class="qh-footer" aria-label="QuickHire footer">
-      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <!-- LOGO LINK SWAP (GLOBAL RULE): FOOTER LOGO -> MAIN SITE -->
-        <a href="https://www.quickhire.agency/" target="_self" rel="noopener">
-          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
-        </a>
-      </div>
-
-      <p style="text-align:center;">
-        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
-      </p>
-
-      <div class="qh-footer-grid">
-        <section aria-label="Contact Us">
-          <h3>Contact Us</h3>
-          <p>
-            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
-            <a href="tel:+13174421437">(317) 442-1437</a>
-          </p>
-        </section>
-
-        <section aria-label="Location">
-          <h3>Location</h3>
-          <address>
-            <span class="qh-line">151 N. Delaware Street</span>
-            <span class="qh-line">Suite 122</span>
-            <span class="qh-line">Indianapolis, IN 46204</span>
-          </address>
-        </section>
-
-        <section aria-label="Hours of Operation">
-          <h3>Hours of Operation</h3>
-          <p>
-            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
-            Saturday: Closed<br>
-            Sunday: Closed
-          </p>
-        </section>
-      </div>
-
-      <div class="qh-footer-legal" aria-label="Legal and EEO">
-        <h3>Equal Opportunity Employer</h3>
-
-        <p>
-          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
-          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
-          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
-          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
-          Act of 1973, as amended.
-        </p>
-
-        <p>
-          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
-          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
-          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
-          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
-        </p>
-
-        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
-
-        <nav class="qh-footer-links" aria-label="Footer links">
-          <a href="/legal/terms.html" target="_self">Terms of Service</a>
-          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
-          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
-          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
-          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
-          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
-        </nav>
-
-        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
-          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
-            POWERED BY COOK TECHNOLOGY SERVICES
-          </a>
-        </div>
-      </div>
-    </footer>
-
+    <!-- year -->
     <script>
       (function () {
         var y = new Date().getFullYear();
@@ -721,11 +494,15 @@
       })();
     </script>
 
-    <div id="toast" class="toast"><div class="t"><div style="font-weight:1000" id="toastTitle"></div><div class="m" id="toastMsg"></div></div></div>
+    <div id="toast" class="toast">
+      <div class="t">
+        <div style="font-weight:1000" id="toastTitle"></div>
+        <div class="m" id="toastMsg"></div>
+      </div>
+    </div>
 
   </div>
 
-  <!-- Confirm modal -->
   <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-label="Confirm dialog">
     <div class="modal">
       <div class="mh">
@@ -742,801 +519,714 @@
 
 <script>
 /* =========================================================
-   QuickHire™ — My Jobs (Backend-Matched)
-   BACKEND ACTIONS USED (POST):
-   - list_employer_jobs
-   - list_employer_applicants
-   - employer_job_set_status
-   - employer_job_duplicate
+   QuickHire™ — Employer Jobs (MATCHES BACKEND)
+   Backend actions used:
+     - list_employer_jobs (POST)
+     - list_employer_applicants (POST)
+     - employer_job_set_status (POST)
+     - employer_job_duplicate (POST)
    ========================================================= */
 
-const sess = QH.requireSession("employer");
-if (!sess) throw new Error("No employer session");
+(function(){
+  const STATE = {
+    jobsRaw: [],
+    jobsView: [],
+    appsByJob: new Map(),
+    countsByJob: new Map(),
+    selectedJobId: null,
+    filters: { search:"", status:"", dateDays:"", sort:"updated_desc" }
+  };
 
-/* ----------------------------- State ----------------------------- */
-const STATE = {
-  jobsRaw: [],
-  jobsView: [],
-  appsByJob: new Map(),     // job_id -> applicants array
-  countsByJob: new Map(),   // job_id -> visible applicant count (REMOVED:false)
-  selectedJobId: null,
-  filters: { search:"", status:"", dateDays:"", sort:"updated_desc" }
-};
+  function esc(s){ return (window.QH && QH.esc) ? QH.esc(s) : String(s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m])); }
 
-/* ----------------------------- Tiny helpers ----------------------------- */
-function toast(title, msg){
-  const el = document.getElementById("toast");
-  document.getElementById("toastTitle").textContent = title || "";
-  document.getElementById("toastMsg").textContent = msg || "";
-  el.classList.add("show");
-  setTimeout(()=> el.classList.remove("show"), 2600);
-}
-
-function parseDate(x){
-  if (!x) return null;
-  const d = new Date(x);
-  if (!isNaN(d.getTime())) return d;
-  const n = Number(x);
-  if (!isNaN(n) && n > 0) return new Date(n);
-  return null;
-}
-function fmtDateShort(x){
-  const d = parseDate(x);
-  if (!d) return "—";
-  return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"numeric"});
-}
-
-function normStatus(s){
-  const v = String(s||"").toLowerCase().trim();
-  if (!v) return "active";
-  if (v === "live" || v === "open") return "active";
-  if (v === "removed" || v === "deleted" || v === "soft_deleted") return "removed";
-  if (v === "draft") return "draft";
-  if (v === "closed" || v === "filled" || v === "paused") return "closed";
-  if (v === "active") return "active";
-  return v;
-}
-function statusPill(status){
-  const s = normStatus(status);
-  const cls = (s==="active") ? "green" : (s==="draft" ? "yellow" : (s==="closed" ? "blue" : (s==="removed" ? "red" : "")));
-  const label = (s==="active") ? "Active" : (s==="draft" ? "Draft" : (s==="closed" ? "Closed" : (s==="removed" ? "Removed" : s)));
-  return `<span class="pill ${cls}">${QH.esc(label)}</span>`;
-}
-function jobLocation(job){
-  const parts = [];
-  const city = job.city || job.location_city || "";
-  const state = job.state || job.location_state || "";
-  const loc = job.location || "";
-  if (city || state) parts.push([city, state].filter(Boolean).join(", "));
-  else if (loc) parts.push(loc);
-  return parts.join(" ").trim() || "—";
-}
-function hasRemovedFlag(notes){
-  return String(notes||"").toLowerCase().includes("removed:true");
-}
-
-/* ----------------------------- Modal ----------------------------- */
-let modalResolve = null;
-function showConfirm({title, body, okText="Confirm", okDanger=true}){
-  const back = document.getElementById("modalBackdrop");
-  document.getElementById("modalTitle").textContent = title || "Confirm";
-  document.getElementById("modalBody").textContent = body || "";
-  const okBtn = document.getElementById("modalOk");
-  okBtn.textContent = okText;
-  okBtn.className = okDanger ? "btn danger" : "btn green";
-  back.style.display = "flex";
-  return new Promise((resolve)=>{ modalResolve = resolve; });
-}
-function hideConfirm(result){
-  const back = document.getElementById("modalBackdrop");
-  back.style.display = "none";
-  if (modalResolve) modalResolve(result);
-  modalResolve = null;
-}
-document.getElementById("modalX").addEventListener("click", ()=>hideConfirm(false));
-document.getElementById("modalCancel").addEventListener("click", ()=>hideConfirm(false));
-document.getElementById("modalOk").addEventListener("click", ()=>hideConfirm(true));
-document.getElementById("modalBackdrop").addEventListener("click", (e)=>{
-  if (e.target && e.target.id === "modalBackdrop") hideConfirm(false);
-});
-
-/* ----------------------------- Nav buttons ----------------------------- */
-document.getElementById("btnLogout").addEventListener("click", () => {
-  QH.clearSession();
-  window.location.href = "/";
-});
-
-/* ----------------------------- Filters UI ----------------------------- */
-const fSearch = document.getElementById("fSearch");
-const fStatus = document.getElementById("fStatus");
-const fDate   = document.getElementById("fDate");
-const fSort   = document.getElementById("fSort");
-
-document.getElementById("btnApply").addEventListener("click", ()=>{
-  STATE.filters.search = (fSearch.value||"").trim();
-  STATE.filters.status = fStatus.value || "";
-  STATE.filters.dateDays = fDate.value || "";
-  STATE.filters.sort = fSort.value || "updated_desc";
-  applyFiltersAndRender();
-});
-
-document.getElementById("btnReset").addEventListener("click", ()=>{
-  fSearch.value = "";
-  fStatus.value = "";
-  fDate.value = "";
-  fSort.value = "updated_desc";
-  STATE.filters = { search:"", status:"", dateDays:"", sort:"updated_desc" };
-  applyFiltersAndRender();
-});
-
-document.getElementById("btnViewDrafts").addEventListener("click", ()=>{
-  fStatus.value = "draft";
-  STATE.filters.status = "draft";
-  applyFiltersAndRender();
-  toast("Drafts", "Showing Draft jobs.");
-});
-
-/* ----------------------------- Backend-matched API calls ----------------------------- */
-async function apiListEmployerJobs(){
-  const res = await QH.apiPost("list_employer_jobs", {
-    session_token: sess.session_token,
-    search: "",      // we do client-side filtering for UI responsiveness
-    status: "",      // all
-    sort: "updated_desc",
-    limit: 500
-  });
-  if (!res || !res.ok) return { ok:false, error: (res && res.error) ? res.error : "Unable to load jobs" };
-  return { ok:true, jobs: Array.isArray(res.jobs) ? res.jobs : [] };
-}
-
-async function apiListEmployerApplicants(job_id){
-  const res = await QH.apiPost("list_employer_applicants", {
-    session_token: sess.session_token,
-    job_id
-  });
-  if (!res || !res.ok) return { ok:false, error: (res && res.error) ? res.error : "Unable to load applicants" };
-  return { ok:true, applicants: Array.isArray(res.applicants) ? res.applicants : [] };
-}
-
-async function apiSetJobStatus(job_id, status){
-  const res = await QH.apiPost("employer_job_set_status", {
-    session_token: sess.session_token,
-    job_id,
-    status
-  });
-  if (res && res.ok) return res;
-  return { ok:false, error: (res && res.error) ? res.error : "Failed to set job status" };
-}
-
-async function apiDuplicateJob(job_id){
-  const res = await QH.apiPost("employer_job_duplicate", {
-    session_token: sess.session_token,
-    job_id
-  });
-  if (res && res.ok) return res;
-  return { ok:false, error: (res && res.error) ? res.error : "Failed to duplicate job" };
-}
-
-/* ----------------------------- KPIs ----------------------------- */
-function computeKpis(){
-  const jobs = STATE.jobsRaw || [];
-  const active = jobs.filter(j=> normStatus(j.status) === "active").length;
-  const draft  = jobs.filter(j=> normStatus(j.status) === "draft").length;
-
-  document.getElementById("kpiActive").textContent = String(active);
-  document.getElementById("kpiDraft").textContent  = String(draft);
-
-  // Applicants KPIs (7/30 days) computed from cached applicants (preloaded)
-  let app7 = 0, app30 = 0;
-  const now = Date.now();
-  const msDay = 24*60*60*1000;
-
-  for (const arr of STATE.appsByJob.values()){
-    (arr||[]).forEach(a=>{
-      // Exclude removed candidates from KPI counts
-      if (hasRemovedFlag(a.notes_internal)) return;
-
-      const dt = parseDate(a.applied_at || a.created_at || a.timestamp || a.date_applied);
-      if (!dt) return;
-
-      const ageDays = (now - dt.getTime()) / msDay;
-      if (ageDays <= 7) app7++;
-      if (ageDays <= 30) app30++;
-    });
+  function toast(title, msg){
+    const el = document.getElementById("toast");
+    document.getElementById("toastTitle").textContent = title || "";
+    document.getElementById("toastMsg").textContent = msg || "";
+    el.classList.add("show");
+    setTimeout(()=> el.classList.remove("show"), 2600);
   }
 
-  document.getElementById("kpiApp7").textContent = String(app7);
-  document.getElementById("kpiApp30").textContent = String(app30);
-}
-
-/* ----------------------------- Filtering/sorting ----------------------------- */
-function applyFiltersAndRender(){
-  const search = (STATE.filters.search || "").toLowerCase();
-  const status = STATE.filters.status || "";
-  const dateDays = STATE.filters.dateDays ? Number(STATE.filters.dateDays) : 0;
-  const sort = STATE.filters.sort || "updated_desc";
-
-  let rows = [...(STATE.jobsRaw || [])];
-
-  if (status){
-    rows = rows.filter(j => normStatus(j.status) === status);
-  }
-
-  if (search){
-    rows = rows.filter(j=>{
-      const hay = [
-        j.job_title, j.title,
-        j.location, j.city, j.state,
-        j.job_id
-      ].filter(Boolean).join(" ").toLowerCase();
-      return hay.includes(search);
-    });
-  }
-
-  if (dateDays && !isNaN(dateDays)){
-    const cutoff = Date.now() - (dateDays * 24*60*60*1000);
-    rows = rows.filter(j=>{
-      const d = parseDate(j.updated_at || j.modified_at || j.last_updated || j.created_at || j.posted_at);
-      return d ? (d.getTime() >= cutoff) : false;
-    });
-  }
-
-  rows.sort((a,b)=>{
-    if (sort === "title_asc"){
-      const at = String(a.job_title || a.title || "").toLowerCase();
-      const bt = String(b.job_title || b.title || "").toLowerCase();
-      return at.localeCompare(bt);
+  // -------------------- Session --------------------
+  function getEmployerSession(){
+    // Prefer your helper if it exists
+    if (window.QH && typeof QH.requireSession === "function"){
+      try{
+        const s = QH.requireSession("employer");
+        if (s) return s;
+      }catch(e){}
     }
-    if (sort === "apps_desc"){
-      const ac = Number(STATE.countsByJob.get(String(a.job_id||"")) || 0);
-      const bc = Number(STATE.countsByJob.get(String(b.job_id||"")) || 0);
-      return bc - ac;
+    // Fallback: try common storage keys
+    const keys = ["qh_session", "QH_SESSION", "session", "quickhire_session"];
+    for (const k of keys){
+      try{
+        const raw = localStorage.getItem(k);
+        if (!raw) continue;
+        const obj = JSON.parse(raw);
+        if (obj && obj.role === "employer" && (obj.session_token || obj.token)) return obj;
+      }catch(e){}
     }
-    if (sort === "created_desc"){
-      const ad = parseDate(a.created_at || a.posted_at);
-      const bd = parseDate(b.created_at || b.posted_at);
-      return (bd?bd.getTime():0) - (ad?ad.getTime():0);
-    }
-    // updated_desc
-    const ad = parseDate(a.updated_at || a.modified_at || a.last_updated || a.created_at || a.posted_at);
-    const bd = parseDate(b.updated_at || b.modified_at || b.last_updated || b.created_at || b.posted_at);
-    return (bd?bd.getTime():0) - (ad?ad.getTime():0);
-  });
+    return null;
+  }
 
-  STATE.jobsView = rows;
-  renderJobsTable();
-  syncMgrVisibility();
-}
-
-/* ----------------------------- Render: Jobs table ----------------------------- */
-function renderJobsTable(){
-  const wrap = document.getElementById("jobsWrap");
-  const rows = STATE.jobsView || [];
-
-  if (!rows.length){
-    wrap.innerHTML = `<div class="note">No jobs match your filters.</div>`;
+  const session = getEmployerSession();
+  if (!session){
+    document.getElementById("jobsWrap").innerHTML =
+      `<div class="note"><b>Session expired.</b><div class="muted" style="margin-top:6px;">Please log in again.</div><div style="margin-top:10px;"><a class="btn" href="/auth/login.html">Go to Login</a></div></div>`;
     return;
   }
 
-  const html = `
-    <table aria-label="Jobs table">
-      <thead>
-        <tr>
-          <th style="width:28%;">Title</th>
-          <th style="width:16%;">Location</th>
-          <th style="width:10%;">Status</th>
-          <th style="width:10%;">Applicants</th>
-          <th style="width:12%;">Created</th>
-          <th style="width:12%;">Updated</th>
-          <th style="width:12%; text-align:right;">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${rows.map(j=>{
-          const jobId = String(j.job_id || "");
-          const title = QH.esc(j.job_title || j.title || "(untitled)");
-          const loc = QH.esc(jobLocation(j));
-          const st = normStatus(j.status);
-          const apps = Number(STATE.countsByJob.get(jobId) || 0);
-          const created = fmtDateShort(j.created_at || j.posted_at);
-          const updated = fmtDateShort(j.updated_at || j.modified_at || j.last_updated || j.created_at || j.posted_at);
+  const SESSION_TOKEN = String(session.session_token || session.token || session.session || "");
 
-          const canClose = (st === "active");
-          const canReopen = (st === "closed");
-          const canRestore = (st === "removed");
-          const canRemove = (st !== "removed");
+  // -------------------- API (matches backend doPost) --------------------
+  async function apiPost(action, payload){
+    // If your helper exists, use it (but FORCE mode + action)
+    if (window.QH && typeof QH.apiPost === "function"){
+      return await QH.apiPost(action, Object.assign({ session_token: SESSION_TOKEN }, payload || {}));
+    }
 
-          const editHref = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(jobId)}`;
+    // Hard fallback: attempt to discover API URL
+    const cfg = window.QH_CONFIG || window.CONFIG || {};
+    const apiUrl =
+      cfg.api_url || cfg.apiUrl || cfg.api_base_url || cfg.apiBaseUrl || cfg.backend_url || cfg.backendUrl ||
+      window.QH_API_URL || window.API_URL || "";
 
-          return `
-            <tr data-jobid="${QH.esc(jobId)}">
-              <td>
-                <a class="titleLink" href="#" data-act="open">${title}</a>
-                <div class="muted" style="margin-top:4px;">Job ID: <span class="pill">${QH.esc(jobId)}</span></div>
-              </td>
-              <td>${loc}</td>
-              <td>${statusPill(j.status)}</td>
-              <td><b>${apps}</b></td>
-              <td>${QH.esc(created)}</td>
-              <td>${QH.esc(updated)}</td>
-              <td style="text-align:right;">
-                <div class="rowActions">
-                  <button class="btn small" data-act="open">View</button>
-                  <a class="btn small" href="${editHref}">Edit</a>
-                  <button class="btn small" data-act="dup">Duplicate</button>
-                  ${canClose ? `<button class="btn small blue" data-act="close">Close</button>` : ``}
-                  ${canReopen ? `<button class="btn small green" data-act="reopen">Reopen</button>` : ``}
-                  ${canRemove ? `<button class="btn small danger" data-act="remove">Remove</button>` : ``}
-                  ${canRestore ? `<button class="btn small green" data-act="restore">Restore</button>` : ``}
-                </div>
-              </td>
-            </tr>
-          `;
-        }).join("")}
-      </tbody>
-    </table>
-  `;
+    if (!apiUrl){
+      return { ok:false, error:"Missing API base URL. (config.js must expose it, or QH.apiPost must exist.)" };
+    }
 
-  wrap.innerHTML = html;
+    const res = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type":"application/json" },
+      body: JSON.stringify(Object.assign({ mode:"public_api", action }, Object.assign({ session_token: SESSION_TOKEN }, payload || {})))
+    });
+    const txt = await res.text();
+    try{ return JSON.parse(txt); }catch(e){ return { ok:false, error:"Invalid JSON from backend.", raw: txt }; }
+  }
 
-  wrap.querySelectorAll("tbody tr").forEach(tr=>{
-    const jobId = tr.getAttribute("data-jobid");
-    tr.querySelectorAll("[data-act]").forEach(el=>{
-      el.addEventListener("click", async (e)=>{
-        e.preventDefault();
-        const act = el.getAttribute("data-act");
-        if (act === "open") return openJobManager(jobId);
-        if (act === "dup") return handleDuplicate(jobId);
-        if (act === "close") return handleClose(jobId);
-        if (act === "reopen") return handleReopen(jobId);
-        if (act === "remove") return handleRemove(jobId);
-        if (act === "restore") return handleRestore(jobId);
+  async function apiListEmployerJobs(){
+    return await apiPost("list_employer_jobs", {
+      search: "",
+      status: "",
+      sort: "updated_desc",
+      limit: 500
+    });
+  }
+
+  async function apiListEmployerApplicants(jobId){
+    return await apiPost("list_employer_applicants", { job_id: jobId });
+  }
+
+  async function apiSetJobStatus(jobId, status){
+    return await apiPost("employer_job_set_status", { job_id: jobId, status: status });
+  }
+
+  async function apiDuplicateJob(jobId){
+    return await apiPost("employer_job_duplicate", { job_id: jobId });
+  }
+
+  // -------------------- Helpers --------------------
+  function parseDate(x){
+    if (!x) return null;
+    const d = new Date(x);
+    if (!isNaN(d.getTime())) return d;
+    const n = Number(x);
+    if (!isNaN(n) && n > 0) return new Date(n);
+    return null;
+  }
+  function fmtDateShort(x){
+    const d = parseDate(x);
+    if (!d) return "—";
+    return d.toLocaleDateString(undefined, {year:"numeric", month:"short", day:"numeric"});
+  }
+  function normStatus(s){
+    const v = String(s||"").toLowerCase().trim();
+    if (!v) return "active";
+    if (v === "live" || v === "open") return "active";
+    if (v === "draft") return "draft";
+    if (v === "closed") return "closed";
+    if (v === "removed") return "removed";
+    return v;
+  }
+  function statusPill(status){
+    const s = normStatus(status);
+    const cls = (s==="active") ? "green" : (s==="draft" ? "yellow" : (s==="closed" ? "blue" : (s==="removed" ? "red" : "")));
+    const label = (s==="active") ? "Active" : (s==="draft" ? "Draft" : (s==="closed" ? "Closed" : (s==="removed" ? "Removed" : s)));
+    return `<span class="pill ${cls}">${esc(label)}</span>`;
+  }
+  function jobLocation(job){
+    const city = job.city || "";
+    const state = job.state || "";
+    const loc = job.location || "";
+    if (city || state) return [city, state].filter(Boolean).join(", ");
+    if (loc) return loc;
+    return "—";
+  }
+
+  function notesHasRemoved(notes){
+    return String(notes||"").toLowerCase().includes("removed:true");
+  }
+
+  // -------------------- Modal --------------------
+  let modalResolve = null;
+  function showConfirm({title, body, okText="Confirm", okDanger=true}){
+    const back = document.getElementById("modalBackdrop");
+    document.getElementById("modalTitle").textContent = title || "Confirm";
+    document.getElementById("modalBody").textContent = body || "";
+    const okBtn = document.getElementById("modalOk");
+    okBtn.textContent = okText;
+    okBtn.className = okDanger ? "btn danger" : "btn green";
+    back.style.display = "flex";
+    return new Promise((resolve)=>{ modalResolve = resolve; });
+  }
+  function hideConfirm(result){
+    const back = document.getElementById("modalBackdrop");
+    back.style.display = "none";
+    if (modalResolve) modalResolve(result);
+    modalResolve = null;
+  }
+  document.getElementById("modalX").addEventListener("click", ()=>hideConfirm(false));
+  document.getElementById("modalCancel").addEventListener("click", ()=>hideConfirm(false));
+  document.getElementById("modalOk").addEventListener("click", ()=>hideConfirm(true));
+  document.getElementById("modalBackdrop").addEventListener("click", (e)=>{
+    if (e.target && e.target.id === "modalBackdrop") hideConfirm(false);
+  });
+
+  // -------------------- UI: logout --------------------
+  document.getElementById("btnLogout").addEventListener("click", () => {
+    if (window.QH && typeof QH.clearSession === "function") QH.clearSession();
+    try{ localStorage.removeItem("qh_session"); }catch(e){}
+    window.location.href = "/";
+  });
+
+  // -------------------- Filters UI --------------------
+  const fSearch = document.getElementById("fSearch");
+  const fStatus = document.getElementById("fStatus");
+  const fDate   = document.getElementById("fDate");
+  const fSort   = document.getElementById("fSort");
+
+  document.getElementById("btnApply").addEventListener("click", ()=>{
+    STATE.filters.search = (fSearch.value||"").trim();
+    STATE.filters.status = fStatus.value || "";
+    STATE.filters.dateDays = fDate.value || "";
+    STATE.filters.sort = fSort.value || "updated_desc";
+    applyFiltersAndRender();
+  });
+
+  document.getElementById("btnReset").addEventListener("click", ()=>{
+    fSearch.value = "";
+    fStatus.value = "";
+    fDate.value = "";
+    fSort.value = "updated_desc";
+    STATE.filters = { search:"", status:"", dateDays:"", sort:"updated_desc" };
+    applyFiltersAndRender();
+  });
+
+  document.getElementById("btnViewDrafts").addEventListener("click", ()=>{
+    fStatus.value = "draft";
+    STATE.filters.status = "draft";
+    applyFiltersAndRender();
+    toast("Drafts", "Showing Draft jobs.");
+  });
+
+  // -------------------- KPIs --------------------
+  function computeKpis(){
+    const jobs = STATE.jobsRaw || [];
+    const active = jobs.filter(j=> normStatus(j.status) === "active").length;
+    const draft  = jobs.filter(j=> normStatus(j.status) === "draft").length;
+    document.getElementById("kpiActive").textContent = String(active);
+    document.getElementById("kpiDraft").textContent  = String(draft);
+
+    // Applicants 7/30
+    let app7 = 0, app30 = 0;
+    const now = Date.now();
+    const msDay = 86400000;
+
+    for (const arr of STATE.appsByJob.values()){
+      (arr||[]).forEach(a=>{
+        if (notesHasRemoved(a.notes_internal)) return; // removed candidates hidden
+        const dt = parseDate(a.applied_at || a.created_at || a.timestamp || a.date_applied);
+        if (!dt) return;
+        const ageDays = (now - dt.getTime()) / msDay;
+        if (ageDays <= 7) app7++;
+        if (ageDays <= 30) app30++;
       });
+    }
+
+    document.getElementById("kpiApp7").textContent = String(app7);
+    document.getElementById("kpiApp30").textContent = String(app30);
+  }
+
+  // -------------------- Filtering/sorting --------------------
+  function applyFiltersAndRender(){
+    const search = (STATE.filters.search || "").toLowerCase();
+    const status = STATE.filters.status || "";
+    const dateDays = STATE.filters.dateDays ? Number(STATE.filters.dateDays) : 0;
+    const sort = STATE.filters.sort || "updated_desc";
+
+    let rows = [...(STATE.jobsRaw || [])];
+
+    if (status){
+      rows = rows.filter(j => normStatus(j.status) === status);
+    }
+
+    if (search){
+      rows = rows.filter(j=>{
+        const hay = [j.job_title, j.city, j.state, j.job_id].filter(Boolean).join(" ").toLowerCase();
+        return hay.includes(search);
+      });
+    }
+
+    if (dateDays && !isNaN(dateDays)){
+      const cutoff = Date.now() - (dateDays * 86400000);
+      rows = rows.filter(j=>{
+        const d = parseDate(j.updated_at || j.posted_at);
+        return d ? d.getTime() >= cutoff : false;
+      });
+    }
+
+    rows.sort((a,b)=>{
+      if (sort === "title_asc"){
+        return String(a.job_title||"").toLowerCase().localeCompare(String(b.job_title||"").toLowerCase());
+      }
+      if (sort === "apps_desc"){
+        const ac = Number(STATE.countsByJob.get(String(a.job_id||"")) || 0);
+        const bc = Number(STATE.countsByJob.get(String(b.job_id||"")) || 0);
+        return bc - ac;
+      }
+      if (sort === "created_desc"){
+        const ad = parseDate(a.posted_at);
+        const bd = parseDate(b.posted_at);
+        return (bd?bd.getTime():0) - (ad?ad.getTime():0);
+      }
+      // updated_desc
+      const ad = parseDate(a.updated_at || a.posted_at);
+      const bd = parseDate(b.updated_at || b.posted_at);
+      return (bd?bd.getTime():0) - (ad?ad.getTime():0);
     });
-  });
-}
 
-/* ----------------------------- Job actions ----------------------------- */
-async function handleClose(jobId){
-  const ok = await showConfirm({
-    title: "Close this job?",
-    body: "Candidates can no longer apply to this job while it’s closed.",
-    okText: "Close Job",
-    okDanger: false
-  });
-  if (!ok) return;
-  const res = await apiSetJobStatus(jobId, "closed");
-  if (!res.ok) return toast("Error", res.error || "Failed to close job");
-  toast("Closed", "Job closed.");
-  await refreshAll({ keepSelected: jobId });
-}
-
-async function handleReopen(jobId){
-  const ok = await showConfirm({
-    title: "Reopen this job?",
-    body: "This job will become active again and visible to candidates.",
-    okText: "Reopen Job",
-    okDanger: false
-  });
-  if (!ok) return;
-  const res = await apiSetJobStatus(jobId, "active");
-  if (!res.ok) return toast("Error", res.error || "Failed to reopen job");
-  toast("Reopened", "Job active.");
-  await refreshAll({ keepSelected: jobId });
-}
-
-async function handleRemove(jobId){
-  const ok = await showConfirm({
-    title: "Remove this job?",
-    body: "This will hide the job from candidates. You can restore it later.",
-    okText: "Remove Job",
-    okDanger: true
-  });
-  if (!ok) return;
-  const res = await apiSetJobStatus(jobId, "removed");
-  if (!res.ok) return toast("Error", res.error || "Failed to remove job");
-  toast("Removed", "Job removed (soft).");
-  await refreshAll({ keepSelected: jobId });
-}
-
-async function handleRestore(jobId){
-  const ok = await showConfirm({
-    title: "Restore this job?",
-    body: "This will restore the job as a draft (recommended) so you can review before publishing.",
-    okText: "Restore as Draft",
-    okDanger: false
-  });
-  if (!ok) return;
-  const res = await apiSetJobStatus(jobId, "draft");
-  if (!res.ok) return toast("Error", res.error || "Failed to restore job");
-  toast("Restored", "Job restored as draft.");
-  await refreshAll({ keepSelected: jobId });
-}
-
-async function handleDuplicate(jobId){
-  const ok = await showConfirm({
-    title: "Duplicate this job?",
-    body: "We’ll create a copy as a Draft so you can edit it before publishing.",
-    okText: "Duplicate",
-    okDanger: false
-  });
-  if (!ok) return;
-
-  const res = await apiDuplicateJob(jobId);
-  if (!res.ok) return toast("Error", res.error || "Failed to duplicate job");
-
-  const newId = res.new_job_id || "";
-  toast("Duplicated", "Draft created.");
-  await refreshAll({ keepSelected: newId || null });
-
-  if (newId){
-    window.location.href = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(newId)}`;
-  }
-}
-
-/* ----------------------------- Job Manager (right panel) ----------------------------- */
-function syncMgrVisibility(){
-  const mgr = document.getElementById("jobMgr");
-  const grid = document.getElementById("grid");
-  if (STATE.selectedJobId){
-    mgr.style.display = "";
-    grid.classList.add("open");
-  } else {
-    mgr.style.display = "none";
-    grid.classList.remove("open");
-  }
-}
-
-document.getElementById("btnCloseMgr").addEventListener("click", ()=>{
-  STATE.selectedJobId = null;
-  document.getElementById("jobMgrBody").innerHTML = `<div class="muted">Select a job to load applicants.</div>`;
-  syncMgrVisibility();
-});
-
-async function openJobManager(jobId){
-  STATE.selectedJobId = jobId;
-  syncMgrVisibility();
-  await renderJobManager(jobId);
-}
-
-function findJob(jobId){
-  return (STATE.jobsRaw || []).find(j => String(j.job_id||"") === String(jobId)) || null;
-}
-
-async function renderJobManager(jobId){
-  const job = findJob(jobId);
-  const body = document.getElementById("jobMgrBody");
-
-  if (!job){
-    body.innerHTML = `<div class="note">Job not found.</div>`;
-    return;
+    STATE.jobsView = rows;
+    renderJobsTable();
+    syncMgrVisibility();
   }
 
-  if (!STATE.appsByJob.has(jobId)){
-    body.innerHTML = `<div class="muted">Loading applicants…</div>`;
-    const r = await apiListEmployerApplicants(jobId);
-    if (!r.ok){
-      body.innerHTML = `<div class="note">Applicants could not be loaded.<div class="muted" style="margin-top:6px;">${QH.esc(r.error || "")}</div></div>`;
+  // -------------------- Render: Jobs table --------------------
+  function renderJobsTable(){
+    const wrap = document.getElementById("jobsWrap");
+    const rows = STATE.jobsView || [];
+
+    if (!rows.length){
+      wrap.innerHTML = `<div class="note">No jobs match your filters.</div>`;
       return;
     }
 
-    const arr = r.applicants || [];
-    STATE.appsByJob.set(jobId, arr);
-    STATE.countsByJob.set(jobId, arr.filter(a => !hasRemovedFlag(a.notes_internal)).length);
-    computeKpis();
+    const html = `
+      <table aria-label="Jobs table">
+        <thead>
+          <tr>
+            <th style="width:28%;">Title</th>
+            <th style="width:16%;">Location</th>
+            <th style="width:10%;">Status</th>
+            <th style="width:10%;">Applicants</th>
+            <th style="width:12%;">Created</th>
+            <th style="width:12%;">Updated</th>
+            <th style="width:12%; text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(j=>{
+            const jobId = String(j.job_id || "");
+            const title = esc(j.job_title || "(untitled)");
+            const loc = esc(jobLocation(j));
+            const st = normStatus(j.status);
+            const apps = Number(STATE.countsByJob.get(jobId) || 0);
+            const created = fmtDateShort(j.posted_at);
+            const updated = fmtDateShort(j.updated_at || j.posted_at);
+
+            const canClose = (st === "active");
+            const canReopen = (st === "closed");
+            const canRestore = (st === "removed");
+            const canRemove = (st !== "removed");
+
+            const editHref = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(jobId)}`;
+
+            return `
+              <tr data-jobid="${esc(jobId)}">
+                <td>
+                  <a class="titleLink" href="#" data-act="open">${title}</a>
+                  <div class="muted" style="margin-top:4px;">Job ID: <span class="pill">${esc(jobId)}</span></div>
+                </td>
+                <td>${loc}</td>
+                <td>${statusPill(j.status)}</td>
+                <td><b>${apps}</b></td>
+                <td>${esc(created)}</td>
+                <td>${esc(updated)}</td>
+                <td style="text-align:right;">
+                  <div class="rowActions">
+                    <button class="btn small" data-act="open">View</button>
+                    <a class="btn small" href="${editHref}">Edit</a>
+                    <button class="btn small" data-act="dup">Duplicate</button>
+                    ${canClose ? `<button class="btn small blue" data-act="close">Close</button>` : ``}
+                    ${canReopen ? `<button class="btn small green" data-act="reopen">Reopen</button>` : ``}
+                    ${canRemove ? `<button class="btn small danger" data-act="remove">Remove</button>` : ``}
+                    ${canRestore ? `<button class="btn small green" data-act="restore">Restore</button>` : ``}
+                  </div>
+                </td>
+              </tr>
+            `;
+          }).join("")}
+        </tbody>
+      </table>
+    `;
+
+    wrap.innerHTML = html;
+
+    wrap.querySelectorAll("tbody tr").forEach(tr=>{
+      const jobId = tr.getAttribute("data-jobid");
+      tr.querySelectorAll("[data-act]").forEach(el=>{
+        el.addEventListener("click", async (e)=>{
+          e.preventDefault();
+          const act = el.getAttribute("data-act");
+          if (act === "open") return openJobManager(jobId);
+          if (act === "dup") return handleDuplicate(jobId);
+          if (act === "close") return handleClose(jobId);
+          if (act === "reopen") return handleReopen(jobId);
+          if (act === "remove") return handleRemove(jobId);
+          if (act === "restore") return handleRestore(jobId);
+        });
+      });
+    });
   }
 
-  const st = normStatus(job.status);
-  const title = QH.esc(job.job_title || job.title || "(untitled)");
-  const loc = QH.esc(jobLocation(job));
-  const created = fmtDateShort(job.created_at || job.posted_at);
-  const updated = fmtDateShort(job.updated_at || job.modified_at || job.last_updated || job.created_at || job.posted_at);
-
-  const apps = (STATE.appsByJob.get(jobId) || []);
-  const appsVisible = apps.filter(a => !hasRemovedFlag(a.notes_internal));
-  const appsCount = Number(STATE.countsByJob.get(jobId) || appsVisible.length || 0);
-
-  const editHref = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(jobId)}`;
-
-  const mgrHtml = `
-    <div class="jobMgrHeader">
-      <div>
-        <h3>${title}</h3>
-        <div class="sub">
-          ${statusPill(job.status)} &nbsp; • &nbsp; ${loc} &nbsp; • &nbsp; Applicants: <b>${appsCount}</b><br/>
-          <span class="muted">Created: ${QH.esc(created)} &nbsp; • &nbsp; Updated: ${QH.esc(updated)}</span>
-        </div>
-      </div>
-      <div class="jobMgrBtns">
-        <a class="btn small" href="${editHref}">Edit</a>
-        ${st==="active" ? `<button class="btn small blue" id="mgrClose">Close</button>` : ``}
-        ${st==="closed" ? `<button class="btn small green" id="mgrReopen">Reopen</button>` : ``}
-        ${st!=="removed" ? `<button class="btn small danger" id="mgrRemove">Remove</button>` : ``}
-        ${st==="removed" ? `<button class="btn small green" id="mgrRestore">Restore</button>` : ``}
-      </div>
-    </div>
-
-    <div class="hr"></div>
-
-    <div class="filters" style="margin-bottom:10px;">
-      <div>
-        <label for="aStatus">Applicant Filter</label>
-        <select id="aStatus">
-          <option value="">Visible (default)</option>
-          <option value="all">All (including removed)</option>
-          <option value="removed">Removed only</option>
-        </select>
-      </div>
-      <div>
-        <label for="aDate">Date</label>
-        <select id="aDate">
-          <option value="">Any time</option>
-          <option value="7">Last 7 days</option>
-          <option value="30">Last 30 days</option>
-        </select>
-      </div>
-      <div style="grid-column: span 2;">
-        <label for="aSearch">Search</label>
-        <input id="aSearch" placeholder="Candidate name or email">
-      </div>
-    </div>
-
-    <div id="appsWrap">${renderApplicantsTable(appsVisible)}</div>
-  `;
-
-  body.innerHTML = mgrHtml;
-
-  const closeBtn = document.getElementById("mgrClose");
-  if (closeBtn) closeBtn.addEventListener("click", ()=>handleClose(jobId));
-  const reopenBtn = document.getElementById("mgrReopen");
-  if (reopenBtn) reopenBtn.addEventListener("click", ()=>handleReopen(jobId));
-  const removeBtn = document.getElementById("mgrRemove");
-  if (removeBtn) removeBtn.addEventListener("click", ()=>handleRemove(jobId));
-  const restoreBtn = document.getElementById("mgrRestore");
-  if (restoreBtn) restoreBtn.addEventListener("click", ()=>handleRestore(jobId));
-
-  const aStatus = document.getElementById("aStatus");
-  const aDate = document.getElementById("aDate");
-  const aSearch = document.getElementById("aSearch");
-
-  const applyApps = ()=>{
-    const mode = (aStatus.value||"").toLowerCase().trim();
-    const dd = aDate.value ? Number(aDate.value) : 0;
-    const s = (aSearch.value||"").toLowerCase().trim();
-
-    let filtered = [...apps];
-
-    // mode filter
-    if (!mode){
-      filtered = filtered.filter(a => !hasRemovedFlag(a.notes_internal)); // default visible
-    } else if (mode === "removed"){
-      filtered = filtered.filter(a => hasRemovedFlag(a.notes_internal));
-    } // "all" leaves list untouched
-
-    // date filter
-    if (dd && !isNaN(dd)){
-      const cutoff = Date.now() - dd*24*60*60*1000;
-      filtered = filtered.filter(a=>{
-        const dt = parseDate(a.applied_at || a.created_at || a.timestamp || a.date_applied);
-        return dt ? dt.getTime() >= cutoff : false;
-      });
+  // -------------------- Right panel --------------------
+  function syncMgrVisibility(){
+    const mgr = document.getElementById("jobMgr");
+    const grid = document.getElementById("grid");
+    if (STATE.selectedJobId){
+      mgr.style.display = "";
+      grid.classList.add("open");
+    } else {
+      mgr.style.display = "none";
+      grid.classList.remove("open");
     }
-
-    // search filter
-    if (s){
-      filtered = filtered.filter(a=>{
-        const hay = [
-          a.candidate_first_name, a.candidate_last_name,
-          a.candidate_email, a.candidate_phone,
-          a.name, a.full_name, a.candidate_name,
-          a.email, a.candidate_email
-        ].filter(Boolean).join(" ").toLowerCase();
-        return hay.includes(s);
-      });
-    }
-
-    document.getElementById("appsWrap").innerHTML = renderApplicantsTable(filtered);
-    wireApplicantClicks();
-  };
-
-  aStatus.addEventListener("change", applyApps);
-  aDate.addEventListener("change", applyApps);
-  aSearch.addEventListener("input", ()=>{ clearTimeout(aSearch._t); aSearch._t=setTimeout(applyApps, 180); });
-
-  wireApplicantClicks();
-}
-
-function renderApplicantsTable(apps){
-  if (!apps || !apps.length){
-    return `<div class="note">No applicants yet.</div>`;
   }
 
-  const rows = apps.map(a=>{
-    const fn = a.candidate_first_name || "";
-    const ln = a.candidate_last_name || "";
-    const name = (String(fn + " " + ln).trim()) || a.name || a.full_name || a.candidate_name || "(candidate)";
-    const email = a.candidate_email || a.email || a.candidate_email || "";
-    const applied = fmtDateShort(a.applied_at || a.created_at || a.timestamp || a.date_applied);
+  document.getElementById("btnCloseMgr").addEventListener("click", ()=>{
+    STATE.selectedJobId = null;
+    document.getElementById("jobMgrBody").innerHTML = `<div class="muted">Select a job to load applicants.</div>`;
+    syncMgrVisibility();
+  });
 
-    const isRemoved = hasRemovedFlag(a.notes_internal);
-    const statusLabel = isRemoved ? "Removed" : "Active";
-    const statusP = `<span class="pill ${isRemoved ? "red" : "green"}">${QH.esc(statusLabel)}</span>`;
+  function findJob(jobId){
+    return (STATE.jobsRaw || []).find(j => String(j.job_id||"") === String(jobId)) || null;
+  }
 
-    const payload = encodeURIComponent(JSON.stringify(a));
+  async function openJobManager(jobId){
+    STATE.selectedJobId = jobId;
+    syncMgrVisibility();
+    await renderJobManager(jobId);
+  }
+
+  function renderApplicantsTable(apps){
+    if (!apps || !apps.length){
+      return `<div class="note">No applicants yet.</div>`;
+    }
+
+    const rows = apps.map(a=>{
+      const name = [a.candidate_first_name, a.candidate_last_name].filter(Boolean).join(" ").trim() || "(candidate)";
+      const email = a.candidate_email || "";
+      const applied = fmtDateShort(a.applied_at);
+      const removed = notesHasRemoved(a.notes_internal);
+      const statusText = removed ? "Removed" : (String(a.status || "Applied") || "Applied");
+
+      const payload = encodeURIComponent(JSON.stringify(a));
+      return `
+        <tr data-app="${payload}" ${removed ? `style="opacity:.55"` : ``}>
+          <td><b>${esc(name)}</b>${email ? `<div class="muted">${esc(email)}</div>` : ``}</td>
+          <td>${esc(applied)}</td>
+          <td>${statusPill(statusText)}</td>
+        </tr>
+      `;
+    }).join("");
 
     return `
-      <tr data-app="${payload}">
-        <td><b>${QH.esc(name)}</b>${email ? `<div class="muted">${QH.esc(email)}</div>` : ``}</td>
-        <td>${QH.esc(applied)}</td>
-        <td>${statusP}</td>
-      </tr>
+      <table aria-label="Applicants table">
+        <thead>
+          <tr>
+            <th style="width:60%;">Candidate</th>
+            <th style="width:20%;">Applied</th>
+            <th style="width:20%;">Status</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="muted" style="margin-top:8px;">Tip: click a candidate to open the candidate card.</div>
     `;
-  }).join("");
+  }
 
-  return `
-    <table aria-label="Applicants table">
-      <thead>
-        <tr>
-          <th style="width:60%;">Candidate</th>
-          <th style="width:20%;">Applied</th>
-          <th style="width:20%;">Status</th>
-        </tr>
-      </thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div class="muted" style="margin-top:8px;">Tip: click a candidate to open the candidate card.</div>
-  `;
-}
+  function openCandidateCardExisting(applicant){
+    if (typeof window.QH_openCandidateCard === "function"){
+      window.QH_openCandidateCard(applicant, { job_id: STATE.selectedJobId });
+      return;
+    }
+    const nm = [applicant.candidate_first_name, applicant.candidate_last_name].filter(Boolean).join(" ").trim() || "Candidate";
+    toast("Candidate", `Candidate card function not found. Clicked: ${nm}`);
+  }
 
-function wireApplicantClicks(){
-  const body = document.getElementById("jobMgrBody");
-  if (!body) return;
-  body.querySelectorAll("tbody tr[data-app]").forEach(tr=>{
-    tr.style.cursor = "pointer";
-    tr.addEventListener("click", ()=>{
-      try{
-        const raw = decodeURIComponent(tr.getAttribute("data-app")||"");
-        const applicant = JSON.parse(raw);
-        openCandidateCardExisting(applicant);
-      }catch(e){
-        toast("Error", "Could not open candidate.");
-      }
+  function wireApplicantClicks(){
+    const body = document.getElementById("jobMgrBody");
+    if (!body) return;
+    body.querySelectorAll("tbody tr[data-app]").forEach(tr=>{
+      tr.style.cursor = "pointer";
+      tr.addEventListener("click", ()=>{
+        try{
+          const raw = decodeURIComponent(tr.getAttribute("data-app")||"");
+          const applicant = JSON.parse(raw);
+          openCandidateCardExisting(applicant);
+        }catch(e){
+          toast("Error", "Could not open candidate.");
+        }
+      });
     });
-  });
-}
-
-function openCandidateCardExisting(applicant){
-  if (typeof window.QH_openCandidateCard === "function"){
-    window.QH_openCandidateCard(applicant, { job_id: STATE.selectedJobId });
-    return;
   }
-  const fn = applicant.candidate_first_name || "";
-  const ln = applicant.candidate_last_name || "";
-  const name = (String(fn + " " + ln).trim()) || applicant.name || applicant.full_name || applicant.candidate_name || "Candidate";
-  toast("Candidate", `Open candidate card not found. Clicked: ${name}`);
-}
 
-/* ----------------------------- Export CSV ----------------------------- */
-function csvEscape(v){
-  const s = String(v ?? "");
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
-  return s;
-}
-function buildCsv(jobs){
-  const headers = ["job_id","job_title","location","status","created_at","updated_at","applicants_count"];
-  const lines = [headers.join(",")];
-  jobs.forEach(j=>{
-    const jobId = String(j.job_id||"");
-    const row = [
-      jobId,
-      j.job_title || j.title || "",
-      jobLocation(j),
-      normStatus(j.status),
-      j.created_at || j.posted_at || "",
-      j.updated_at || j.modified_at || j.last_updated || "",
-      Number(STATE.countsByJob.get(jobId) || 0)
-    ].map(csvEscape).join(",");
-    lines.push(row);
-  });
-  return lines.join("\n");
-}
-document.getElementById("btnExportCsv").addEventListener("click", ()=>{
-  const jobs = STATE.jobsView || [];
-  if (!jobs.length){
-    toast("Export", "Nothing to export.");
-    return;
-  }
-  const csv = buildCsv(jobs);
-  const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `quickhire_my_jobs_${new Date().toISOString().slice(0,10)}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
-  toast("Export", "CSV downloaded.");
-});
+  async function renderJobManager(jobId){
+    const job = findJob(jobId);
+    const body = document.getElementById("jobMgrBody");
+    if (!job){
+      body.innerHTML = `<div class="note">Job not found.</div>`;
+      return;
+    }
 
-/* ----------------------------- KPI Preload (fixes KPI 7/30 days) ----------------------------- */
-async function preloadApplicantsForKpis(){
-  // sequential to avoid hammering Apps Script
-  for (let i = 0; i < (STATE.jobsRaw || []).length; i++){
-    const jobId = String(STATE.jobsRaw[i].job_id || "");
-    if (!jobId) continue;
-    if (STATE.appsByJob.has(jobId)) continue;
-
-    const r = await apiListEmployerApplicants(jobId);
-    if (r && r.ok){
-      const arr = Array.isArray(r.applicants) ? r.applicants : [];
+    // Load applicants for this job
+    if (!STATE.appsByJob.has(jobId)){
+      body.innerHTML = `<div class="muted">Loading applicants…</div>`;
+      const res = await apiListEmployerApplicants(jobId);
+      if (!res || !res.ok){
+        body.innerHTML = `<div class="note"><b>Applicants could not be loaded.</b><div class="muted" style="margin-top:6px;">${esc(res && res.error ? res.error : "Unknown error")}</div></div>`;
+        return;
+      }
+      const arr = Array.isArray(res.applicants) ? res.applicants : [];
       STATE.appsByJob.set(jobId, arr);
-      STATE.countsByJob.set(jobId, arr.filter(a => !hasRemovedFlag(a.notes_internal)).length);
+
+      const visibleCount = arr.filter(a => !notesHasRemoved(a.notes_internal)).length;
+      STATE.countsByJob.set(jobId, visibleCount);
+      computeKpis();
+      applyFiltersAndRender();
+    }
+
+    const st = normStatus(job.status);
+    const title = esc(job.job_title || "(untitled)");
+    const loc = esc(jobLocation(job));
+    const created = fmtDateShort(job.posted_at);
+    const updated = fmtDateShort(job.updated_at || job.posted_at);
+    const apps = (STATE.appsByJob.get(jobId) || []);
+    const appsCount = Number(STATE.countsByJob.get(jobId) || 0);
+
+    const editHref = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(jobId)}`;
+
+    body.innerHTML = `
+      <div class="jobMgrHeader">
+        <div>
+          <h3>${title}</h3>
+          <div class="sub">
+            ${statusPill(job.status)} &nbsp; • &nbsp; ${loc} &nbsp; • &nbsp; Applicants: <b>${appsCount}</b><br/>
+            <span class="muted">Created: ${esc(created)} &nbsp; • &nbsp; Updated: ${esc(updated)}</span>
+          </div>
+        </div>
+        <div class="jobMgrBtns">
+          <a class="btn small" href="${editHref}">Edit</a>
+          ${st==="active" ? `<button class="btn small blue" id="mgrClose">Close</button>` : ``}
+          ${st==="closed" ? `<button class="btn small green" id="mgrReopen">Reopen</button>` : ``}
+          ${st!=="removed" ? `<button class="btn small danger" id="mgrRemove">Remove</button>` : ``}
+          ${st==="removed" ? `<button class="btn small green" id="mgrRestore">Restore</button>` : ``}
+        </div>
+      </div>
+
+      <div class="hr"></div>
+
+      <div id="appsWrap">${renderApplicantsTable(apps)}</div>
+    `;
+
+    const closeBtn = document.getElementById("mgrClose");
+    if (closeBtn) closeBtn.addEventListener("click", ()=>handleClose(jobId));
+    const reopenBtn = document.getElementById("mgrReopen");
+    if (reopenBtn) reopenBtn.addEventListener("click", ()=>handleReopen(jobId));
+    const removeBtn = document.getElementById("mgrRemove");
+    if (removeBtn) removeBtn.addEventListener("click", ()=>handleRemove(jobId));
+    const restoreBtn = document.getElementById("mgrRestore");
+    if (restoreBtn) restoreBtn.addEventListener("click", ()=>handleRestore(jobId));
+
+    wireApplicantClicks();
+  }
+
+  // -------------------- Job actions --------------------
+  async function handleClose(jobId){
+    const ok = await showConfirm({ title:"Close this job?", body:"Candidates can no longer apply while it’s closed.", okText:"Close Job", okDanger:false });
+    if (!ok) return;
+    const res = await apiSetJobStatus(jobId, "closed");
+    if (!res || !res.ok) return toast("Error", res && res.error ? res.error : "Failed to close job");
+    toast("Closed", "Job closed.");
+    await refreshAll({ keepSelected: jobId });
+  }
+
+  async function handleReopen(jobId){
+    const ok = await showConfirm({ title:"Reopen this job?", body:"This job becomes active and visible again.", okText:"Reopen Job", okDanger:false });
+    if (!ok) return;
+    const res = await apiSetJobStatus(jobId, "active");
+    if (!res || !res.ok) return toast("Error", res && res.error ? res.error : "Failed to reopen job");
+    toast("Reopened", "Job active.");
+    await refreshAll({ keepSelected: jobId });
+  }
+
+  async function handleRemove(jobId){
+    const ok = await showConfirm({ title:"Remove this job?", body:"This hides the job from candidates. You can restore it later.", okText:"Remove Job", okDanger:true });
+    if (!ok) return;
+    const res = await apiSetJobStatus(jobId, "removed");
+    if (!res || !res.ok) return toast("Error", res && res.error ? res.error : "Failed to remove job");
+    toast("Removed", "Job removed (soft).");
+    await refreshAll({ keepSelected: jobId });
+  }
+
+  async function handleRestore(jobId){
+    const ok = await showConfirm({ title:"Restore this job?", body:"Restores as a Draft so you can review before publishing.", okText:"Restore as Draft", okDanger:false });
+    if (!ok) return;
+    const res = await apiSetJobStatus(jobId, "draft");
+    if (!res || !res.ok) return toast("Error", res && res.error ? res.error : "Failed to restore job");
+    toast("Restored", "Job restored as draft.");
+    await refreshAll({ keepSelected: jobId });
+  }
+
+  async function handleDuplicate(jobId){
+    const ok = await showConfirm({ title:"Duplicate this job?", body:"Creates a copy as Draft so you can edit before publishing.", okText:"Duplicate", okDanger:false });
+    if (!ok) return;
+
+    const res = await apiDuplicateJob(jobId);
+    if (!res || !res.ok) return toast("Error", res && res.error ? res.error : "Failed to duplicate job");
+
+    const newId = res.new_job_id || "";
+    toast("Duplicated", "Draft created.");
+    await refreshAll({ keepSelected: newId || null });
+
+    if (newId){
+      window.location.href = `/employer/post-job.html?mode=edit&job_id=${encodeURIComponent(newId)}`;
     }
   }
-  computeKpis();
-  renderJobsTable(); // refresh counts column after preload
-}
 
-/* ----------------------------- Refresh / init ----------------------------- */
-async function refreshAll({ keepSelected=null } = {}){
-  const wrap = document.getElementById("jobsWrap");
-  wrap.innerHTML = `<div class="muted">Loading…</div>`;
-
-  const r = await apiListEmployerJobs();
-  if (!r.ok){
-    wrap.innerHTML = `<div class="note">Error loading jobs.<div class="muted" style="margin-top:6px;">${QH.esc(r.error||"")}</div></div>`;
-    return;
+  // -------------------- Export CSV --------------------
+  function csvEscape(v){
+    const s = String(v ?? "");
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+    return s;
+  }
+  function buildCsv(jobs){
+    const headers = ["job_id","job_title","location","status","posted_at","updated_at","applicants_count"];
+    const lines = [headers.join(",")];
+    jobs.forEach(j=>{
+      const jobId = String(j.job_id||"");
+      const row = [
+        jobId,
+        j.job_title || "",
+        jobLocation(j),
+        normStatus(j.status),
+        j.posted_at || "",
+        j.updated_at || "",
+        Number(STATE.countsByJob.get(jobId) || 0)
+      ].map(csvEscape).join(",");
+      lines.push(row);
+    });
+    return lines.join("\n");
   }
 
-  STATE.jobsRaw = r.jobs || [];
+  document.getElementById("btnExportCsv").addEventListener("click", ()=>{
+    const jobs = STATE.jobsView || [];
+    if (!jobs.length) return toast("Export", "Nothing to export.");
 
-  // Init counts quickly (0 until preload fills them)
-  STATE.countsByJob = new Map();
-  STATE.jobsRaw.forEach(j=>{
-    const jobId = String(j.job_id||"");
-    STATE.countsByJob.set(jobId, STATE.countsByJob.get(jobId) || 0);
+    const csv = buildCsv(jobs);
+    const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `quickhire_jobs_${new Date().toISOString().slice(0,10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("Export", "CSV downloaded.");
   });
 
-  // Immediate KPIs for jobs
-  computeKpis();
+  // -------------------- KPI preload (so 7/30 works without clicking) --------------------
+  async function preloadApplicantsForKpis(){
+    // Sequential to avoid hammering Apps Script.
+    for (let i = 0; i < (STATE.jobsRaw || []).length; i++){
+      const jobId = String(STATE.jobsRaw[i].job_id || "");
+      if (!jobId) continue;
+      if (STATE.appsByJob.has(jobId)) continue;
 
-  // Render jobs (fast)
-  applyFiltersAndRender();
+      const res = await apiListEmployerApplicants(jobId);
+      if (res && res.ok){
+        const arr = Array.isArray(res.applicants) ? res.applicants : [];
+        STATE.appsByJob.set(jobId, arr);
+        const visibleCount = arr.filter(a => !notesHasRemoved(a.notes_internal)).length;
+        STATE.countsByJob.set(jobId, visibleCount);
+      }
+    }
+    computeKpis();
+    applyFiltersAndRender();
+  }
 
-  // Now preload applicants to make KPI 7/30 + Applicants column real
-  await preloadApplicantsForKpis();
+  // -------------------- Refresh / init --------------------
+  async function refreshAll({ keepSelected=null } = {}){
+    document.getElementById("jobsWrap").innerHTML = `<div class="muted">Loading…</div>`;
 
-  // Selection handling
-  if (keepSelected){
-    STATE.selectedJobId = keepSelected;
-    syncMgrVisibility();
-    await renderJobManager(keepSelected);
-  } else if (STATE.selectedJobId){
-    const exists = (STATE.jobsRaw||[]).some(j=> String(j.job_id||"") === String(STATE.selectedJobId));
-    if (exists){
+    const res = await apiListEmployerJobs();
+    if (!res || !res.ok){
+      document.getElementById("jobsWrap").innerHTML =
+        `<div class="note"><b>Error loading jobs.</b><div class="muted" style="margin-top:6px;">${esc(res && res.error ? res.error : "Unknown error")}</div></div>`;
+      return;
+    }
+
+    STATE.jobsRaw = Array.isArray(res.jobs) ? res.jobs : [];
+    STATE.countsByJob = new Map();
+
+    // Initialize counts to 0 (will be updated by preload)
+    STATE.jobsRaw.forEach(j=>{
+      const jobId = String(j.job_id||"");
+      STATE.countsByJob.set(jobId, 0);
+    });
+
+    applyFiltersAndRender();
+
+    // Load applicants for KPI totals (7/30 + counts)
+    await preloadApplicantsForKpis();
+
+    if (keepSelected){
+      STATE.selectedJobId = keepSelected;
       syncMgrVisibility();
-      await renderJobManager(STATE.selectedJobId);
-    } else {
-      STATE.selectedJobId = null;
-      syncMgrVisibility();
+      await renderJobManager(keepSelected);
+    } else if (STATE.selectedJobId){
+      const exists = (STATE.jobsRaw||[]).some(j=> String(j.job_id||"") === String(STATE.selectedJobId));
+      if (exists){
+        syncMgrVisibility();
+        await renderJobManager(STATE.selectedJobId);
+      } else {
+        STATE.selectedJobId = null;
+        syncMgrVisibility();
+      }
     }
   }
-}
 
-(async function init(){
-  // Initial defaults
-  fSort.value = "updated_desc";
-  await refreshAll();
+  (async function init(){
+    fSort.value = "updated_desc";
+    await refreshAll();
 
-  // Optional open via ?job_id=
-  try{
-    const params = new URLSearchParams(location.search);
-    const jobId = params.get("job_id");
-    if (jobId){
-      await openJobManager(jobId);
-    }
-  }catch(e){}
+    try{
+      const params = new URLSearchParams(location.search);
+      const jobId = params.get("job_id");
+      if (jobId) await openJobManager(jobId);
+    }catch(e){}
+  })();
+
 })();
 </script>
 
