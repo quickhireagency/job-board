@@ -332,14 +332,17 @@
       line-height:1.45;
     }
 
-    /* Verified badge (right) - must never crop */
-    .verified-badge{
-      display:block;
-      width:100%;
-      max-width: 220px;
-      height:auto;
-      margin-top:10px;
-    }
+/* Verified badge (right) */
+.verified-badge{
+  display:inline-block;   /* not a full-width block */
+  width:auto;             /* don't stretch */
+  height:16px;            /* <<< THIS is the size knob */
+  max-height:16px;
+  max-width:140px;        /* safety so it never becomes a banner */
+  margin:0;               /* no extra spacing */
+  vertical-align:middle;
+  object-fit:contain;
+}
 
     /* Company block (right) */
     .company-block{
