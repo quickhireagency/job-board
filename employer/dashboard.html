@@ -1,3 +1,4 @@
+```html
 <!doctype html>
 <html lang="en">
 <head>
@@ -406,7 +407,8 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+        <!-- LOGO URL SWAP: top logo -> job board -->
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
             <div style="font-weight:1000; letter-spacing:.2px;">Employer Dashboard</div>
@@ -416,8 +418,11 @@
       </div>
 
       <div class="controls">
-        <a class="btn" href="/">Public Job Board</a>
-        <a class="btn blue" href="/billing/success/">Claim Purchase</a>
+        <!-- Employer topbar nav -->
+        <a class="btn" href="/employer/dashboard.html">Dashboard</a>
+        <a class="btn blue" href="/employer/jobs.html">My Jobs</a>
+        <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
+        <a class="btn" href="/">Back to Job Board</a>
         <button class="btn danger" id="btnLogout">Logout</button>
       </div>
     </div>
@@ -457,9 +462,23 @@
           <div id="eeoBox" class="note" style="margin-top:10px;">Loading…</div>
 
           <div class="hr"></div>
+          <div style="font-weight:1000; margin-bottom:6px;">Quick Actions</div>
+          <div class="muted">Post a job or manage your existing jobs.</div>
+
+          <div class="hr"></div>
+
+          <!-- Keep existing Post Job logic intact; add Manage Jobs button -->
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
+            <a class="btn blue" href="/employer/jobs.html">Manage Jobs</a>
+          </div>
+
+          <div class="hr"></div>
           <div style="font-weight:1000; margin-bottom:6px;">Buy / Upgrade Plan</div>
           <div class="muted">
-            After paying, return to <b>/billing/success/</b> and claim using <b>the SAME E-mail + Username</b> from signup.
+            <b>Important:</b> Pay with the same Stripe checkout email as your QuickHire employer account email to avoid delays.
+            <br><br>
+            After paying, return to <b>/billing/success</b> (Stripe will send you back automatically) and attach using your session id.
           </div>
 
           <div class="hr"></div>
@@ -495,6 +514,9 @@
               <div style="margin-top:8px;">
                 <a class="btn" href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Buy Verified</a>
               </div>
+              <div class="muted" style="margin-top:8px;">
+                If you are on Corporate, Verified is already included.
+              </div>
             </div>
           </div>
 
@@ -513,7 +535,7 @@
         </div>
       </div>
 
-      <!-- Post job -->
+      <!-- Post job (keep existing logic; left intact) -->
       <div class="panel">
         <div class="panel-header">
           <div>
@@ -695,7 +717,8 @@
 
     <footer class="qh-footer" aria-label="QuickHire footer">
       <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+        <!-- LOGO URL SWAP: footer logo -> main site -->
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
           <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
         </a>
       </div>
@@ -892,7 +915,7 @@
       <div style="margin-top:6px;"><b>EEO Aggregate Access:</b> <span class="badge ${e.eeo_export_included ? "ok":"warn"}">${eeo}</span></div>
       <div class="hr"></div>
       <div class="muted">
-        If you just paid, go to <a href="/billing/success/">/billing/success/</a> and CLAIM using the SAME E-mail + Username.
+        If you just paid, go to <a href="/billing/success">/billing/success</a> and attach your purchase.
       </div>
     `;
 
@@ -933,17 +956,11 @@
   function normalizeResumeUrl(url){
     const u = String(url || "").trim();
     if (!u) return "";
-    // If already a /preview link, keep it
     if (u.includes("/preview")) return u;
-
-    // Convert Drive "open?id=" or "uc?id=" or "file/d/.../view" into iframe-safe /preview
     const m1 = u.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
     if (m1 && m1[1]) return `https://drive.google.com/file/d/${m1[1]}/preview`;
-
     const m2 = u.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})\//);
     if (m2 && m2[1]) return `https://drive.google.com/file/d/${m2[1]}/preview`;
-
-    // Otherwise return as-is
     return u;
   }
 
@@ -991,7 +1008,6 @@
       const status = normalizeStatus(r.status || "Applied");
       const xoff = !!r.is_x_off;
 
-      // Resume URL coming from backend list may be a view/download link; normalize to /preview for iframe
       const resumeUrl = normalizeResumeUrl(String(r.resume_file_url || ""));
 
       const loc = [r.city, r.state].filter(Boolean).join(", ");
@@ -1046,7 +1062,6 @@
       `;
     }).join("");
 
-    // Delegated handlers (avoid stacking duplicate listeners)
     box.__qhBound = box.__qhBound || { change: false, click: false };
 
     if (!box.__qhBound.change){
@@ -1070,7 +1085,6 @@
           return;
         }
 
-        // Sync ALL status selects inside this applicant block (only card has it now)
         wrapEl.querySelectorAll('select[data-role="status"]').forEach(s2 => {
           s2.value = next;
           s2.setAttribute("data-prev", next);
@@ -1085,7 +1099,6 @@
       box.addEventListener("click", async (ev) => {
         const t = ev.target;
 
-        // Toggle card by clicking name
         if (t && t.getAttribute && t.getAttribute("data-role") === "toggleCard") {
           ev.preventDefault();
           const wrapEl = t.closest("[data-app-id]");
@@ -1096,7 +1109,6 @@
           return;
         }
 
-        // Close card
         if (t && t.getAttribute && t.getAttribute("data-role") === "closeCard") {
           ev.preventDefault();
           const wrapEl = t.closest("[data-app-id]");
@@ -1106,7 +1118,6 @@
           return;
         }
 
-        // X-off checkbox
         if (t && t.getAttribute && t.getAttribute("data-role") === "xoff") {
           ev.preventDefault();
           const wrapEl = t.closest("[data-app-id]");
@@ -1117,7 +1128,6 @@
           const isOn = t.classList.contains("on");
           const nextOn = !isOn;
 
-          // optimistic UI
           if (nextOn){
             t.classList.add("on");
             t.textContent = "☑";
@@ -1132,7 +1142,6 @@
 
           const r = await toggleXOff(appId, nextOn);
           if (!r.ok) {
-            // revert
             if (nextOn){
               t.classList.remove("on");
               t.textContent = "☐";
@@ -1155,7 +1164,6 @@
       box.__qhBound.click = true;
     }
 
-    // Initialize data-prev for status selects
     box.querySelectorAll('select[data-role="status"]').forEach(sel => {
       sel.setAttribute("data-prev", normalizeStatus(sel.value));
     });
@@ -1205,3 +1213,4 @@
 </script>
 </body>
 </html>
+```
