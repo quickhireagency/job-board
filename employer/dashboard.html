@@ -65,10 +65,12 @@
       display:flex;
       align-items:center;
       gap:12px;
+      flex-wrap:wrap;
     }
     .brand{
       display:flex; align-items:center; gap:10px;
       min-width: 280px;
+      flex: 1 1 auto;
     }
     .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
     .brand img{ height:102px; width:auto; display:block; }
@@ -79,7 +81,7 @@
       line-height:1.1;
     }
     .controls{
-      flex:1;
+      flex:1 1 auto;
       display:flex;
       gap:10px;
       align-items:center;
@@ -141,6 +143,13 @@
       .grid{grid-template-columns:1fr}
     }
 
+    .col{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-width:0;
+    }
+
     .panel{
       background: rgba(255,255,255,.88);
       border:1px solid var(--line);
@@ -153,6 +162,7 @@
       border-bottom:1px solid var(--line);
       display:flex; align-items:center; justify-content:space-between;
       gap:10px;
+      flex-wrap:wrap;
       background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
     }
     .panel-header h2{margin:0; font-size:14px}
@@ -303,6 +313,7 @@
       font-size:12px;
       font-weight:900;
       margin:0 0 6px;
+      color:var(--muted);
     }
     input, textarea{
       width:100%;
@@ -312,8 +323,58 @@
       background: rgba(255,255,255,.95);
       font-size:13px;
       outline:none;
+      font-family: var(--font);
     }
     textarea{ min-height: 140px; resize: vertical; }
+
+    /* Company card */
+    .companyCardTop{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .companyLogo{
+      width:120px;
+      height:120px;
+      border-radius:18px;
+      border:1px solid rgba(10,30,20,.14);
+      background: rgba(255,255,255,.9);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .companyLogo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      background:#fff;
+    }
+    .companyMeta{
+      flex:1;
+      min-width: 240px;
+    }
+    .companyNameBig{
+      font-weight:1000;
+      font-size:16px;
+      letter-spacing:.2px;
+      margin:0;
+    }
+    .companySiteBig{
+      margin-top:6px;
+      font-weight:800;
+      font-size:13px;
+      word-break:break-word;
+    }
+    .inlineActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
 
     /* Footer logo + legal links */
     .qh-footer-logo-wrap{ display:flex; justify-content:center; margin: 14px 0 8px; }
@@ -335,7 +396,6 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <!-- LOGO URL SWAP: top logo -> job board -->
         <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
@@ -357,111 +417,217 @@
 
   <div class="wrap">
     <div class="grid">
-      <!-- Subscription / Applicants / Plans -->
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <h2>Your Subscription &amp; Entitlements</h2>
-            <div class="meta">Manage your plan and Verified status</div>
+      <!-- LEFT COLUMN -->
+      <div class="col">
+        <!-- Company Info / Account card (NEW, ABOVE ENTITLEMENTS) -->
+        <div class="panel" aria-label="Company and Account">
+          <div class="panel-header">
+            <div>
+              <h2>Company &amp; Account</h2>
+              <div class="meta">Update your company info and account settings</div>
+            </div>
+            <div class="inlineActions">
+              <button class="btn" id="btnEditCompany" type="button">Edit</button>
+              <button class="btn green" id="btnSaveCompany" type="button" style="display:none;">Save Changes</button>
+              <button class="btn" id="btnCancelCompany" type="button" style="display:none;">Cancel</button>
+            </div>
+          </div>
+
+          <div class="content">
+            <div class="companyCardTop">
+              <div class="companyLogo" aria-label="Company logo">
+                <img id="companyLogoImg" src="/QuickHireTransparentLogo02.png" alt="Company logo" onerror="this.style.display='none';" />
+              </div>
+
+              <div class="companyMeta">
+                <!-- READ MODE -->
+                <div id="companyRead">
+                  <div class="companyNameBig" id="companyNameText">Loading…</div>
+                  <div class="companySiteBig" id="companySiteText"></div>
+                  <div class="muted" id="companyContactText" style="margin-top:8px;"></div>
+                </div>
+
+                <!-- EDIT MODE -->
+                <div id="companyEdit" style="display:none;">
+                  <div class="row2">
+                    <div>
+                      <label for="company_name">Company name</label>
+                      <input id="company_name" placeholder="Company name">
+                    </div>
+                    <div>
+                      <label for="company_website">Company website</label>
+                      <input id="company_website" placeholder="https://...">
+                    </div>
+                  </div>
+
+                  <div style="height:10px;"></div>
+
+                  <div class="row2">
+                    <div>
+                      <label for="company_logo_url">Company logo URL</label>
+                      <input id="company_logo_url" placeholder="https://...">
+                    </div>
+                    <div>
+                      <label for="employer_email">Account email</label>
+                      <input id="employer_email" placeholder="you@company.com">
+                    </div>
+                  </div>
+
+                  <div style="height:10px;"></div>
+
+                  <div class="row2">
+                    <div>
+                      <label for="employer_phone">Phone (optional)</label>
+                      <input id="employer_phone" placeholder="(317) 555-1234">
+                    </div>
+                    <div>
+                      <label for="company_preview_note">Preview</label>
+                      <div class="note muted" id="company_preview_note">
+                        Your company card updates after you save.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Password change -->
+                <div class="hr"></div>
+                <div style="font-weight:1000; margin-bottom:6px;">Change Password</div>
+                <div class="row2">
+                  <div>
+                    <label for="pw_old">Old password</label>
+                    <input id="pw_old" type="password" autocomplete="current-password" placeholder="Old password">
+                  </div>
+                  <div>
+                    <label for="pw_new">New password</label>
+                    <input id="pw_new" type="password" autocomplete="new-password" placeholder="New password">
+                  </div>
+                </div>
+
+                <div style="height:10px;"></div>
+
+                <div class="row2">
+                  <div>
+                    <label for="pw_confirm">Confirm new password</label>
+                    <input id="pw_confirm" type="password" autocomplete="new-password" placeholder="Confirm new password">
+                  </div>
+                  <div style="display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;">
+                    <button class="btn blue" id="btnChangePw" type="button">Update Password</button>
+                    <div class="muted" id="pwOut"></div>
+                  </div>
+                </div>
+
+                <div class="muted" id="companyOut" style="margin-top:10px;"></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="content">
-          <div id="entBox" class="note">Loading…</div>
-
-          <div class="hr"></div>
-          <div style="font-weight:1000; margin-bottom:6px;">Quick Actions</div>
-          <div class="muted">Post a job or manage your existing jobs.</div>
-
-          <div class="hr"></div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
-            <a class="btn blue" href="/employer/jobs.html">Manage Jobs</a>
-          </div>
-
-          <!-- Applicants panel -->
-          <div class="hr"></div>
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <div style="font-weight:1000;">Applicants</div>
-            <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
-          </div>
-          <div class="muted" style="margin-top:6px;">
-            Row shows only: <b>Job Title | Name</b>. Checkbox toggles <b>X-off</b>. Click candidate name to open card. Remove Candidate is inside the card.
-          </div>
-          <div id="applicantsBox" class="note" style="margin-top:10px;">
-            Click "Load Applicants" to see all applicants.
-          </div>
-
-          <!-- EEO Aggregate panel (Corporate only) — MOVED ABOVE BUY/UPGRADE -->
-          <div class="hr"></div>
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-            <div style="font-weight:1000;">EEO Aggregate (Corporate)</div>
-            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-              <label class="muted" style="margin:0;">Days</label>
-              <select id="eeoDays" style="width:auto; padding:8px 10px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.95);">
-                <option value="30">30</option>
-                <option value="60">60</option>
-                <option value="90">90</option>
-                <option value="180">180</option>
-                <option value="270">270</option>
-                <option value="365">365</option>
-              </select>
-              <button class="btn" id="btnLoadEeo" type="button">Load EEO</button>
+        <!-- Subscription / Applicants / Plans -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Your Subscription &amp; Entitlements</h2>
+              <div class="meta">Manage your plan and Verified status</div>
             </div>
           </div>
-          <div id="eeoBox" class="note" style="margin-top:10px;">Loading…</div>
 
-          <!-- Buy / Upgrade Plan -->
-          <div class="hr"></div>
-          <div style="font-weight:1000; margin-bottom:6px;">Buy / Upgrade Plan</div>
-          <div class="muted">
-            <b>Important:</b> Pay with the same Stripe checkout email as your QuickHire employer account email to avoid delays.
-            <br><br>
-            After paying, return to <b>/billing/success</b> (Stripe will send you back automatically) and attach using your session id.
-          </div>
+          <div class="content">
+            <div id="entBox" class="note">Loading…</div>
 
-          <div class="hr"></div>
+            <div class="hr"></div>
+            <div style="font-weight:1000; margin-bottom:6px;">Quick Actions</div>
+            <div class="muted">Post a job or manage your existing jobs.</div>
 
-          <div class="plans">
-            <div class="note">
-              <div style="font-weight:1000;">QuickHire Local</div>
-              <div class="muted">$49.99/mo</div>
-              <div style="margin-top:8px;">
-                <a class="btn" href="https://buy.stripe.com/dRm00bblue5Gbz61ufbfO00" target="_blank" rel="noopener">Buy Local</a>
-              </div>
+            <div class="hr"></div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
+              <a class="btn blue" href="/employer/jobs.html">Manage Jobs</a>
             </div>
 
-            <div class="note">
-              <div style="font-weight:1000;">QuickHire Business</div>
-              <div class="muted">$99.99/mo</div>
-              <div style="margin-top:8px;">
-                <a class="btn" href="https://buy.stripe.com/4gM7sDahq9PqeLi3CnbfO05" target="_blank" rel="noopener">Buy Business</a>
-              </div>
+            <!-- Applicants panel -->
+            <div class="hr"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div style="font-weight:1000;">Applicants</div>
+              <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
+            </div>
+            <div class="muted" style="margin-top:6px;">
+              Row shows only: <b>Job Title | Name</b>. Checkbox toggles <b>X-off</b>. Click candidate name to open card. Remove Candidate is inside the card.
+            </div>
+            <div id="applicantsBox" class="note" style="margin-top:10px;">
+              Click "Load Applicants" to see all applicants.
             </div>
 
-            <div class="note">
-              <div style="font-weight:1000;">QuickHire Corporate</div>
-              <div class="muted">$249.99/mo</div>
-              <div style="margin-top:8px;">
-                <a class="btn" href="https://buy.stripe.com/14AaEP9dm4v6dHe8WHbfO02" target="_blank" rel="noopener">Buy Corporate</a>
+            <!-- EEO Aggregate panel — MOVED ABOVE BUY/UPGRADE -->
+            <div class="hr"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div style="font-weight:1000;">EEO Aggregate</div>
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <label class="muted" style="margin:0;">Days</label>
+                <select id="eeoDays" style="width:auto; padding:8px 10px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.95);">
+                  <option value="30">30</option>
+                  <option value="60">60</option>
+                  <option value="90">90</option>
+                  <option value="180">180</option>
+                  <option value="270">270</option>
+                  <option value="365">365</option>
+                </select>
+                <button class="btn" id="btnLoadEeo" type="button">Load EEO</button>
               </div>
             </div>
+            <div id="eeoBox" class="note" style="margin-top:10px;">Loading…</div>
 
-            <div class="note">
-              <div style="font-weight:1000;">Verified Employer (Add-on)</div>
-              <div class="muted">$14.99/mo</div>
-              <div style="margin-top:8px;">
-                <a class="btn" href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Buy Verified</a>
+            <!-- Buy / Upgrade Plan -->
+            <div class="hr"></div>
+            <div style="font-weight:1000; margin-bottom:6px;">Buy / Upgrade Plan</div>
+            <div class="muted">
+              <b>Important:</b> Pay with the same Stripe checkout email as your QuickHire employer account email to avoid delays.
+              <br><br>
+              After paying, return to <b>/billing/success</b> (Stripe will send you back automatically) and attach using your session id.
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="plans">
+              <div class="note">
+                <div style="font-weight:1000;">QuickHire Local</div>
+                <div class="muted">$49.99/mo</div>
+                <div style="margin-top:8px;">
+                  <a class="btn" href="https://buy.stripe.com/dRm00bblue5Gbz61ufbfO00" target="_blank" rel="noopener">Buy Local</a>
+                </div>
               </div>
-              <div class="muted" style="margin-top:8px;">
-                If you are on Corporate, Verified is already included.
+
+              <div class="note">
+                <div style="font-weight:1000;">QuickHire Business</div>
+                <div class="muted">$99.99/mo</div>
+                <div style="margin-top:8px;">
+                  <a class="btn" href="https://buy.stripe.com/4gM7sDahq9PqeLi3CnbfO05" target="_blank" rel="noopener">Buy Business</a>
+                </div>
+              </div>
+
+              <div class="note">
+                <div style="font-weight:1000;">QuickHire Corporate</div>
+                <div class="muted">$249.99/mo</div>
+                <div style="margin-top:8px;">
+                  <a class="btn" href="https://buy.stripe.com/14AaEP9dm4v6dHe8WHbfO02" target="_blank" rel="noopener">Buy Corporate</a>
+                </div>
+              </div>
+
+              <div class="note">
+                <div style="font-weight:1000;">Verified Employer (Add-on)</div>
+                <div class="muted">$14.99/mo</div>
+                <div style="margin-top:8px;">
+                  <a class="btn" href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Buy Verified</a>
+                </div>
+                <div class="muted" style="margin-top:8px;">
+                  If you are on Corporate, Verified is already included.
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Post job (kept) -->
+      <!-- RIGHT COLUMN (Quick Post remains) -->
       <div class="panel">
         <div class="panel-header">
           <div>
@@ -472,7 +638,7 @@
 
         <div class="content">
           <div class="muted">
-            Posting requires an active plan. This uses the backend <code>create_job</code> endpoint and writes into your Job Board sheet.
+            Posting requires an active plan. Complete the form below and click Post Job to publish.
           </div>
 
           <div class="hr"></div>
@@ -643,7 +809,6 @@
 
     <footer class="qh-footer" aria-label="QuickHire footer">
       <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <!-- LOGO URL SWAP: footer logo -> main site -->
         <a href="https://www.quickhire.agency" target="_self" rel="noopener">
           <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
         </a>
@@ -738,6 +903,234 @@
     window.location.href = "/";
   });
 
+  // ----------------------------
+  // Company/Account Card (NEW)
+  // ----------------------------
+  let __profile = null;       // profile + company info (loaded)
+  let __profileDraft = null;  // edit buffer
+
+  function isHttpUrl(u){
+    const s = String(u||"").trim();
+    if (!s) return true; // allow empty website/logo
+    return /^https?:\/\/.+/i.test(s);
+  }
+
+  function safeLinkText(url){
+    const s = String(url||"").trim();
+    if (!s) return "";
+    return s;
+  }
+
+  function renderCompanyCard(){
+    const name = String(__profile?.company_name || "").trim() || "(Company)";
+    const site = String(__profile?.company_website || "").trim();
+    const logo = String(__profile?.company_logo_url || "").trim();
+
+    // logo preview
+    const img = document.getElementById("companyLogoImg");
+    if (logo && isHttpUrl(logo)){
+      img.style.display = "block";
+      img.src = logo;
+    } else {
+      // keep it visible but harmless (or hide if you prefer)
+      img.style.display = "block";
+      img.src = "/QuickHireTransparentLogo02.png";
+    }
+
+    document.getElementById("companyNameText").textContent = name;
+
+    const siteWrap = document.getElementById("companySiteText");
+    if (site && isHttpUrl(site)){
+      siteWrap.innerHTML = `<a href="${escapeHtml(site)}" target="_blank" rel="noopener">${escapeHtml(safeLinkText(site))}</a>`;
+    } else {
+      siteWrap.textContent = site ? site : "";
+    }
+
+    const email = String(__profile?.employer_email || "").trim();
+    const phone = String(__profile?.employer_phone || "").trim();
+    const contact = [email ? ("Email: " + email) : "", phone ? ("Phone: " + phone) : ""].filter(Boolean).join(" • ");
+    document.getElementById("companyContactText").textContent = contact;
+  }
+
+  function enterCompanyEdit(){
+    if (!__profile) return;
+
+    __profileDraft = JSON.parse(JSON.stringify(__profile));
+
+    document.getElementById("companyRead").style.display = "none";
+    document.getElementById("companyEdit").style.display = "block";
+
+    document.getElementById("btnEditCompany").style.display = "none";
+    document.getElementById("btnSaveCompany").style.display = "inline-flex";
+    document.getElementById("btnCancelCompany").style.display = "inline-flex";
+
+    document.getElementById("company_name").value = String(__profileDraft.company_name || "");
+    document.getElementById("company_website").value = String(__profileDraft.company_website || "");
+    document.getElementById("company_logo_url").value = String(__profileDraft.company_logo_url || "");
+    document.getElementById("employer_email").value = String(__profileDraft.employer_email || "");
+    document.getElementById("employer_phone").value = String(__profileDraft.employer_phone || "");
+
+    document.getElementById("companyOut").textContent = "";
+  }
+
+  function exitCompanyEdit(discard){
+    if (discard) __profileDraft = null;
+
+    document.getElementById("companyRead").style.display = "block";
+    document.getElementById("companyEdit").style.display = "none";
+
+    document.getElementById("btnEditCompany").style.display = "inline-flex";
+    document.getElementById("btnSaveCompany").style.display = "none";
+    document.getElementById("btnCancelCompany").style.display = "none";
+
+    document.getElementById("companyOut").textContent = "";
+  }
+
+  // Endpoints used (we’ll implement backend later in one pass):
+  // - get_employer_profile
+  // - update_employer_profile
+  // - change_password
+  async function loadEmployerProfile(){
+    const out = document.getElementById("companyOut");
+    out.textContent = "Loading…";
+
+    // Primary attempt
+    let res = await QH.apiGet("get_employer_profile", { session_token: session.session_token });
+
+    // Fallback: use entitlements payload if profile endpoint not implemented yet
+    if (!res || !res.ok){
+      const ent = await QH.apiGet("get_employer_entitlements", { session_token: session.session_token });
+      if (ent && ent.ok && ent.entitlements){
+        // Best-effort mapping if your entitlements already include these fields
+        res = {
+          ok: true,
+          profile: {
+            employer_email: ent.entitlements.employer_email || "",
+            employer_phone: ent.entitlements.employer_phone || "",
+            company_name: ent.entitlements.company_name || "",
+            company_website: ent.entitlements.company_website || ent.entitlements.website || "",
+            company_logo_url: ent.entitlements.company_logo_url || ent.entitlements.logo_url || ""
+          }
+        };
+      }
+    }
+
+    if (!res || !res.ok){
+      out.textContent = "Company info will appear here once your profile endpoint is connected.";
+      __profile = {
+        employer_email: "",
+        employer_phone: "",
+        company_name: "",
+        company_website: "",
+        company_logo_url: ""
+      };
+      renderCompanyCard();
+      return;
+    }
+
+    __profile = res.profile || res.company || res.data || res || {};
+    out.textContent = "";
+    renderCompanyCard();
+  }
+
+  async function saveEmployerProfile(){
+    const out = document.getElementById("companyOut");
+    out.textContent = "";
+
+    const company_name = document.getElementById("company_name").value.trim();
+    const company_website = document.getElementById("company_website").value.trim();
+    const company_logo_url = document.getElementById("company_logo_url").value.trim();
+    const employer_email = document.getElementById("employer_email").value.trim();
+    const employer_phone = document.getElementById("employer_phone").value.trim();
+
+    if (!company_name) return QH.toast("Required", "Company name is required.");
+    if (!isHttpUrl(company_website)) return QH.toast("Website", "Website must start with http:// or https://");
+    if (!isHttpUrl(company_logo_url)) return QH.toast("Logo URL", "Logo URL must start with http:// or https://");
+
+    const values_map = {
+      company_name,
+      company_website,
+      company_logo_url,
+      employer_email,
+      employer_phone
+    };
+
+    document.getElementById("btnSaveCompany").disabled = true;
+    out.textContent = "Saving…";
+
+    const res = await QH.apiPost("update_employer_profile", {
+      session_token: session.session_token,
+      values_map
+    });
+
+    document.getElementById("btnSaveCompany").disabled = false;
+
+    if (!res || !res.ok){
+      out.textContent = "❌ " + (res && res.error ? res.error : "Unable to save changes.");
+      return QH.toast("Failed", (res && res.error) ? res.error : "Could not save changes.");
+    }
+
+    // Update local view
+    __profile.company_name = company_name;
+    __profile.company_website = company_website;
+    __profile.company_logo_url = company_logo_url;
+    __profile.employer_email = employer_email;
+    __profile.employer_phone = employer_phone;
+
+    renderCompanyCard();
+    exitCompanyEdit(true);
+
+    out.textContent = "✅ Saved.";
+    QH.toast("Saved", "Company info updated.");
+    setTimeout(()=>{ out.textContent=""; }, 1400);
+  }
+
+  async function changePassword(){
+    const out = document.getElementById("pwOut");
+    out.textContent = "";
+
+    const old_password = document.getElementById("pw_old").value;
+    const new_password = document.getElementById("pw_new").value;
+    const confirm = document.getElementById("pw_confirm").value;
+
+    if (!old_password || !new_password || !confirm) return QH.toast("Required", "Fill out all password fields.");
+    if (new_password.length < 8) return QH.toast("Password", "New password must be at least 8 characters.");
+    if (new_password !== confirm) return QH.toast("Password", "New password and confirmation do not match.");
+
+    const btn = document.getElementById("btnChangePw");
+    btn.disabled = true;
+    out.textContent = "Updating…";
+
+    const res = await QH.apiPost("change_password", {
+      session_token: session.session_token,
+      old_password,
+      new_password
+    });
+
+    btn.disabled = false;
+
+    if (!res || !res.ok){
+      out.textContent = "❌ " + (res && res.error ? res.error : "Unable to update password.");
+      return;
+    }
+
+    document.getElementById("pw_old").value = "";
+    document.getElementById("pw_new").value = "";
+    document.getElementById("pw_confirm").value = "";
+
+    out.textContent = "✅ Updated.";
+    QH.toast("Updated", "Password updated.");
+    setTimeout(()=>{ out.textContent=""; }, 1400);
+  }
+
+  document.getElementById("btnEditCompany").addEventListener("click", enterCompanyEdit);
+  document.getElementById("btnCancelCompany").addEventListener("click", () => exitCompanyEdit(true));
+  document.getElementById("btnSaveCompany").addEventListener("click", saveEmployerProfile);
+  document.getElementById("btnChangePw").addEventListener("click", changePassword);
+
+  // ----------------------------
+  // Existing dashboard logic
+  // ----------------------------
   let __entitlements = null;
   const APP_STATUS_OPTIONS = ["Applied","Reviewed","Interview","Offer","Hired","Rejected"];
 
@@ -875,7 +1268,7 @@
     });
   }
 
-  // NEW: remove candidate (soft remove from view only)
+  // remove candidate (soft remove from view only)
   async function removeCandidate(applicationId){
     return await QH.apiPost("remove_candidate", {
       session_token: session.session_token,
@@ -1077,7 +1470,7 @@
           return;
         }
 
-        // NEW: Remove Candidate
+        // Remove Candidate
         if (t && t.getAttribute && t.getAttribute("data-role") === "removeCandidate") {
           ev.preventDefault();
           const wrapEl = t.closest("[data-app-id]");
@@ -1101,7 +1494,6 @@
             return;
           }
 
-          // Remove from DOM
           wrapEl.remove();
           QH.toast("Removed", "Candidate removed from your view.");
           return;
@@ -1115,6 +1507,7 @@
     });
   });
 
+  // Quick Post (unchanged)
   document.getElementById("btnPost").addEventListener("click", async () => {
     const job_title = document.getElementById("job_title").value.trim();
     const job_description = document.getElementById("job_description").value.trim();
@@ -1156,6 +1549,9 @@
     out.textContent = "✅ Posted. Job ID: " + res.job_id;
     QH.toast("Posted", "Job created successfully.");
   });
+
+  // Kick off loads
+  loadEmployerProfile();
 </script>
 </body>
 </html>
