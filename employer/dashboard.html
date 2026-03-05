@@ -388,6 +388,47 @@
       letter-spacing:.02em;
     }
     .qh-powered a{ color: var(--blue); text-decoration:underline; }
+
+    /* Password modal (keeps Company card clean) */
+    .qh-modal-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 9999;
+    }
+    .qh-modal-overlay.open{ display:flex; }
+
+    .qh-modal{
+      width: min(620px, 100%);
+      background: rgba(255,255,255,.98);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(16,24,40,.22);
+      overflow: hidden;
+    }
+    .qh-modal-head{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.88));
+    }
+    .qh-modal-head h3{ margin:0; font-size:14px; }
+    .qh-modal-body{ padding: 14px; }
+    .qh-modal-foot{
+      padding: 14px;
+      border-top: 1px solid var(--line);
+      display:flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
   </style>
 </head>
 
@@ -489,31 +530,23 @@
                   </div>
                 </div>
 
-                <!-- Password change -->
-                <div class="hr"></div>
-                <div style="font-weight:1000; margin-bottom:6px;">Change Password</div>
-                <div class="row2">
-                  <div>
-                    <label for="pw_old">Old password</label>
-                    <input id="pw_old" type="password" autocomplete="current-password" placeholder="Old password">
+                <!-- Password actions (Option A): ONLY show while editing -->
+                <div id="pwEditActions" style="display:none;">
+                  <div class="hr"></div>
+                  <div class="row2">
+                    <div>
+                      <div style="font-weight:1000; margin-bottom:6px;">Account Security</div>
+                      <div class="muted">
+                        Password updates are hidden by default so your Company Info card stays clean.
+                      </div>
+                    </div>
+                    <div style="display:flex; align-items:flex-end; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+                      <button class="btn blue" id="btnOpenPwModal" type="button">Update Password</button>
+                      <a class="btn" href="/auth/reset" target="_self" rel="noopener">Forgot Password?</a>
+                    </div>
                   </div>
-                  <div>
-                    <label for="pw_new">New password</label>
-                    <input id="pw_new" type="password" autocomplete="new-password" placeholder="New password">
-                  </div>
-                </div>
 
-                <div style="height:10px;"></div>
-
-                <div class="row2">
-                  <div>
-                    <label for="pw_confirm">Confirm new password</label>
-                    <input id="pw_confirm" type="password" autocomplete="new-password" placeholder="Confirm new password">
-                  </div>
-                  <div style="display:flex; align-items:flex-end; gap:10px; flex-wrap:wrap;">
-                    <button class="btn blue" id="btnChangePw" type="button">Update Password</button>
-                    <div class="muted" id="pwOut"></div>
-                  </div>
+                  <div class="muted" id="pwOut" style="margin-top:10px;"></div>
                 </div>
 
                 <div class="muted" id="companyOut" style="margin-top:10px;"></div>
@@ -894,6 +927,52 @@
     <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
   </div>
 
+  <!-- Password Modal (hidden by default) -->
+  <div class="qh-modal-overlay" id="pwModalOverlay" aria-hidden="true">
+    <div class="qh-modal" role="dialog" aria-modal="true" aria-labelledby="pwModalTitle">
+      <div class="qh-modal-head">
+        <div>
+          <h3 id="pwModalTitle">Update Password</h3>
+          <div class="muted">Enter your old password to set a new one.</div>
+        </div>
+        <button class="btn" id="btnClosePwModal" type="button">Close</button>
+      </div>
+
+      <div class="qh-modal-body">
+        <div class="row2">
+          <div>
+            <label for="pw_old_modal">Old password</label>
+            <input id="pw_old_modal" type="password" autocomplete="current-password" placeholder="Old password">
+          </div>
+          <div>
+            <label for="pw_new_modal">New password</label>
+            <input id="pw_new_modal" type="password" autocomplete="new-password" placeholder="New password">
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="row2">
+          <div>
+            <label for="pw_confirm_modal">Confirm new password</label>
+            <input id="pw_confirm_modal" type="password" autocomplete="new-password" placeholder="Confirm new password">
+          </div>
+          <div class="note muted">
+            Forgot your old password?
+            <a href="/auth/reset" target="_self" rel="noopener">Forgot Password?</a>
+          </div>
+        </div>
+
+        <div class="muted" id="pwModalOut" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="qh-modal-foot">
+        <button class="btn" id="btnCancelPwModal" type="button">Cancel</button>
+        <button class="btn blue" id="btnSavePwModal" type="button">Save Password</button>
+      </div>
+    </div>
+  </div>
+
 <script>
   const session = QH.requireSession("employer");
   if (!session) throw new Error("No session");
@@ -926,13 +1005,12 @@
     const site = String(__profile?.company_website || "").trim();
     const logo = String(__profile?.company_logo_url || "").trim();
 
-    // logo preview
+    // logo preview (KEEP CURRENT SIZE/STYLES — DO NOT CHANGE)
     const img = document.getElementById("companyLogoImg");
     if (logo && isHttpUrl(logo)){
       img.style.display = "block";
       img.src = logo;
     } else {
-      // keep it visible but harmless (or hide if you prefer)
       img.style.display = "block";
       img.src = "/QuickHireTransparentLogo02.png";
     }
@@ -943,13 +1021,18 @@
     if (site && isHttpUrl(site)){
       siteWrap.innerHTML = `<a href="${escapeHtml(site)}" target="_blank" rel="noopener">${escapeHtml(safeLinkText(site))}</a>`;
     } else {
-      siteWrap.textContent = site ? site : "";
+      siteWrap.innerHTML = `<span class="muted">${site ? escapeHtml(site) : "Website not set"}</span>`;
     }
 
     const email = String(__profile?.employer_email || "").trim();
     const phone = String(__profile?.employer_phone || "").trim();
-    const contact = [email ? ("Email: " + email) : "", phone ? ("Phone: " + phone) : ""].filter(Boolean).join(" • ");
-    document.getElementById("companyContactText").textContent = contact;
+
+    const parts = [];
+    parts.push(email ? ("Email: " + email) : "Email not set");
+    parts.push(phone ? ("Phone: " + phone) : "Phone not set");
+
+    document.getElementById("companyContactText").innerHTML =
+      `<span class="muted">${escapeHtml(parts.join(" • "))}</span>`;
   }
 
   function enterCompanyEdit(){
@@ -971,6 +1054,10 @@
     document.getElementById("employer_phone").value = String(__profileDraft.employer_phone || "");
 
     document.getElementById("companyOut").textContent = "";
+
+    // Option A: password actions ONLY show while editing
+    document.getElementById("pwEditActions").style.display = "block";
+    document.getElementById("pwOut").textContent = "";
   }
 
   function exitCompanyEdit(discard){
@@ -984,6 +1071,10 @@
     document.getElementById("btnCancelCompany").style.display = "none";
 
     document.getElementById("companyOut").textContent = "";
+
+    // Option A: hide password actions when not editing
+    document.getElementById("pwEditActions").style.display = "none";
+    document.getElementById("pwOut").textContent = "";
   }
 
   // Endpoints used (we’ll implement backend later in one pass):
@@ -1085,21 +1176,53 @@
     setTimeout(()=>{ out.textContent=""; }, 1400);
   }
 
+  // ----------------------------
+  // Password modal logic (Option A)
+  // ----------------------------
+  const pwOverlay = document.getElementById("pwModalOverlay");
+
+  function openPwModal(){
+    document.getElementById("pwModalOut").textContent = "";
+    pwOverlay.classList.add("open");
+    pwOverlay.setAttribute("aria-hidden", "false");
+    setTimeout(()=>{ document.getElementById("pw_old_modal").focus(); }, 0);
+  }
+
+  function closePwModal(){
+    pwOverlay.classList.remove("open");
+    pwOverlay.setAttribute("aria-hidden", "true");
+    document.getElementById("pwModalOut").textContent = "";
+  }
+
   async function changePassword(){
-    const out = document.getElementById("pwOut");
-    out.textContent = "";
+    const outInline = document.getElementById("pwOut");
+    const outModal = document.getElementById("pwModalOut");
+    if (outInline) outInline.textContent = "";
+    if (outModal) outModal.textContent = "";
 
-    const old_password = document.getElementById("pw_old").value;
-    const new_password = document.getElementById("pw_new").value;
-    const confirm = document.getElementById("pw_confirm").value;
+    const old_password = document.getElementById("pw_old_modal").value;
+    const new_password = document.getElementById("pw_new_modal").value;
+    const confirm = document.getElementById("pw_confirm_modal").value;
 
-    if (!old_password || !new_password || !confirm) return QH.toast("Required", "Fill out all password fields.");
-    if (new_password.length < 8) return QH.toast("Password", "New password must be at least 8 characters.");
-    if (new_password !== confirm) return QH.toast("Password", "New password and confirmation do not match.");
+    if (!old_password || !new_password || !confirm) {
+      QH.toast("Required", "Fill out all password fields.");
+      if (outModal) outModal.textContent = "Please fill out all fields.";
+      return;
+    }
+    if (new_password.length < 8) {
+      QH.toast("Password", "New password must be at least 8 characters.");
+      if (outModal) outModal.textContent = "New password must be at least 8 characters.";
+      return;
+    }
+    if (new_password !== confirm) {
+      QH.toast("Password", "New password and confirmation do not match.");
+      if (outModal) outModal.textContent = "New password and confirmation do not match.";
+      return;
+    }
 
-    const btn = document.getElementById("btnChangePw");
+    const btn = document.getElementById("btnSavePwModal");
     btn.disabled = true;
-    out.textContent = "Updating…";
+    if (outModal) outModal.textContent = "Updating…";
 
     const res = await QH.apiPost("change_password", {
       session_token: session.session_token,
@@ -1110,23 +1233,42 @@
     btn.disabled = false;
 
     if (!res || !res.ok){
-      out.textContent = "❌ " + (res && res.error ? res.error : "Unable to update password.");
+      const msg = (res && res.error) ? res.error : "Unable to update password.";
+      if (outModal) outModal.textContent = "❌ " + msg;
+      QH.toast("Failed", msg);
       return;
     }
 
-    document.getElementById("pw_old").value = "";
-    document.getElementById("pw_new").value = "";
-    document.getElementById("pw_confirm").value = "";
+    // Clear fields
+    document.getElementById("pw_old_modal").value = "";
+    document.getElementById("pw_new_modal").value = "";
+    document.getElementById("pw_confirm_modal").value = "";
 
-    out.textContent = "✅ Updated.";
+    if (outInline) outInline.textContent = "✅ Password updated.";
     QH.toast("Updated", "Password updated.");
-    setTimeout(()=>{ out.textContent=""; }, 1400);
+
+    closePwModal();
+    setTimeout(()=>{ if (outInline) outInline.textContent = ""; }, 1400);
   }
 
   document.getElementById("btnEditCompany").addEventListener("click", enterCompanyEdit);
   document.getElementById("btnCancelCompany").addEventListener("click", () => exitCompanyEdit(true));
   document.getElementById("btnSaveCompany").addEventListener("click", saveEmployerProfile);
-  document.getElementById("btnChangePw").addEventListener("click", changePassword);
+
+  document.getElementById("btnOpenPwModal").addEventListener("click", openPwModal);
+  document.getElementById("btnClosePwModal").addEventListener("click", closePwModal);
+  document.getElementById("btnCancelPwModal").addEventListener("click", closePwModal);
+  document.getElementById("btnSavePwModal").addEventListener("click", changePassword);
+
+  // Click outside to close
+  pwOverlay.addEventListener("click", (e) => {
+    if (e.target === pwOverlay) closePwModal();
+  });
+
+  // ESC to close
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && pwOverlay.classList.contains("open")) closePwModal();
+  });
 
   // ----------------------------
   // Existing dashboard logic
