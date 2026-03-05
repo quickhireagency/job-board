@@ -1,0 +1,1006 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QuickHire™ — Job Detail</title>
+
+  <!-- SEO -->
+  <meta name="robots" content="index,follow" />
+  <meta name="description" content="View this job posting on QuickHire™." />
+  <link rel="canonical" href="https://jobboard.quickhireagency.com/job.html" />
+
+  <!-- Config (API base) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (same vibe as index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 240px;
+      flex: 1 1 auto;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px;
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex: 1 1 auto;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+      position:relative;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+    .btn.danger{
+      border-color: rgba(180,35,24,.35);
+      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
+      color: #3a0f0b;
+    }
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; filter:saturate(.9); }
+
+    /* My Account dropdown */
+    .dropdown{ position:relative; display:inline-flex; }
+    .menu{
+      position:absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 180px;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display:none;
+      z-index: 50;
+    }
+    .menu a, .menu button{
+      width:100%;
+      border:none;
+      background:transparent;
+      text-align:left;
+      padding:10px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+      color: var(--text);
+      text-decoration:none;
+      display:block;
+    }
+    .menu a:hover, .menu button:hover{
+      background: rgba(43,134,214,.10);
+      text-decoration:none;
+    }
+    .menu .danger{ color: var(--danger); }
+    .dropdown.open .menu{ display:block; }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+
+    .detail{
+      padding:16px;
+    }
+    .detail h1{margin:0 0 8px 0; font-size:20px}
+    .muted{ color:var(--muted); font-size:12px; line-height:1.35; }
+
+    .pill{
+      border:1px solid rgba(10,30,20,.14);
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:11px;
+      color:var(--muted);
+      background: rgba(255,255,255,.75);
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      line-height:1;
+      white-space:nowrap;
+    }
+
+    /* Facts row */
+    .facts{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin:10px 0 12px;
+      align-items:center;
+    }
+    .verified-inline{
+      display:inline-flex;
+      align-items:center;
+      flex: 0 0 auto;
+    }
+    .verified-badge{
+      height:90px;
+      width:auto;
+      display:block;
+    }
+
+    .box{
+      background: rgba(10,30,20,.04);
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      padding:12px;
+      margin-top:12px;
+    }
+    pre{
+      margin:0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-family: inherit;
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    /* Company block */
+    .company-block{
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(10,30,20,.12);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:8px;
+    }
+    .company-logo{
+      display:block;
+      max-width: 180px;
+      width: 100%;
+      height:auto;
+    }
+    .company-name{
+      font-weight: 1000;
+      letter-spacing:.2px;
+    }
+    .company-site{
+      font-weight: 800;
+      font-size: 13px;
+      word-break: break-word;
+    }
+
+    /* Footer logo + legal links (copied from index) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px;
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+
+    /* Mobile: make actions readable + big tap targets */
+    @media (max-width: 720px){
+      .brand{ width:100%; min-width:0; }
+      .brand img{ height:78px; }
+
+      .actions{
+        width:100%;
+        justify-content:flex-start;
+      }
+      .actions .btn,
+      .actions .dropdown{
+        flex: 1 1 calc(50% - 10px);
+        min-width: 160px;
+      }
+
+      .verified-badge{ max-width: 200px; }
+      .company-logo{ max-width: 160px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="QuickHire brand">
+        <a href="https://jobboard.quickhireagency.com" target="_self" rel="noopener">
+          <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+          <div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Job Detail</div>
+            <div class="sub">A single job posting (shareable link)</div>
+          </div>
+        </a>
+      </div>
+
+      <div class="actions" aria-label="Top actions">
+        <a class="btn" id="backBtn" href="/" target="_self">Back to Job Board</a>
+        <a class="btn" id="helpBtn" href="/help.html" target="_self">Help</a>
+
+        <button class="btn blue" id="loginBtn" type="button">Login / Sign Up</button>
+
+        <div class="dropdown" id="acctWrap" style="display:none;">
+          <button class="btn blue" id="acctBtn" aria-haspopup="true" aria-expanded="false" type="button">My Account</button>
+          <div class="menu" id="acctMenu" role="menu" aria-label="My Account menu">
+            <a href="/candidate/dashboard.html" target="_self" role="menuitem">Dashboard</a>
+            <button class="danger" id="logoutBtn" type="button" role="menuitem">Logout</button>
+          </div>
+        </div>
+
+        <a class="btn primary" id="employerBtn" href="/employer/dashboard.html" target="_self">Employer Portal</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="panel" aria-label="Job detail">
+      <div class="panel-header">
+        <div>
+          <h2>Overview</h2>
+          <div class="meta" id="detailMeta">Loading…</div>
+        </div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+          <button class="btn danger" id="reportBtn" disabled type="button">Report Job</button>
+          <button class="btn primary" id="applyBtn" disabled type="button">Apply</button>
+        </div>
+      </div>
+
+      <div class="detail" id="jobDetail">
+        <div class="muted">Loading job…</div>
+      </div>
+    </div>
+
+    <!-- Footer (same as index.html) -->
+    <style>
+      footer,
+      #footer,
+      .sqs-footer,
+      .Footer,
+      .Footer-inner,
+      .footer-sections,
+      .footer-sections .page-section,
+      .footer-sections .content-wrapper,
+      .footer-sections .content,
+      .footer-sections .sqs-layout,
+      .footer-sections .sqs-row,
+      .footer-sections .sqs-col-12,
+      .footer-sections .sqs-block,
+      .footer-sections .sqs-block-content{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      .footer-sections .sqs-block:last-child,
+      .footer-sections .sqs-block-content:last-child{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+      .page-section:last-of-type{
+        padding-bottom: 0 !important;
+        margin-bottom: 0 !important;
+      }
+
+      .qh-footer{
+        max-width: 1100px;
+        margin: 0 auto !important;
+        padding: 0 !important;
+        box-sizing: border-box;
+      }
+      .qh-footer, .qh-footer *{ box-sizing: border-box; }
+
+      .qh-footer-grid{
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 22px;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      @media (min-width: 900px){
+        .qh-footer-grid{
+          grid-template-columns: 1.2fr 1fr 1fr;
+          gap: 26px;
+        }
+      }
+
+      .qh-footer h3{ margin: 0 0 10px; font-size: 1.05rem; line-height: 1.25; }
+      .qh-footer p{ margin: 0 0 10px; line-height: 1.6; }
+      .qh-footer a{ text-decoration: underline; }
+
+      .qh-footer address{ font-style: normal; margin: 0; line-height: 1.65; }
+      .qh-line{ display:block; margin:0; padding:0; text-indent:0; }
+
+      .qh-footer-legal{
+        margin: 18px 0 0;
+        padding: 14px 0 0;
+        border-top: 1px solid rgba(0,0,0,0.15);
+      }
+
+      .qh-footer-links{
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px 18px;
+        align-items: center;
+        justify-content:center;
+        margin: 10px 0 0;
+        padding: 0;
+      }
+
+      .qh-badge{
+        margin: 10px 0 0;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .qh-footer > *:last-child,
+      .qh-footer-legal > *:last-child{
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+      }
+    </style>
+
+    <footer class="qh-footer" aria-label="QuickHire footer">
+      <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+          <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
+        </a>
+      </div>
+
+      <p style="text-align:center;">
+        <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
+      </p>
+
+      <div class="qh-footer-grid">
+        <section aria-label="Contact Us">
+          <h3>Contact Us</h3>
+          <p>
+            <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+            <a href="tel:+13174421437">(317) 442-1437</a>
+          </p>
+        </section>
+
+        <section aria-label="Location">
+          <h3>Location</h3>
+          <address>
+            <span class="qh-line">151 N. Delaware Street</span>
+            <span class="qh-line">Suite 122</span>
+            <span class="qh-line">Indianapolis, IN 46204</span>
+          </address>
+        </section>
+
+        <section aria-label="Hours of Operation">
+          <h3>Hours of Operation</h3>
+          <p>
+            Monday – Friday: 9:00 AM – 5:00 PM (ET)<br>
+            Saturday: Closed<br>
+            Sunday: Closed
+          </p>
+        </section>
+      </div>
+
+      <div class="qh-footer-legal" aria-label="Legal and EEO">
+        <h3>Equal Opportunity Employer</h3>
+
+        <p>
+          QuickHire™ is an equal opportunity employer, and does not discriminate on the basis of race, sex, religion, color, national origin,
+          gender identity, pregnancy status, disability status, veteran status or any other protected category as defined by law, and in accordance
+          with the Civil Rights Act of 1964, as amended, Americans with Disabilities Act of 1990, as amended, the Vietnam Era Veterans’ Readjustment
+          Assistance Act of 1974, as amended, Uniformed Services Employment &amp; Reemployment Rights Act of 1994, as amended, and the Rehabilitation
+          Act of 1973, as amended.
+        </p>
+
+        <p>
+          If you believe you have experienced discrimination in the employment process, you may contact the Equal Employment Opportunity Commission
+          by visiting <a href="https://www.eeoc.gov" target="_self" rel="noopener">www.eeoc.gov</a> or by mail at:
+          <span class="qh-line">131 M Street, NE, Washington, D.C., 20507</span>
+          <span class="qh-line">or for IN, KY, MI applicant(s) &amp; employee(s): 115 W. Washington Street, South Tower, Suite 600, Indianapolis, IN 46204.</span>
+        </p>
+
+        <p class="qh-badge">VETERAN OWNED BUSINESS</p>
+
+        <nav class="qh-footer-links" aria-label="Footer links">
+          <a href="/legal/terms.html" target="_self">Terms of Service</a>
+          <a href="/legal/privacy.html" target="_self">Privacy Policy</a>
+          <a href="/legal/veterans.html" target="_self">Veteran’s Policy</a>
+          <a href="/legal/eeo.html" target="_self">EEO Policy</a>
+          <a href="/legal/osha.html" target="_self">OSHA Policy</a>
+          <a href="/legal/drug-alcohol.html" target="_self">Drug Free Policy</a>
+        </nav>
+
+        <div class="qh-powered" aria-label="Powered by Cook Technology Services">
+          <a href="https://cts.cook-international.com/" target="_self" rel="noopener">
+            POWERED BY COOK TECHNOLOGY SERVICES
+          </a>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
+  </div>
+
+  <!-- Report modal (same behavior as index) -->
+  <div class="modal-backdrop" id="reportModal" aria-hidden="true" style="position:fixed; inset:0; background: rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index: 100; padding: 18px;">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Report job" style="width:100%; max-width:560px; background: rgba(255,255,255,.98); border:1px solid var(--line); border-radius:18px; box-shadow: var(--shadow); overflow:hidden;">
+      <div class="modal-head" style="padding:14px 14px 10px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:10px; background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));">
+        <h3 style="margin:0; font-size:14px;">Report this job</h3>
+        <button class="btn" id="reportCloseBtn" type="button">Close</button>
+      </div>
+      <div class="modal-body" style="padding:14px;">
+        <div class="muted" style="margin-bottom:10px;">
+          Reports are reviewed by our team. Please be specific.
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label for="complaintTypeSel">Reason</label>
+          <select id="complaintTypeSel">
+            <option value="">Select a reason…</option>
+            <option>Scam / Fraud</option>
+            <option>Misleading job posting</option>
+            <option>Discrimination concern</option>
+            <option>Harassment / abusive content</option>
+            <option>Incorrect location / pay / details</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="complaintMsg">Message</label>
+          <textarea id="complaintMsg" placeholder="Describe what’s wrong with this posting…"></textarea>
+        </div>
+
+        <div class="muted" style="margin-top:10px;">
+          You must be logged in as a candidate to submit a report.
+        </div>
+      </div>
+      <div class="modal-actions" style="padding:12px 14px 14px; border-top:1px solid var(--line); display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+        <button class="btn" id="reportCancelBtn" type="button">Cancel</button>
+        <button class="btn danger" id="reportSubmitBtn" type="button">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ----------------------------
+    // Config / State
+    // ----------------------------
+    const API_BASE = (window.QH_CONFIG && window.QH_CONFIG.API_BASE) || "";
+
+    const state = {
+      jobId: "",
+      job: null,
+      session: (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {})
+    };
+
+    const PATHS = {
+      jobBoard: "/",
+      candidateLogin: "/auth/login.html",
+      employerPortal: "/employer/dashboard.html",
+      applyPage: "/apply/index.html"
+    };
+
+    function qs(sel){ return document.querySelector(sel); }
+    function setText(el, txt){ el.textContent = txt; }
+
+    function escapeHtml(s){
+      return String(s == null ? "" : s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function normalizeEmploymentType(v){
+      const s = String(v || "").trim().toLowerCase();
+      if (!s) return "";
+      if (s.includes("part")) return "Part Time";
+      if (s.includes("full")) return "Full Time";
+      return String(v || "").trim();
+    }
+
+    function getJobIdFromUrl(){
+      try{
+        const url = new URL(window.location.href);
+        return (url.searchParams.get("job_id") || "").trim();
+      }catch(e){
+        return "";
+      }
+    }
+
+    function setCanonicalForJob(jobId){
+      try{
+        const canonical = "https://jobboard.quickhireagency.com/job.html?job_id=" + encodeURIComponent(jobId);
+        const link = document.querySelector('link[rel="canonical"]');
+        if (link) link.setAttribute("href", canonical);
+
+        // keep robots already index/follow; update description lightly
+      }catch(e){ /* ignore */ }
+    }
+
+    function setMetaFromJob(j){
+      try{
+        const title = j && j.job_title ? (String(j.job_title) + " — QuickHire™ Job Board") : "QuickHire™ — Job Detail";
+        document.title = title;
+
+        const desc = String(j && (j.job_description || "") || "").replace(/\s+/g," ").trim();
+        const snippet = (desc.length > 155) ? (desc.slice(0, 152) + "...") : (desc || "View this job posting on QuickHire™.");
+        const metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) metaDesc.setAttribute("content", snippet);
+      }catch(e){ /* ignore */ }
+    }
+
+    async function apiGet(params){
+      const url = API_BASE + "?" + new URLSearchParams(params).toString();
+      const res = await fetch(url, { method:"GET" });
+      const json = await res.json();
+      return json;
+    }
+
+    async function apiPost(body){
+      const res = await fetch(API_BASE, {
+        method:"POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(body)
+      });
+      const json = await res.json();
+      return json;
+    }
+
+    // ----------------------------
+    // Account UI
+    // ----------------------------
+    function syncAccountUi(){
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+      const isCandidate = !!sess.session_token && sess.role === "job_seeker";
+      qs("#acctWrap").style.display = isCandidate ? "inline-flex" : "none";
+    }
+
+    function closeAccountMenu(){
+      const wrap = qs("#acctWrap");
+      if (wrap) wrap.classList.remove("open");
+      const btn = qs("#acctBtn");
+      if (btn) btn.setAttribute("aria-expanded","false");
+    }
+
+    // ----------------------------
+    // Render
+    // ----------------------------
+    function renderNotFound(msg){
+      setText(qs("#detailMeta"), "Not found");
+      qs("#applyBtn").disabled = true;
+      qs("#reportBtn").disabled = true;
+      qs("#jobDetail").innerHTML = `
+        <h1>Job not found</h1>
+        <div class="muted">${escapeHtml(msg || "This job link is invalid or the job is no longer available.")}</div>
+        <div class="box">
+          <div class="muted" style="font-weight:900; margin-bottom:6px;">Next step</div>
+          <div class="muted">
+            <a class="btn" href="${PATHS.jobBoard}" target="_self" style="margin-top:8px;">Back to Job Board</a>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderJob(j){
+      const loc = [j.city, j.state, j.country].filter(Boolean).join(", ") || (j.location || "");
+      const empType = normalizeEmploymentType(j.employment_type);
+      const pay = (j.pay_min || j.pay_max) ? `${j.pay_min||""} – ${j.pay_max||""} ${j.pay_currency||""}`.trim() : "";
+      const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
+
+      // company fields (same logic as index.html right panel)
+      const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
+      const companyLogo = String(j.company_logo_url || j.logo_url || "").trim();
+      const companySite = String(j.company_website || j.website || "").trim();
+
+      setText(qs("#detailMeta"), "Job detail");
+      qs("#applyBtn").disabled = false;
+      qs("#reportBtn").disabled = false;
+
+      qs("#jobDetail").innerHTML = `
+        <h1>${escapeHtml(j.job_title || "Untitled role")}</h1>
+
+        <div class="facts" aria-label="Job facts">
+          ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
+          ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
+          ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
+          ${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
+          ${verified ? `
+            <span class="verified-inline">
+              <img class="verified-badge" src="/QuickHireVerifiedEmployerBadge.png" alt="Verified Employer" />
+            </span>
+          ` : ``}
+        </div>
+
+        ${(companyName || companyLogo || companySite) ? `
+          <div class="company-block" aria-label="Company information">
+            ${companyLogo ? `<img class="company-logo" src="${escapeHtml(companyLogo)}" alt="${escapeHtml(companyName || "Company logo")}" loading="lazy" />` : ``}
+            ${companyName ? `<div class="company-name">${escapeHtml(companyName)}</div>` : ``}
+            ${companySite ? `<div class="company-site"><a href="${escapeHtml(companySite)}" target="_blank" rel="noopener">${escapeHtml(companySite)}</a></div>` : ``}
+          </div>
+        ` : ``}
+
+        <div class="muted" style="margin-top:10px;">Job ID: ${escapeHtml(j.job_id || state.jobId || "")}</div>
+
+        <div class="box" style="margin-top:14px;">
+          <div class="muted" style="margin-bottom:6px; font-weight:900;">Description</div>
+          <pre>${escapeHtml(j.job_description || "")}</pre>
+        </div>
+
+        ${j.benefits_summary ? `
+          <div class="box">
+            <div class="muted" style="margin-bottom:6px; font-weight:900;">Benefits Summary</div>
+            <pre>${escapeHtml(j.benefits_summary)}</pre>
+          </div>
+        ` : ``}
+
+        ${String(j.apply_url || "").trim() ? `
+          <div class="box">
+            <div class="muted" style="margin-bottom:6px; font-weight:900;">External apply</div>
+            <div class="muted">This job has an external application link. Clicking Apply will take you to the employer’s site.</div>
+          </div>
+        ` : `
+          <div class="box">
+            <div class="muted" style="margin-bottom:6px; font-weight:900;">How to apply</div>
+            <div class="muted">You must have a Job Seeker account and be logged in to apply.</div>
+          </div>
+        `}
+      `;
+    }
+
+    // ----------------------------
+    // Apply / Report
+    // ----------------------------
+    async function goApply(){
+      if (!state.jobId) return;
+
+      const current = state.job || {};
+      const external = String(current.apply_url || "").trim();
+
+      // External apply branch + log click
+      if (external){
+        try{
+          const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+          await apiPost({
+            mode: "public_api",
+            action: "external_apply_click",
+            session_token: (sess && sess.session_token) ? sess.session_token : "",
+            job_id: state.jobId,
+            apply_url: external
+          });
+        }catch(e){ /* ignore */ }
+
+        window.location.href = external;
+        return;
+      }
+
+      // Internal apply unchanged
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+      const applyUrl = PATHS.applyPage + "?job_id=" + encodeURIComponent(state.jobId);
+
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(applyUrl);
+        return;
+      }
+
+      window.location.href = applyUrl;
+    }
+
+    function openReportModal(){
+      if (!state.jobId) return;
+
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        const here = window.location.pathname + window.location.search;
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
+        return;
+      }
+
+      qs("#complaintTypeSel").value = "";
+      qs("#complaintMsg").value = "";
+      qs("#reportModal").style.display = "flex";
+      qs("#reportModal").setAttribute("aria-hidden","false");
+    }
+
+    function closeReportModal(){
+      qs("#reportModal").style.display = "none";
+      qs("#reportModal").setAttribute("aria-hidden","true");
+    }
+
+    async function submitReport(){
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        alert("You must be logged in as a candidate to submit a report.");
+        closeReportModal();
+        return;
+      }
+
+      const complaintType = (qs("#complaintTypeSel").value || "").trim();
+      const message = (qs("#complaintMsg").value || "").trim();
+
+      if (!state.jobId){
+        alert("Missing job_id.");
+        return;
+      }
+      if (!complaintType){
+        alert("Please select a reason.");
+        return;
+      }
+      if (!message || message.length < 10){
+        alert("Please enter a message (at least 10 characters).");
+        return;
+      }
+
+      qs("#reportSubmitBtn").disabled = true;
+
+      try{
+        const json = await apiPost({
+          mode: "public_api",
+          action: "report_job",
+          session_token: sess.session_token,
+          job_id: state.jobId,
+          complaint_type: complaintType,
+          message: message
+        });
+
+        if (!json.ok){
+          alert("Unable to submit report: " + (json.error || "Unknown error"));
+          return;
+        }
+
+        alert("Report submitted. Thank you.");
+        closeReportModal();
+      } catch(e){
+        alert("Unable to submit report. Please try again.");
+      } finally {
+        qs("#reportSubmitBtn").disabled = false;
+      }
+    }
+
+    // ----------------------------
+    // Load job
+    // ----------------------------
+    async function loadJob(){
+      if (!API_BASE){
+        renderNotFound("Missing API base. Set it in /config/config.js");
+        return;
+      }
+
+      qs("#jobDetail").innerHTML = `<div class="muted">Loading job…</div>`;
+      setText(qs("#detailMeta"), "Loading…");
+
+      const jobId = getJobIdFromUrl();
+      state.jobId = jobId;
+
+      if (!jobId){
+        renderNotFound("No job_id provided in the URL.");
+        return;
+      }
+
+      setCanonicalForJob(jobId);
+
+      const json = await apiGet({
+        mode:"public_api",
+        action:"get_job",
+        job_id: jobId
+      });
+
+      if (!json.ok || !json.job){
+        renderNotFound(json && json.error ? json.error : "This job may have been removed.");
+        return;
+      }
+
+      state.job = json.job;
+      setMetaFromJob(state.job);
+      renderJob(state.job);
+    }
+
+    // ----------------------------
+    // Wire up
+    // ----------------------------
+    function init(){
+      // year
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+
+      syncAccountUi();
+
+      // Candidate login
+      qs("#loginBtn").addEventListener("click", () => {
+        const here = window.location.pathname + window.location.search;
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
+      });
+
+      // Employer portal: if not logged in as employer, force employer role in login (matches index flow)
+      qs("#employerBtn").addEventListener("click", (e) => {
+        try{
+          const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+          const isEmployer = !!sess.session_token && (sess.role === "employer");
+          if (isEmployer) return;
+        }catch(err){ /* ignore */ }
+
+        e.preventDefault();
+        window.location.href = PATHS.candidateLogin + "?role=employer&next=" + encodeURIComponent(PATHS.employerPortal);
+      });
+
+      // My Account dropdown toggle + logout
+      qs("#acctBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        const wrap = qs("#acctWrap");
+        if (!wrap) return;
+        const open = wrap.classList.toggle("open");
+        qs("#acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
+      });
+
+      qs("#logoutBtn").addEventListener("click", () => {
+        try{
+          if (window.QH && typeof QH.clearSession === "function") QH.clearSession();
+          else localStorage.removeItem("qh_session");
+        }catch(e){ /* ignore */ }
+        closeAccountMenu();
+        syncAccountUi();
+        alert("Logged out.");
+      });
+
+      // close menu on outside click
+      document.addEventListener("click", (e) => {
+        const wrap = qs("#acctWrap");
+        if (!wrap) return;
+        if (!wrap.contains(e.target)) closeAccountMenu();
+      });
+
+      // Apply + Report
+      qs("#applyBtn").addEventListener("click", goApply);
+      qs("#reportBtn").addEventListener("click", openReportModal);
+
+      qs("#reportCloseBtn").addEventListener("click", closeReportModal);
+      qs("#reportCancelBtn").addEventListener("click", closeReportModal);
+      qs("#reportSubmitBtn").addEventListener("click", submitReport);
+
+      // click outside modal to close
+      qs("#reportModal").addEventListener("click", (e) => {
+        if (e.target === qs("#reportModal")) closeReportModal();
+      });
+
+      loadJob();
+    }
+
+    init();
+  </script>
+</body>
+</html>
