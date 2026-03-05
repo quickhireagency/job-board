@@ -374,32 +374,95 @@
       .resume-frame iframe{ height: 520px; }
     }
 
-    /* Footer (same as your standard block) */
-    .qh-footer-logo-wrap{
+    /* Profile inline layout inside My Dashboard (merged) */
+    .dash-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .dash-row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 720px){
+      .dash-row2{ grid-template-columns: 1fr; }
+    }
+    .dash-actions{
       display:flex;
-      justify-content:center;
-      margin: 14px 0 8px;
-    }
-    .qh-footer-logo-wrap a{
-      display:inline-flex;
+      gap:10px;
+      flex-wrap:wrap;
       align-items:center;
-      justify-content:center;
-      text-decoration:none;
+      justify-content:flex-end;
     }
-    .qh-footer-logo{
-      height:102px;
-      width:auto;
+    label{
       display:block;
-    }
-    .qh-powered{
-      text-align:center;
-      margin-top: 10px;
+      font-size:12px;
       font-weight:900;
-      letter-spacing:.02em;
+      margin:0 0 6px;
+      color:var(--muted);
     }
-    .qh-powered a{
-      color: var(--blue);
-      text-decoration:underline;
+    input{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      font-size:13px;
+      outline:none;
+      font-family: var(--font);
+    }
+
+    /* Password modal (Employer-style) */
+    .qh-modal-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 9999;
+    }
+    .qh-modal-overlay.open{ display:flex; }
+
+    .qh-modal{
+      width: min(620px, 100%);
+      background: rgba(255,255,255,.98);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(16,24,40,.22);
+      overflow: hidden;
+    }
+    .qh-modal-head{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.88));
+    }
+    .qh-modal-head h3{ margin:0; font-size:14px; }
+    .qh-modal-body{ padding: 14px; }
+    .qh-modal-foot{
+      padding: 14px;
+      border-top: 1px solid var(--line);
+      display:flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Withdraw button grouping in app cards */
+    .app-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      margin-top:10px;
     }
   </style>
 </head>
@@ -408,7 +471,8 @@
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+        <!-- FIXED: header logo goes to job board -->
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
             <div style="font-weight:1000; letter-spacing:.2px;">Job Board</div>
@@ -433,14 +497,97 @@
   </div>
 
   <div class="wrap">
-    <div class="notice">
-      <h3>My Dashboard</h3>
-      <div class="muted" id="whoami">Loading your account…</div>
+    <!-- MERGED: My Dashboard + Profile (single card) -->
+    <div class="notice" id="dashCard">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+        <div>
+          <h3 style="margin:0 0 8px 0; font-size:14px;">My Dashboard</h3>
+          <div class="muted" id="whoami">Loading your account…</div>
+        </div>
+
+        <div class="dash-actions" id="profileActions">
+          <button class="btn" id="btnEditProfile" type="button">Edit</button>
+          <button class="btn primary" id="btnSaveProfile" type="button" style="display:none;">Save</button>
+          <button class="btn" id="btnCancelProfile" type="button" style="display:none;">Cancel</button>
+        </div>
+      </div>
+
+      <!-- READ MODE -->
+      <div id="profileRead" class="dash-grid" style="display:none;">
+        <div class="dash-row2">
+          <div>
+            <div class="muted" style="font-weight:900;">Name</div>
+            <div id="pName" style="font-weight:1000;">—</div>
+          </div>
+          <div>
+            <div class="muted" style="font-weight:900;">Username</div>
+            <div id="pUsername" style="font-weight:1000;">—</div>
+          </div>
+        </div>
+
+        <div class="dash-row2">
+          <div>
+            <div class="muted" style="font-weight:900;">Email</div>
+            <div id="pEmail" style="font-weight:1000;">—</div>
+          </div>
+          <div>
+            <div class="muted" style="font-weight:900;">Phone</div>
+            <div id="pPhone" style="font-weight:1000;">—</div>
+          </div>
+        </div>
+
+        <div class="muted" id="profileOut" style="margin-top:6px;"></div>
+      </div>
+
+      <!-- EDIT MODE -->
+      <div id="profileEdit" class="dash-grid" style="display:none;">
+        <div class="dash-row2">
+          <div>
+            <label for="first_name">First name</label>
+            <input id="first_name" placeholder="First name">
+          </div>
+          <div>
+            <label for="last_name">Last name</label>
+            <input id="last_name" placeholder="Last name">
+          </div>
+        </div>
+
+        <div class="dash-row2">
+          <div>
+            <label for="email">Email</label>
+            <input id="email" placeholder="you@email.com">
+            <div class="muted" style="margin-top:6px;">(Email edits will be saved after backend profile endpoints are added.)</div>
+          </div>
+          <div>
+            <label for="phone">Phone</label>
+            <input id="phone" placeholder="(317) 555-1234">
+          </div>
+        </div>
+
+        <!-- Option A: password actions only while editing -->
+        <div id="pwEditActions" style="margin-top:2px; display:none;">
+          <div style="height:10px;"></div>
+          <div class="dash-row2">
+            <div>
+              <div style="font-weight:1000; margin-bottom:6px;">Account Security</div>
+              <div class="muted">Password updates are hidden by default so your profile stays clean.</div>
+            </div>
+            <div style="display:flex; align-items:flex-end; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+              <button class="btn blue" id="btnOpenPwModal" type="button">Update Password</button>
+              <a class="btn" href="/auth/reset" target="_self" rel="noopener">Forgot Password?</a>
+            </div>
+          </div>
+
+          <div class="muted" id="pwOut" style="margin-top:10px;"></div>
+        </div>
+
+        <div class="muted" id="profileEditOut" style="margin-top:6px;"></div>
+      </div>
     </div>
 
     <div class="grid">
 
-      <!-- NEW: My Resume -->
+      <!-- My Resume (unchanged) -->
       <div class="panel" id="resumePanel">
         <div class="panel-header">
           <div>
@@ -464,7 +611,7 @@
         </div>
       </div>
 
-      <!-- Existing: My Applications -->
+      <!-- My Applications (unchanged + Withdraw button) -->
       <div class="panel">
         <div class="panel-header">
           <div>
@@ -575,7 +722,8 @@
 
     <footer class="qh-footer" aria-label="QuickHire footer">
       <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+        <!-- FIXED: footer logo goes to main site -->
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
           <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
         </a>
       </div>
@@ -658,6 +806,79 @@
     </script>
   </div>
 
+  <!-- Password Modal (Employer-style; hidden by default) -->
+  <div class="qh-modal-overlay" id="pwModalOverlay" aria-hidden="true">
+    <div class="qh-modal" role="dialog" aria-modal="true" aria-labelledby="pwModalTitle">
+      <div class="qh-modal-head">
+        <div>
+          <h3 id="pwModalTitle">Update Password</h3>
+          <div class="muted">Enter your old password to set a new one.</div>
+        </div>
+        <button class="btn" id="btnClosePwModal" type="button">Close</button>
+      </div>
+
+      <div class="qh-modal-body">
+        <div class="dash-row2">
+          <div>
+            <label for="pw_old_modal">Old password</label>
+            <input id="pw_old_modal" type="password" autocomplete="current-password" placeholder="Old password">
+          </div>
+          <div>
+            <label for="pw_new_modal">New password</label>
+            <input id="pw_new_modal" type="password" autocomplete="new-password" placeholder="New password">
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="dash-row2">
+          <div>
+            <label for="pw_confirm_modal">Confirm new password</label>
+            <input id="pw_confirm_modal" type="password" autocomplete="new-password" placeholder="Confirm new password">
+          </div>
+          <div class="card" style="box-shadow:none; margin:0; padding:12px;">
+            <div class="muted">
+              Forgot your old password?
+              <a href="/auth/reset" target="_self" rel="noopener">Forgot Password?</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="muted" id="pwModalOut" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="qh-modal-foot">
+        <button class="btn" id="btnCancelPwModal" type="button">Cancel</button>
+        <button class="btn blue" id="btnSavePwModal" type="button">Save Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Withdraw Confirm Modal -->
+  <div class="qh-modal-overlay" id="wdModalOverlay" aria-hidden="true">
+    <div class="qh-modal" role="dialog" aria-modal="true" aria-labelledby="wdModalTitle">
+      <div class="qh-modal-head">
+        <div>
+          <h3 id="wdModalTitle">Withdraw Application</h3>
+          <div class="muted">This cannot be undone.</div>
+        </div>
+        <button class="btn" id="btnCloseWdModal" type="button">Close</button>
+      </div>
+
+      <div class="qh-modal-body">
+        <div class="muted" id="wdModalText">
+          Withdraw this application? You will no longer be considered unless you apply again.
+        </div>
+        <div class="muted" id="wdModalOut" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="qh-modal-foot">
+        <button class="btn" id="btnCancelWdModal" type="button">Cancel</button>
+        <button class="btn danger" id="btnConfirmWithdraw" type="button">Confirm Withdraw</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const API_BASE = (window.QH_CONFIG && window.QH_CONFIG.API_BASE) || "";
 
@@ -713,6 +934,7 @@
       if (s === "interview") return { idx: 2 };
       if (s === "offer") return { idx: 3 };
 
+      // Keep tracker language unchanged; withdrawals only change the status pill text.
       return { idx: 0 };
     }
 
@@ -780,7 +1002,191 @@
     }
 
     // ---------------------------
-    // Resume (NEW)
+    // Profile (merged into My Dashboard card)
+    // ---------------------------
+    let __profile = null;
+    let __profileDraft = null;
+
+    function renderProfile(){
+      const s = requireJobSeeker();
+      if (!s) return;
+
+      // Basic local profile from session (no backend endpoints yet)
+      const first = String(s.first_name || s.first || "").trim();
+      const last  = String(s.last_name || s.last || "").trim();
+      const email = String(s.email || "").trim();
+      const user  = String(s.username || "").trim();
+      const phone = String(s.phone || "").trim();
+
+      __profile = {
+        first_name: first,
+        last_name: last,
+        email: email,
+        username: user,
+        phone: phone
+      };
+
+      // Signed-in message: email • username
+      const parts = [];
+      if (email) parts.push(email);
+      if (user) parts.push(user);
+      qs("#whoami").textContent = parts.length ? ("Signed in as " + parts.join(" • ")) : "Signed in.";
+
+      // Read view
+      qs("#pName").textContent = (first || last) ? ([first,last].filter(Boolean).join(" ")) : "Name not set";
+      qs("#pUsername").textContent = user || "Username not set";
+      qs("#pEmail").textContent = email || "Email not set";
+      qs("#pPhone").textContent = phone || "Phone not set";
+
+      qs("#profileRead").style.display = "block";
+      qs("#profileEdit").style.display = "none";
+      qs("#pwEditActions").style.display = "none";
+
+      qs("#btnEditProfile").style.display = "inline-flex";
+      qs("#btnSaveProfile").style.display = "none";
+      qs("#btnCancelProfile").style.display = "none";
+
+      qs("#profileOut").textContent = "";
+      qs("#profileEditOut").textContent = "";
+      qs("#pwOut").textContent = "";
+    }
+
+    function enterProfileEdit(){
+      if (!__profile) return;
+      __profileDraft = JSON.parse(JSON.stringify(__profile));
+
+      qs("#profileRead").style.display = "none";
+      qs("#profileEdit").style.display = "block";
+      qs("#pwEditActions").style.display = "block";
+
+      qs("#btnEditProfile").style.display = "none";
+      qs("#btnSaveProfile").style.display = "inline-flex";
+      qs("#btnCancelProfile").style.display = "inline-flex";
+
+      qs("#first_name").value = __profileDraft.first_name || "";
+      qs("#last_name").value = __profileDraft.last_name || "";
+      qs("#email").value = __profileDraft.email || "";
+      qs("#phone").value = __profileDraft.phone || "";
+
+      qs("#profileEditOut").textContent = "";
+      qs("#pwOut").textContent = "";
+    }
+
+    function exitProfileEdit(discard){
+      if (discard) __profileDraft = null;
+      qs("#profileRead").style.display = "block";
+      qs("#profileEdit").style.display = "none";
+      qs("#pwEditActions").style.display = "none";
+
+      qs("#btnEditProfile").style.display = "inline-flex";
+      qs("#btnSaveProfile").style.display = "none";
+      qs("#btnCancelProfile").style.display = "none";
+
+      qs("#profileEditOut").textContent = "";
+      qs("#pwOut").textContent = "";
+    }
+
+    async function saveProfile(){
+      // We are NOT adding backend endpoints yet.
+      // Save locally to session storage so the UI reflects edits without breaking anything.
+      const s = safeLoadSession();
+      if (!s || !s.session_token) return;
+
+      const first = qs("#first_name").value.trim();
+      const last  = qs("#last_name").value.trim();
+      const email = qs("#email").value.trim();
+      const phone = qs("#phone").value.trim();
+
+      // Username stays read-only
+      s.first_name = first;
+      s.last_name = last;
+      s.email = email;
+      s.phone = phone;
+
+      try{
+        if (window.QH && typeof QH.saveSession === "function") QH.saveSession(s);
+        else localStorage.setItem("qh_session", JSON.stringify(s));
+      }catch(e){ /* ignore */ }
+
+      qs("#profileEditOut").textContent = "✅ Saved (local). Backend profile save will be enabled when we add endpoints.";
+      setTimeout(()=>{ qs("#profileEditOut").textContent = ""; }, 1600);
+
+      renderProfile();
+      exitProfileEdit(true);
+    }
+
+    // ---------------------------
+    // Password modal (Employer-style; shared endpoint)
+    // ---------------------------
+    const pwOverlay = qs("#pwModalOverlay");
+
+    function openPwModal(){
+      qs("#pwModalOut").textContent = "";
+      pwOverlay.classList.add("open");
+      pwOverlay.setAttribute("aria-hidden", "false");
+      setTimeout(()=>{ qs("#pw_old_modal").focus(); }, 0);
+    }
+
+    function closePwModal(){
+      pwOverlay.classList.remove("open");
+      pwOverlay.setAttribute("aria-hidden", "true");
+      qs("#pwModalOut").textContent = "";
+    }
+
+    async function changePassword(){
+      const session = requireJobSeeker();
+      if (!session) return;
+
+      qs("#pwOut").textContent = "";
+      qs("#pwModalOut").textContent = "";
+
+      const old_password = qs("#pw_old_modal").value;
+      const new_password = qs("#pw_new_modal").value;
+      const confirm = qs("#pw_confirm_modal").value;
+
+      if (!old_password || !new_password || !confirm){
+        qs("#pwModalOut").textContent = "Please fill out all fields.";
+        return;
+      }
+      if (new_password.length < 8){
+        qs("#pwModalOut").textContent = "New password must be at least 8 characters.";
+        return;
+      }
+      if (new_password !== confirm){
+        qs("#pwModalOut").textContent = "New password and confirmation do not match.";
+        return;
+      }
+
+      const btn = qs("#btnSavePwModal");
+      btn.disabled = true;
+      qs("#pwModalOut").textContent = "Updating…";
+
+      const res = await apiPost("change_password", {
+        session_token: session.session_token,
+        old_password,
+        new_password
+      });
+
+      btn.disabled = false;
+
+      if (!res || !res.ok){
+        const msg = (res && res.error) ? String(res.error) : "Unable to update password.";
+        qs("#pwModalOut").textContent = "❌ " + msg;
+        return;
+      }
+
+      // Clear
+      qs("#pw_old_modal").value = "";
+      qs("#pw_new_modal").value = "";
+      qs("#pw_confirm_modal").value = "";
+
+      qs("#pwOut").textContent = "✅ Password updated.";
+      closePwModal();
+      setTimeout(()=>{ qs("#pwOut").textContent = ""; }, 1400);
+    }
+
+    // ---------------------------
+    // Resume (existing)
     // ---------------------------
     function setResumeUiState(state){
       // state: { has, title, url, error, uploading }
@@ -932,8 +1338,67 @@
     }
 
     // ---------------------------
-    // Applications (existing)
+    // Applications (existing + Withdraw)
     // ---------------------------
+    function isWithdrawnStatus(status){
+      return String(status || "").trim().toLowerCase() === "withdrawn";
+    }
+    function isTerminalStatus(status){
+      const s = String(status || "").trim().toLowerCase();
+      return s === "withdrawn" || s === "rejected" || s === "accepted" || s === "hired";
+    }
+
+    // Withdraw state
+    let __withdrawTarget = null; // { application_id, title, company }
+
+    function openWithdrawModal(target){
+      __withdrawTarget = target || null;
+      qs("#wdModalOut").textContent = "";
+      const t = __withdrawTarget || {};
+      const title = t.title || "this job";
+      const company = t.company ? (" at " + t.company) : "";
+      qs("#wdModalText").textContent = `Withdraw your application for ${title}${company}? This cannot be undone.`;
+      const o = qs("#wdModalOverlay");
+      o.classList.add("open");
+      o.setAttribute("aria-hidden","false");
+    }
+    function closeWithdrawModal(){
+      __withdrawTarget = null;
+      const o = qs("#wdModalOverlay");
+      o.classList.remove("open");
+      o.setAttribute("aria-hidden","true");
+      qs("#wdModalOut").textContent = "";
+    }
+
+    async function confirmWithdraw(){
+      const session = requireJobSeeker();
+      if (!session) return;
+      if (!__withdrawTarget || !__withdrawTarget.application_id) return;
+
+      const btn = qs("#btnConfirmWithdraw");
+      btn.disabled = true;
+      qs("#wdModalOut").textContent = "Withdrawing…";
+
+      // Simple backend method: reuse update_application_status with "Withdrawn"
+      const res = await apiPost("update_application_status", {
+        session_token: session.session_token,
+        application_id: __withdrawTarget.application_id,
+        status: "Withdrawn"
+      });
+
+      btn.disabled = false;
+
+      if (!res || !res.ok){
+        const msg = (res && res.error) ? String(res.error) : "Unable to withdraw right now.";
+        qs("#wdModalOut").textContent = "❌ " + msg;
+        return;
+      }
+
+      closeWithdrawModal();
+      // Refresh list so UI reflects the status from backend
+      await loadApplications();
+    }
+
     function renderApps(apps){
       const el = qs("#appsList");
       if (!apps || !apps.length){
@@ -944,18 +1409,22 @@
       setCount(apps.length);
 
       el.innerHTML = apps.map(a => {
+        const appId = String(a.application_id || a.applicationId || "");
         const title = a.job_title || a.jobTitle || ("Job ID: " + (a.job_id || ""));
         const company = a.company_name || a.company || a.company_id || "";
         const loc = [a.city, a.state].filter(Boolean).join(", ");
         const appliedAt = a.applied_at || a.appliedAt || "";
         const status = a.status || "Applied";
 
+        const statusLow = String(status).toLowerCase();
         const statusPillClass =
-          String(status).toLowerCase() === "rejected" ? "bad" :
-          (String(status).toLowerCase() === "accepted" ? "good" : "");
+          statusLow === "rejected" ? "bad" :
+          (statusLow === "accepted" ? "good" : "");
+
+        const canWithdraw = !!appId && !isTerminalStatus(status);
 
         return `
-          <div class="card">
+          <div class="card" data-app-id="${escapeHtml(appId)}" data-status="${escapeHtml(status)}">
             <div class="card-top">
               <div>
                 <div class="title">${escapeHtml(title)}</div>
@@ -971,9 +1440,42 @@
             </div>
 
             ${renderTracker(status)}
+
+            <div class="app-actions">
+              ${
+                canWithdraw
+                  ? `<button class="btn danger" data-role="withdraw" type="button">Withdraw Application</button>`
+                  : (isWithdrawnStatus(status) ? `<span class="pill bad">Withdrawn</span>` : ``)
+              }
+            </div>
           </div>
         `;
       }).join("");
+
+      // Delegated click for Withdraw
+      el.__qhBound = el.__qhBound || { click:false };
+      if (!el.__qhBound.click){
+        el.addEventListener("click", (ev) => {
+          const t = ev.target;
+          if (!t || !t.getAttribute) return;
+          if (t.getAttribute("data-role") !== "withdraw") return;
+
+          const card = t.closest("[data-app-id]");
+          if (!card) return;
+
+          const appId = card.getAttribute("data-app-id") || "";
+          const title = (card.querySelector(".title") && card.querySelector(".title").textContent) || "this job";
+          const companyEl = card.querySelector(".subline .pill");
+          const company = companyEl ? companyEl.textContent : "";
+
+          openWithdrawModal({
+            application_id: appId,
+            title: String(title || "").trim(),
+            company: String(company || "").trim()
+          });
+        });
+        el.__qhBound.click = true;
+      }
     }
 
     async function loadApplications(){
@@ -1005,11 +1507,6 @@
       const session = requireJobSeeker();
       if (!session) return;
 
-      // Who am I
-      const email = session.email || "";
-      const user = session.username || "";
-      qs("#whoami").textContent = (email || user) ? (`Signed in as ${email || user}`) : "Signed in.";
-
       // Account menu
       qs("#acctBtn").addEventListener("click", (e) => {
         e.preventDefault();
@@ -1032,7 +1529,34 @@
         if (wrap && !wrap.contains(e.target)) closeAccountMenu();
       });
 
-      // Resume handlers (NEW)
+      // Profile
+      renderProfile();
+      qs("#btnEditProfile").addEventListener("click", enterProfileEdit);
+      qs("#btnCancelProfile").addEventListener("click", () => { renderProfile(); exitProfileEdit(true); });
+      qs("#btnSaveProfile").addEventListener("click", saveProfile);
+
+      // Password modal wiring (Employer-style)
+      qs("#btnOpenPwModal").addEventListener("click", openPwModal);
+      qs("#btnClosePwModal").addEventListener("click", closePwModal);
+      qs("#btnCancelPwModal").addEventListener("click", closePwModal);
+      qs("#btnSavePwModal").addEventListener("click", changePassword);
+
+      pwOverlay.addEventListener("click", (e) => { if (e.target === pwOverlay) closePwModal(); });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && pwOverlay.classList.contains("open")) closePwModal();
+      });
+
+      // Withdraw modal wiring
+      const wdOverlay = qs("#wdModalOverlay");
+      qs("#btnCloseWdModal").addEventListener("click", closeWithdrawModal);
+      qs("#btnCancelWdModal").addEventListener("click", closeWithdrawModal);
+      qs("#btnConfirmWithdraw").addEventListener("click", confirmWithdraw);
+      wdOverlay.addEventListener("click", (e) => { if (e.target === wdOverlay) closeWithdrawModal(); });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && wdOverlay.classList.contains("open")) closeWithdrawModal();
+      });
+
+      // Resume handlers (existing)
       qs("#viewResumeBtn").addEventListener("click", () => {
         const url = String(qs("#viewResumeBtn").dataset.url || "");
         openResumePreview(url);
