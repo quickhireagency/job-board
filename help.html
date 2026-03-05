@@ -3,9 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>QuickHire™ — Help</title>
+  <title>QuickHire™ — Help Center</title>
 
-  <!-- Config (API base) -->
   <script src="/config/config.js"></script>
   <script src="/assets/app.js"></script>
 
@@ -25,8 +24,6 @@
       --blue2:#2b86d6;
 
       --yellow:#ffd66b;
-      --yellow2:#ffe7a6;
-
       --danger:#b42318;
 
       --shadow: 0 10px 30px rgba(16, 24, 40, .10);
@@ -65,33 +62,29 @@
       display:flex;
       align-items:center;
       gap:12px;
+      flex-wrap:wrap;
     }
     .brand{
       display:flex; align-items:center; gap:10px;
       min-width: 280px;
+      flex: 1 1 auto;
     }
     .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
-    .brand img{
-      height:102px;
-      width:auto;
-      display:block;
-    }
+    .brand img{ height:102px; width:auto; display:block; }
     .brand .sub{
       font-size:12px;
       color:var(--muted);
       margin-top:2px;
       line-height:1.1;
     }
-
     .controls{
-      flex:1;
+      flex:1 1 auto;
       display:flex;
       gap:10px;
       align-items:center;
       justify-content:flex-end;
       flex-wrap:wrap;
     }
-
     .btn{
       border:1px solid var(--line);
       background: rgba(255,255,255,.9);
@@ -99,14 +92,13 @@
       padding:10px 12px;
       border-radius: 12px;
       cursor:pointer;
-      font-weight:700;
+      font-weight:800;
       box-shadow: 0 3px 10px rgba(0,0,0,.05);
       display:inline-flex;
       align-items:center;
       justify-content:center;
       text-decoration:none;
       white-space:nowrap;
-      position:relative;
     }
     .btn:hover{border-color: rgba(10,30,20,.28)}
     .btn.primary{
@@ -119,51 +111,42 @@
       background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
       color: #0b2540;
     }
-    .btn.danger{
-      border-color: rgba(180,35,24,.35);
-      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
-      color: #3a0f0b;
-    }
-
-    /* My Account dropdown */
-    .dropdown{ position:relative; display:inline-flex; }
-    .menu{
-      position:absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      min-width: 190px;
-      background: rgba(255,255,255,.98);
-      border:1px solid var(--line);
-      border-radius: 14px;
-      box-shadow: var(--shadow);
-      padding: 6px;
-      display:none;
-      z-index: 50;
-    }
-    .menu a, .menu button{
-      width:100%;
-      border:none;
-      background:transparent;
-      text-align:left;
-      padding:10px 10px;
-      border-radius: 12px;
-      cursor:pointer;
-      font-weight:800;
+    .btn.ghost{
+      border-color: rgba(10,30,20,.12);
+      background: rgba(255,255,255,.65);
       color: var(--text);
-      text-decoration:none;
-      display:block;
+      box-shadow:none;
     }
-    .menu a:hover, .menu button:hover{
-      background: rgba(43,134,214,.10);
-      text-decoration:none;
-    }
-    .menu .danger{ color: var(--danger); }
-    .dropdown.open .menu{display:block}
 
     .wrap{
       max-width:1200px;
       margin:0 auto;
       padding:18px 16px 26px;
+    }
+
+    .hero{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      padding:16px;
+      overflow:hidden;
+    }
+    .hero h1{ margin:0; font-size:18px; letter-spacing:.2px; }
+    .hero p{ margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.45; }
+
+    .quick-links{
+      margin-top:12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:14px;
     }
 
     .panel{
@@ -178,179 +161,394 @@
       border-bottom:1px solid var(--line);
       display:flex; align-items:center; justify-content:space-between;
       gap:10px;
+      flex-wrap:wrap;
       background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
     }
     .panel-header h2{margin:0; font-size:14px}
     .panel-header .meta{color:var(--muted); font-size:12px}
-
     .content{padding:14px}
-    .muted{color:var(--muted); font-size:12px; line-height:1.45}
 
-    .grid{
+    .muted{ color:var(--muted); font-size:12px; line-height:1.45; }
+    .hr{ height:1px; background: rgba(10,30,20,.12); margin:12px 0; }
+
+    .cols2{
       display:grid;
-      grid-template-columns: 1fr;
-      gap:14px;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 900px){
+      .cols2{ grid-template-columns: 1fr; }
     }
 
     .card{
       background: rgba(255,255,255,.92);
-      border:1px solid var(--line);
+      border:1px solid rgba(10,30,20,.12);
       border-radius: 16px;
       padding:12px;
       box-shadow: 0 6px 18px rgba(16,24,40,.08);
     }
+    .card h3{ margin:0 0 6px; font-size:13px; }
+    .card ul{ margin:8px 0 0; padding-left:18px; color:var(--text); }
+    .card li{ margin:6px 0; color:var(--text); }
+    .card p{ margin:8px 0 0; }
 
-    .k{
-      font-weight:1000;
-      margin:0 0 6px 0;
-      font-size:14px;
+    .plans{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
     }
-    ul{margin:0; padding-left:18px}
-    li{margin:6px 0}
+    @media (max-width: 900px){
+      .plans{ grid-template-columns:1fr; }
+    }
+    .price{ font-weight:1000; margin-top:6px; }
+    .small{ font-size:12px; color:var(--muted); }
 
-    .callout{
-      background: rgba(43,134,214,.08);
-      border:1px solid rgba(43,134,214,.20);
-      border-radius: 16px;
-      padding:12px;
-    }
-
-    /* Footer (same as your standard block) */
-    .qh-footer-logo-wrap{
-      display:flex;
-      justify-content:center;
-      margin: 14px 0 8px;
-    }
-    .qh-footer-logo-wrap a{
+    .pill{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      text-decoration:none;
+      gap:6px;
+      border:1px solid rgba(10,30,20,.14);
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:11px;
+      color:var(--muted);
+      background: rgba(255,255,255,.75);
+      font-weight:900;
     }
-    .qh-footer-logo{
-      height:102px;
-      width:auto;
-      display:block;
-    }
+
+    /* Footer (standard) */
+    .qh-footer-logo-wrap{ display:flex; justify-content:center; margin: 14px 0 8px; }
+    .qh-footer-logo-wrap a{ display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+    .qh-footer-logo{ height:102px; width:auto; display:block; }
+
     .qh-powered{
       text-align:center;
       margin-top: 10px;
       font-weight:900;
       letter-spacing:.02em;
     }
-    .qh-powered a{
-      color: var(--blue);
-      text-decoration:underline;
-    }
+    .qh-powered a{ color: var(--blue); text-decoration:underline; }
   </style>
 </head>
 
 <body>
+  <!-- Top Bar -->
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand" aria-label="QuickHire brand">
-        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
+        <!-- GLOBAL RULE: header logo -> job board -->
+        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
-            <div style="font-weight:1000; letter-spacing:.2px;">Job Board</div>
-            <div class="sub">Help &amp; How-To</div>
+            <div style="font-weight:1000; letter-spacing:.2px;">Help Center</div>
+            <div class="sub">Candidates, Employers, Account Security, Billing</div>
           </div>
         </a>
       </div>
 
       <div class="controls">
-        <a class="btn" href="/" target="_self">Back to Jobs</a>
-
-        <div class="dropdown" id="acctWrap">
-          <button class="btn blue" id="acctBtn" aria-haspopup="true" aria-expanded="false">My Account</button>
-          <div class="menu" id="acctMenu" role="menu" aria-label="My Account menu">
-            <a href="/candidate/dashboard.html" target="_self" role="menuitem">Dashboard</a>
-            <button class="danger" id="logoutBtn" type="button" role="menuitem">Logout</button>
-          </div>
-        </div>
-
-        <a class="btn primary" href="/employer/dashboard.html" target="_self">Employer Portal</a>
+        <a class="btn" href="/" target="_self">Job Board</a>
+        <a class="btn" href="/auth/login.html" target="_self">Login</a>
+        <a class="btn blue" href="/auth/signup.html" target="_self">Sign Up</a>
+        <a class="btn" href="/employer/dashboard.html" target="_self">Employer Portal</a>
+        <a class="btn" href="/candidate/dashboard.html" target="_self">Candidate Portal</a>
       </div>
     </div>
   </div>
 
   <div class="wrap">
-    <div class="panel">
-      <div class="panel-header">
-        <div>
-          <h2>Help</h2>
-          <div class="meta">Quick instructions for candidates and employers</div>
+    <div class="hero">
+      <h1>QuickHire™ Help Center</h1>
+      <p>
+        Everything you need to use the QuickHire Job Board — how to apply, how to post jobs, how dashboards work,
+        how to reset your password, and how billing / plan attachment works after checkout.
+      </p>
+
+      <div class="quick-links">
+        <a class="btn primary" href="#candidates">I’m a Candidate</a>
+        <a class="btn blue" href="#employers">I’m an Employer</a>
+        <a class="btn ghost" href="#security">Account Security</a>
+        <a class="btn ghost" href="#billing">Billing &amp; Plans</a>
+        <a class="btn ghost" href="#support">Contact Support</a>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <!-- Candidates -->
+      <div class="panel" id="candidates">
+        <div class="panel-header">
+          <div>
+            <h2>Candidate Help</h2>
+            <div class="meta">Browse jobs, apply, manage resume, track applications</div>
+          </div>
+          <span class="pill">For Job Seekers</span>
+        </div>
+        <div class="content">
+          <div class="cols2">
+            <div class="card">
+              <h3>How to browse &amp; search jobs</h3>
+              <ul>
+                <li>Use the Job Board search and filters to find roles that match your skills.</li>
+                <li>Click a job to view full details.</li>
+                <li>If a job shows a Verified employer indicator, it means the company is in our trust program.</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>How to apply</h3>
+              <ul>
+                <li>Click <b>Apply</b> on a job.</li>
+                <li>If the job uses an external application link, you’ll be taken to that company’s site.</li>
+                <li>If the job uses internal apply, complete the form and submit.</li>
+                <li>Uploading a resume (PDF/DOC/DOCX) makes future applications faster.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="card">
+            <h3>Candidate Dashboard</h3>
+            <p class="muted">
+              Your Candidate Dashboard is the control center for your resume and applications.
+            </p>
+            <ul>
+              <li><b>Signed in as</b> shows your Email and Username.</li>
+              <li><b>My Resume</b>: Upload/Replace and Preview your current resume.</li>
+              <li><b>My Applications</b>: Track application status and view your progress.</li>
+              <li><b>Withdraw Application</b>: If available, you can withdraw an application from your dashboard.</li>
+            </ul>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="card">
+            <h3>Withdrawing an application</h3>
+            <p class="muted">
+              Withdrawing does not delete history — it updates your application status to <b>Withdrawn</b>.
+              This cannot be undone. If you want to be considered again, you may need to re-apply.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div class="content">
-        <div class="grid">
-          <div class="card callout">
-            <div class="k">Quick start</div>
+      <!-- Employers -->
+      <div class="panel" id="employers">
+        <div class="panel-header">
+          <div>
+            <h2>Employer Help</h2>
+            <div class="meta">Post jobs, manage applicants, manage company info</div>
+          </div>
+          <span class="pill">For Employers</span>
+        </div>
+        <div class="content">
+          <div class="cols2">
+            <div class="card">
+              <h3>Posting jobs</h3>
+              <ul>
+                <li>An active plan is required to post jobs.</li>
+                <li>Go to the <b>Employer Dashboard</b> and use <b>Post a Job</b>.</li>
+                <li>After posting, use <b>My Jobs</b> to manage your listings.</li>
+              </ul>
+            </div>
+
+            <div class="card">
+              <h3>Employer Dashboard (Applicants)</h3>
+              <ul>
+                <li><b>X-off</b>: marks an applicant for your own reference (does not delete).</li>
+                <li>Click the candidate name to open the candidate card and preview their resume.</li>
+                <li><b>Remove Candidate</b> hides them from your view (it does not delete the application).</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="card">
+            <h3>Company &amp; Account card</h3>
+            <p class="muted">
+              Employers can update company info (name, website, logo URL) and contact details.
+              Your logo and company block appear where applicable.
+            </p>
             <ul>
-              <li><strong>Candidates:</strong> browse jobs on the main Job Board, then log in to apply.</li>
-              <li><strong>Employers:</strong> use Employer Portal to manage postings and applicants.</li>
-              <li>If you get signed out, just log in again — your session is stored in your browser.</li>
+              <li>Click <b>Edit</b> to make changes.</li>
+              <li>Click <b>Save</b> to apply updates.</li>
+              <li>Password updates are kept separate so the Company card stays clean.</li>
             </ul>
           </div>
 
-          <div class="card">
-            <div class="k">How to search and filter jobs</div>
-            <ul>
-              <li>Use the keyword search at the top to filter by title/description keywords.</li>
-              <li>Use filters for category, work arrangement, city, and state/territory.</li>
-              <li>“Use My Location” can prefill your city/state and optionally apply a radius filter.</li>
-            </ul>
-          </div>
+          <div class="hr"></div>
 
           <div class="card">
-            <div class="k">How to create an account / log in</div>
-            <ul>
-              <li>Click <strong>Login / Sign Up</strong> on the Job Board.</li>
-              <li>Choose Candidate (Job Seeker) if you’re applying for jobs.</li>
-              <li>After you sign in, you can access your dashboard under <strong>My Account</strong>.</li>
-            </ul>
+            <h3>EEO Aggregate (Corporate only)</h3>
+            <p class="muted">
+              EEO aggregate reporting is available to Corporate plans only. Use the Employer Dashboard EEO section
+              to load reporting by date range.
+            </p>
           </div>
+        </div>
+      </div>
 
-          <div class="card">
-            <div class="k">How to apply</div>
-            <ul>
-              <li>Select a job from the list to view details.</li>
-              <li>Click <strong>Apply</strong>.</li>
-              <li>If you aren’t logged in, you’ll be taken to login first, then returned to continue.</li>
-            </ul>
+      <!-- Security -->
+      <div class="panel" id="security">
+        <div class="panel-header">
+          <div>
+            <h2>Account Security</h2>
+            <div class="meta">Password reset, password changes, secure access tips</div>
           </div>
+          <span class="pill">Candidates &amp; Employers</span>
+        </div>
+        <div class="content">
+          <div class="cols2">
+            <div class="card">
+              <h3>Forgot your password?</h3>
+              <p class="muted">
+                Use the password reset page any time you can’t remember your password.
+              </p>
+              <ul>
+                <li>Go to: <a href="/auth/reset" target="_self">/auth/reset</a></li>
+                <li>Enter your Username or Email and request a reset link.</li>
+                <li>Follow the reset link in your email and set a new password.</li>
+              </ul>
+            </div>
 
-          <div class="card">
-            <div class="k">How to report a job</div>
-            <ul>
-              <li>Select a job and click <strong>Report Job</strong>.</li>
-              <li>Choose a reason and write a short message with what’s wrong.</li>
-              <li>Reports are reviewed by our team.</li>
-            </ul>
-          </div>
-
-          <div class="card">
-            <div class="k">Candidate Dashboard</div>
-            <ul>
-              <li>Go to <strong>My Account → Dashboard</strong> to see your applications.</li>
-              <li>You’ll see a visual progress tracker for each application (Applied → Reviewed → Interview → Offer → Accepted/Rejected).</li>
-            </ul>
-          </div>
-
-          <div class="card">
-            <div class="k">Need help?</div>
-            <div class="muted">
-              Email <a href="mailto:info@quickhire.agency">info@quickhire.agency</a> or call
-              <a href="tel:+13174421437">(317) 442-1437</a>.
+            <div class="card">
+              <h3>Change password (while logged in)</h3>
+              <p class="muted">
+                On your dashboard, click <b>Edit</b>, then choose <b>Update Password</b>.
+                You’ll enter your old password, new password, and confirmation.
+              </p>
+              <ul>
+                <li>If you don’t remember the old password, use <a href="/auth/reset" target="_self">Forgot Password</a>.</li>
+                <li>For shared/public computers, log out when finished.</li>
+              </ul>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- Billing & Plans -->
+      <div class="panel" id="billing">
+        <div class="panel-header">
+          <div>
+            <h2>Billing &amp; Plans (Stripe)</h2>
+            <div class="meta">Choose a package, checkout, and attach your purchase after payment</div>
+          </div>
+          <span class="pill">Employers</span>
+        </div>
+
+        <div class="content">
+          <div class="muted">
+            <b>Important:</b> Use the same email at Stripe checkout as your QuickHire employer account email to avoid delays.
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="plans">
+            <div class="card">
+              <h3>QuickHire Local</h3>
+              <div class="price">$49.99/mo</div>
+              <p class="muted">
+                Trusted Solution for Small Business Owners. Post up to 60 jobs per month (2 per day) on the QuickHire Job Board.
+                Built for local and small businesses that want simple, affordable hiring with high-quality applicants.
+              </p>
+              <div style="margin-top:10px;">
+                <a class="btn" href="https://buy.stripe.com/dRm00bblue5Gbz61ufbfO00" target="_blank" rel="noopener">Buy Local</a>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>QuickHire Business</h3>
+              <div class="price">$99.99/mo</div>
+              <p class="muted">
+                Corporate solutions for small businesses at the mom &amp; pop shop rate. Post up to 99 jobs per month (about 3 per day)
+                with expanded capacity for growing teams. Designed for steady hiring with stronger visibility and faster workflow.
+              </p>
+              <div style="margin-top:10px;">
+                <a class="btn" href="https://buy.stripe.com/4gM7sDahq9PqeLi3CnbfO05" target="_blank" rel="noopener">Buy Business</a>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>QuickHire Corporate</h3>
+              <div class="price">$249.99/mo</div>
+              <p class="muted">
+                Leading industry solution for Fortune 500 companies. Unlimited job postings for teams hiring at scale.
+                Includes premium compliance tools and trust perks to keep hiring fast, fair, and audit-ready.
+              </p>
+              <div style="margin-top:10px;">
+                <a class="btn" href="https://buy.stripe.com/14AaEP9dm4v6dHe8WHbfO02" target="_blank" rel="noopener">Buy Corporate</a>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3>Verified Employer</h3>
+              <div class="price">$14.99/mo</div>
+              <p class="muted">
+                Stand out as a Verified Employer to increase trust and applicant confidence. Verification is a paid trust program
+                with eligibility requirements and ongoing monitoring, and includes our EEO data package.
+              </p>
+              <div style="margin-top:10px;">
+                <a class="btn" href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Buy Verified</a>
+              </div>
+              <p class="small" style="margin-top:10px;">
+                If you are on Corporate, Verified is included.
+              </p>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="card">
+            <h3>After checkout: Attach / Claim your purchase (Session ID workflow)</h3>
+            <p class="muted">
+              After you pay, Stripe redirects you to the Billing Success page. On that page, you will attach your purchase using your
+              Stripe Session ID (it starts with <b>cs_</b>).
+            </p>
+            <ol style="margin:10px 0 0; padding-left:18px;">
+              <li>Complete checkout in Stripe.</li>
+              <li>Stripe sends you back to the Billing Success page (automatic redirect).</li>
+              <li>On the success page, find your <b>Session ID</b> (starts with <b>cs_</b>).</li>
+              <li>Click <b>Attach / Claim Purchase</b> and confirm.</li>
+              <li>If the email you used at Stripe doesn’t match your QuickHire employer account email, attachment will fail.</li>
+            </ol>
+            <p class="muted" style="margin-top:10px;">
+              If you need support, include your Email + Username and your Session ID (cs_…) when you contact us.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Support -->
+      <div class="panel" id="support">
+        <div class="panel-header">
+          <div>
+            <h2>Contact Support</h2>
+            <div class="meta">We’re here to help</div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="card">
+            <h3>Customer Support</h3>
+            <p class="muted" style="margin:0;">
+              Email: <a href="mailto:info@quickhire.agency">info@quickhire.agency</a><br>
+              Phone: <a href="tel:+13174421437">(317) 442-1437</a><br>
+              Address: 151 N. Delaware Street, Suite 122, Indianapolis, IN 46204<br>
+              Hours: Monday – Friday, 9:00 AM – 5:00 PM (ET)
+            </p>
+            <div class="hr"></div>
+            <p class="muted" style="margin:0;">
+              For faster help, include your <b>Email + Username</b>. If it’s billing-related, include your Stripe <b>Session ID</b> (cs_…).
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
 
-    <!-- Footer -->
-    <!-- QuickHire™ — Footer Block (Squarespace Code Block) -->
+    <!-- Footer (standard block styling) -->
     <style>
       footer,
       #footer,
@@ -439,7 +637,8 @@
 
     <footer class="qh-footer" aria-label="QuickHire footer">
       <div class="qh-footer-logo-wrap" aria-label="QuickHire footer logo">
-        <a href="https://jobboard.quickhireagency.com/" target="_self" rel="noopener">
+        <!-- GLOBAL RULE: footer logo -> main site -->
+        <a href="https://www.quickhire.agency" target="_self" rel="noopener">
           <img class="qh-footer-logo" src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
         </a>
       </div>
@@ -521,59 +720,5 @@
       })();
     </script>
   </div>
-
-  <script>
-    function qs(sel){ return document.querySelector(sel); }
-
-    function safeLoadSession(){
-      try{
-        if (window.QH && typeof QH.loadSession === "function") return QH.loadSession() || {};
-        return JSON.parse(localStorage.getItem("qh_session") || "null") || {};
-      }catch(e){
-        return {};
-      }
-    }
-
-    function closeAccountMenu(){
-      const wrap = qs("#acctWrap");
-      if (wrap) wrap.classList.remove("open");
-      const btn = qs("#acctBtn");
-      if (btn) btn.setAttribute("aria-expanded", "false");
-    }
-
-    function init(){
-      // My Account dropdown toggle
-      qs("#acctBtn").addEventListener("click", (e) => {
-        e.preventDefault();
-        const wrap = qs("#acctWrap");
-        const open = wrap.classList.toggle("open");
-        qs("#acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
-      });
-
-      // Logout
-      qs("#logoutBtn").addEventListener("click", () => {
-        try{
-          if (window.QH && typeof QH.clearSession === "function") QH.clearSession();
-          else localStorage.removeItem("qh_session");
-        }catch(e){ /* ignore */ }
-        closeAccountMenu();
-        window.location.href = "/";
-      });
-
-      document.addEventListener("click", (e) => {
-        const wrap = qs("#acctWrap");
-        if (wrap && !wrap.contains(e.target)) closeAccountMenu();
-      });
-
-      // If not logged in as candidate, dashboard link will still work (login will gate it there).
-      // Optional: we could hide the dropdown if no session; leaving visible keeps the UI consistent.
-      const s = safeLoadSession();
-      if (!s || !s.session_token || s.role !== "job_seeker") {
-        // keep visible, no special handling needed
-      }
-    }
-
-    init();
-  </script>
 </body>
 </html>
