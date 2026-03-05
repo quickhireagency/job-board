@@ -7,6 +7,7 @@
 
   <!-- SEO: indexable main page -->
   <meta name="robots" content="index,follow" />
+  <meta name="description" content="Browse jobs on QuickHire™. Fast search, simple filters, and a clean apply flow for candidates. Employers can post jobs and review applicants." />
   <link rel="canonical" href="https://jobboard.quickhireagency.com/" />
 
   <!-- Config (API base) -->
@@ -115,6 +116,15 @@
       outline:none;
       color:var(--text);
       font-size:14px;
+    }
+
+    /* NEW: button row wrapper (desktop stays same; mobile gets clean layout) */
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
     }
 
     .btn{
@@ -282,20 +292,20 @@
     }
     .item .sub{color:var(--muted); font-size:12px; display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
 
-.pill{
-  border:1px solid rgba(10,30,20,.14);
-  border-radius:999px;
-  padding:2px 8px;
-  font-size:11px;
-  color:var(--muted);
-  background: rgba(255,255,255,.75);
-  font-weight:800;
-  display:inline-flex;
-  align-items:center;
-  line-height:1;
-  white-space:nowrap;
-}
-    
+    .pill{
+      border:1px solid rgba(10,30,20,.14);
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:11px;
+      color:var(--muted);
+      background: rgba(255,255,255,.75);
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      line-height:1;
+      white-space:nowrap;
+    }
+
     .pill.verified{
       border-color: rgba(31,122,74,.35);
       color: rgba(31,122,74,.95);
@@ -314,26 +324,26 @@
     .detail h1{margin:0 0 8px 0; font-size:18px}
 
     /* right-side top facts row */
-.detail .facts{
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
-  margin:10px 0 12px;
-  align-items:center;
-}
+    .detail .facts{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin:10px 0 12px;
+      align-items:center;
+    }
 
     /* Verified badge inside facts row - does NOT affect other pills */
-.verified-inline{
-  display:inline-flex;
-  align-items:center;
-  flex: 0 0 auto;         /* do not stretch */
-}
+    .verified-inline{
+      display:inline-flex;
+      align-items:center;
+      flex: 0 0 auto;         /* do not stretch */
+    }
 
-.verified-badge{
-  height:90px;            /* <<< change ONLY this number to resize */
-  width:auto;
-  display:block;
-}
+    .verified-badge{
+      height:90px;            /* <<< change ONLY this number to resize */
+      width:auto;
+      display:block;
+    }
 
     .detail .box{
       background: rgba(10,30,20,.04);
@@ -523,23 +533,38 @@
       .brand img{
         height:78px; /* slightly smaller on mobile */
       }
+
+      /* CRITICAL: controls become a clean vertical stack (no squish) */
       .controls{
         width:100%;
+        flex-direction:column;
+        align-items:stretch;
         justify-content:flex-start;
+        gap:10px;
       }
+
+      /* Searchbar is always first and full width */
       .searchbar{
         width:100%;
         max-width:none;
         min-width:0;
         order: 1;
       }
-      #helpBtn{order: 2;}
-      #loginBtn{order: 3;}
-      #acctWrap{order: 3;}
-      #employerBtn{order: 4;}
-      .btn{
-        flex: 0 0 auto;
+
+      /* Buttons become a wrapped row UNDER the search bar */
+      .actions{
+        width:100%;
+        order: 2;
+        justify-content:flex-start;
       }
+
+      /* Make buttons usable on mobile without squishing */
+      .actions .btn,
+      .actions .dropdown{
+        flex: 1 1 calc(50% - 10px);
+        min-width: 160px;
+      }
+
       .panel-header{
         flex-wrap:wrap;
         align-items:flex-start;
@@ -569,23 +594,26 @@
           <input id="searchInput" placeholder="Search jobs (keyword)..." />
         </div>
 
-        <!-- Help -->
-        <a class="btn" id="helpBtn" href="/help.html" target="_self">Help</a>
+        <!-- NEW: actions row so mobile can place search above buttons cleanly -->
+        <div class="actions" aria-label="Top actions">
+          <!-- Help -->
+          <a class="btn" id="helpBtn" href="/help.html" target="_self">Help</a>
 
-        <!-- Candidate auth entry point (ALWAYS visible) -->
-        <button class="btn blue" id="loginBtn">Login / Sign Up</button>
+          <!-- Candidate auth entry point (ALWAYS visible) -->
+          <button class="btn blue" id="loginBtn">Login / Sign Up</button>
 
-        <!-- My Account dropdown (candidate only; shown when logged in) -->
-        <div class="dropdown" id="acctWrap" style="display:none;">
-          <button class="btn blue" id="acctBtn" aria-haspopup="true" aria-expanded="false">My Account</button>
-          <div class="menu" id="acctMenu" role="menu" aria-label="My Account menu">
-            <a href="/candidate/dashboard.html" target="_self" role="menuitem">Dashboard</a>
-            <button class="danger" id="logoutBtn" type="button" role="menuitem">Logout</button>
+          <!-- My Account dropdown (candidate only; shown when logged in) -->
+          <div class="dropdown" id="acctWrap" style="display:none;">
+            <button class="btn blue" id="acctBtn" aria-haspopup="true" aria-expanded="false">My Account</button>
+            <div class="menu" id="acctMenu" role="menu" aria-label="My Account menu">
+              <a href="/candidate/dashboard.html" target="_self" role="menuitem">Dashboard</a>
+              <button class="danger" id="logoutBtn" type="button" role="menuitem">Logout</button>
+            </div>
           </div>
-        </div>
 
-        <!-- Employer portal entry point (separate UI) -->
-        <a class="btn primary" id="employerBtn" href="/employer/dashboard.html">Employer Portal</a>
+          <!-- Employer portal entry point (auto-select employer role on login if needed) -->
+          <a class="btn primary" id="employerBtn" href="/employer/dashboard.html">Employer Portal</a>
+        </div>
       </div>
     </div>
   </div>
@@ -1266,21 +1294,19 @@
       qs("#jobDetail").innerHTML = `
         <h1>${escapeHtml(j.job_title || "Untitled role")}</h1>
 
-    <!-- Top facts (order per your spec) -->
-<div class="facts">
-  ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
-  ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
-  ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
-${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
-
-${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
-
-${verified ? `
-  <span class="verified-inline">
-    <img class="verified-badge" src="/QuickHireVerifiedEmployerBadge.png" alt="Verified Employer" />
-  </span>
-` : ``}
-</div>
+        <!-- Top facts (order per your spec) -->
+        <div class="facts">
+          ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
+          ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
+          ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
+          ${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
+          ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
+          ${verified ? `
+            <span class="verified-inline">
+              <img class="verified-badge" src="/QuickHireVerifiedEmployerBadge.png" alt="Verified Employer" />
+            </span>
+          ` : ``}
+        </div>
 
         <!-- Company block -->
         ${(companyName || companyLogo || companySite) ? `
@@ -1590,10 +1616,27 @@ ${verified ? `
       qs("#prevPageBtn").addEventListener("click", goPrev);
       qs("#nextPageBtn").addEventListener("click", goNext);
 
-      // buttons
+      // Candidate login (default candidate behavior already in login.html)
       qs("#loginBtn").addEventListener("click", () => {
         const here = window.location.pathname + window.location.search;
         window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
+      });
+
+      // Employer portal: auto-select employer role on login if not already employer
+      qs("#employerBtn").addEventListener("click", (e) => {
+        try{
+          const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+          const isEmployer = !!sess.session_token && (sess.role === "employer");
+          if (isEmployer){
+            // allow normal navigation to dashboard
+            return;
+          }
+        }catch(err){ /* ignore */ }
+
+        // Not logged in as employer -> go to login with role preset + next redirect
+        e.preventDefault();
+        const next = PATHS.employerPortal;
+        window.location.href = PATHS.candidateLogin + "?role=employer&next=" + encodeURIComponent(next);
       });
 
       qs("#applyBtn").addEventListener("click", goApply);
