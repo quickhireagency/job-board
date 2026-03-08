@@ -283,12 +283,15 @@
       .list{max-height: 52vh}
     }
 
-    .item{
-      padding:12px 14px;
-      border-bottom:1px solid rgba(10,30,20,.10);
-      cursor:pointer;
-      background: transparent;
-    }
+.item{
+  display:block;
+  padding:12px 14px;
+  border-bottom:1px solid rgba(10,30,20,.10);
+  cursor:pointer;
+  background: transparent;
+  color:inherit;
+  text-decoration:none;
+}
     .item:hover{background: rgba(43,154,94,.06)}
     .item.active{background: rgba(43,134,214,.08)}
     .item .title{font-weight:900; font-size:14px; margin-bottom:4px}
@@ -1210,50 +1213,56 @@
       renderJobs();
     }
 
-    function renderJobs(){
-      const list = qs("#jobList");
-      const jobs = state.filtered || [];
+function renderJobs(){
+  const list = qs("#jobList");
+  const jobs = state.filtered || [];
 
-      if (!jobs.length){
-        list.innerHTML = `<div class="empty">No jobs found.</div>`;
-        return;
-      }
+  if (!jobs.length){
+    list.innerHTML = `<div class="empty">No jobs found.</div>`;
+    return;
+  }
 
-      list.innerHTML = jobs.map(j => {
-        const active = (j.job_id === state.selectedJobId) ? "active" : "";
-        const loc = [j.city, j.state].filter(Boolean).join(", ") || (j.location || "Location");
-        const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
+  list.innerHTML = jobs.map(j => {
+    const active = (j.job_id === state.selectedJobId) ? "active" : "";
+    const loc = [j.city, j.state].filter(Boolean).join(", ") || (j.location || "Location");
+    const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
 
-        // company name comes from backend join when available; fallback to company_id if not
-        const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
+    const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
+    const empType = normalizeEmploymentType(j.employment_type);
+    const jobUrl = "/job.html?job_id=" + encodeURIComponent(j.job_id || "");
 
-        const empType = normalizeEmploymentType(j.employment_type);
+    return `
+      <a class="item ${active}" data-job="${escapeHtml(j.job_id || "")}" href="${jobUrl}" aria-label="${escapeHtml(j.job_title || "Job opening")}">
+        <div class="title">${escapeHtml(j.job_title || "Untitled role")}</div>
+        ${companyName ? `<div class="company">${escapeHtml(companyName)}</div>` : ``}
+        <div class="sub">
+          <span>${escapeHtml(loc)}</span>
+          ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
+          ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
+          ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
+          ${verified ? `<span class="pill verified">Verified</span>` : ``}
+        </div>
+      </a>
+    `;
+  }).join("");
 
-        return `
-          <div class="item ${active}" data-job="${escapeHtml(j.job_id||"")}">
-            <div class="title">${escapeHtml(j.job_title || "Untitled role")}</div>
-            ${companyName ? `<div class="company">${escapeHtml(companyName)}</div>` : ``}
-            <div class="sub">
-              <span>${escapeHtml(loc)}</span>
-              ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
-              ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
-              ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
-              ${verified ? `<span class="pill verified">Verified</span>` : ``}
-            </div>
-          </div>
-        `;
-      }).join("");
+  list.querySelectorAll(".item").forEach(el => {
+    el.addEventListener("click", (e) => {
+      const isModifiedClick =
+        e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
 
-      list.querySelectorAll(".item").forEach(el => {
-        el.addEventListener("click", () => {
-          const id = el.getAttribute("data-job");
-          state.selectedJobId = id;
-          setUrlJobId(id);
-          renderJobs();
-          renderSelectedJob(id);
-        });
-      });
-    }
+      if (isModifiedClick) return; // allow open in new tab, etc.
+
+      e.preventDefault();
+
+      const id = el.getAttribute("data-job");
+      state.selectedJobId = id;
+      setUrlJobId(id);
+      renderJobs();
+      renderSelectedJob(id);
+    });
+  });
+}
 
     async function renderSelectedJob(jobId){
       if (!jobId){
