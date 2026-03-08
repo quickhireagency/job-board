@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset
-  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
     <loc>https://jobboard.quickhireagency.com/</loc>
@@ -9,31 +8,19 @@
   </url>
 
   <url>
-    <loc>https://jobboard.quickhireagency.com/job.html?job_id=job_0001</loc>
+    <loc>https://jobboard.quickhireagency.com/job.html?job_id=job_0702</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://jobboard.quickhireagency.com/job.html?job_id=job_0002</loc>
+    <loc>https://jobboard.quickhireagency.com/job.html?job_id=job_0703</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://jobboard.quickhireagency.com/job.html?job_id=job_0003</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://jobboard.quickhireagency.com/job.html?job_id=job_0004</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <url>
-    <loc>https://jobboard.quickhireagency.com/job.html?job_id=job_0005</loc>
+    <loc>https://jobboard.quickhireagency.com/job.html?job_id=job_0704</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
