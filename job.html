@@ -3,12 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>QuickHire™ — Job Detail</title>
+  <title>QuickHire™ Job Board | Job Opening</title>
 
   <!-- SEO -->
   <meta name="robots" content="index,follow" />
-  <meta name="description" content="View this job posting on QuickHire™." />
+  <meta name="description" content="View this job posting on the QuickHire™ Job Board." />
   <link rel="canonical" href="https://jobboard.quickhireagency.com/job.html" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="QuickHire™ Job Board | Job Opening" />
+  <meta property="og:description" content="View this job posting on the QuickHire™ Job Board." />
+  <meta property="og:url" content="https://jobboard.quickhireagency.com/job.html" />
+  <meta property="og:site_name" content="QuickHire™ Job Board" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="QuickHire™ Job Board | Job Opening" />
+  <meta name="twitter:description" content="View this job posting on the QuickHire™ Job Board." />
+
+  <!-- Structured data placeholder -->
+  <script id="jobPostingSchema" type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "QuickHire™ Job Board Job Detail",
+    "url": "https://jobboard.quickhireagency.com/job.html"
+  }
+  </script>
 
   <!-- Config (API base) -->
   <script src="/config/config.js"></script>
@@ -56,7 +76,6 @@
     a{color:var(--blue); text-decoration:none}
     a:hover{text-decoration:underline}
 
-    /* Top bar (same vibe as index) */
     .topbar{
       position:sticky; top:0; z-index:10;
       background: rgba(255,255,255,.85);
@@ -133,7 +152,6 @@
     }
     .btn[disabled]{ opacity:.55; cursor:not-allowed; filter:saturate(.9); }
 
-    /* My Account dropdown */
     .dropdown{ position:relative; display:inline-flex; }
     .menu{
       position:absolute;
@@ -174,6 +192,17 @@
       padding:18px 16px 26px;
     }
 
+    .breadcrumbs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      font-size:13px;
+      color:var(--muted);
+      margin:0 0 12px;
+    }
+    .breadcrumbs span{ color:var(--muted); }
+
     .panel{
       background: rgba(255,255,255,.88);
       border:1px solid var(--line);
@@ -196,8 +225,8 @@
     .detail{
       padding:16px;
     }
-    .detail h1{margin:0 0 8px 0; font-size:20px}
-    .muted{ color:var(--muted); font-size:12px; line-height:1.35; }
+    .detail h1{margin:0 0 8px 0; font-size:24px; line-height:1.2}
+    .muted{ color:var(--muted); font-size:12px; line-height:1.45; }
 
     .pill{
       border:1px solid rgba(10,30,20,.14);
@@ -213,7 +242,6 @@
       white-space:nowrap;
     }
 
-    /* Facts row */
     .facts{
       display:flex;
       gap:8px;
@@ -232,6 +260,13 @@
       display:block;
     }
 
+    .lede{
+      font-size:14px;
+      line-height:1.6;
+      color:var(--text);
+      margin:6px 0 0;
+    }
+
     .box{
       background: rgba(10,30,20,.04);
       border:1px solid rgba(10,30,20,.12);
@@ -239,16 +274,15 @@
       padding:12px;
       margin-top:12px;
     }
-    pre{
+    .body-copy{
       margin:0;
       white-space:pre-wrap;
       word-break:break-word;
       font-family: inherit;
       font-size:14px;
-      line-height:1.45;
+      line-height:1.55;
     }
 
-    /* Company block */
     .company-block{
       margin-top: 14px;
       padding-top: 12px;
@@ -274,7 +308,6 @@
       word-break: break-word;
     }
 
-    /* Footer logo + legal links (copied from index) */
     .qh-footer-logo-wrap{
       display:flex;
       justify-content:center;
@@ -303,7 +336,6 @@
       text-decoration:underline;
     }
 
-    /* Mobile: make actions readable + big tap targets */
     @media (max-width: 720px){
       .brand{ width:100%; min-width:0; }
       .brand img{ height:78px; }
@@ -320,6 +352,7 @@
 
       .verified-badge{ max-width: 200px; }
       .company-logo{ max-width: 160px; }
+      .detail h1{ font-size:22px; }
     }
   </style>
 </head>
@@ -332,7 +365,7 @@
           <img src="/QuickHireTransparentLogo02.png" alt="QuickHire™" />
           <div>
             <div style="font-weight:1000; letter-spacing:.2px;">Job Detail</div>
-            <div class="sub">A single job posting (shareable link)</div>
+            <div class="sub">A single job posting page</div>
           </div>
         </a>
       </div>
@@ -356,8 +389,14 @@
     </div>
   </div>
 
-  <div class="wrap">
-    <div class="panel" aria-label="Job detail">
+  <main class="wrap">
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <a href="/">Job Board</a>
+      <span>/</span>
+      <span id="crumbCurrent">Job Detail</span>
+    </nav>
+
+    <article class="panel" aria-label="Job detail">
       <div class="panel-header">
         <div>
           <h2>Overview</h2>
@@ -370,11 +409,12 @@
       </div>
 
       <div class="detail" id="jobDetail">
-        <div class="muted">Loading job…</div>
+        <h1>Loading job…</h1>
+        <p class="lede">QuickHire™ is loading this job posting now.</p>
       </div>
-    </div>
+    </article>
 
-    <!-- Footer (same as index.html) -->
+    <!-- Footer -->
     <style>
       footer,
       #footer,
@@ -536,17 +576,9 @@
         </div>
       </div>
     </footer>
+  </main>
 
-    <script>
-      (function () {
-        var y = new Date().getFullYear();
-        var el = document.getElementById('qh-year');
-        if (el) el.textContent = String(y);
-      })();
-    </script>
-  </div>
-
-  <!-- Report modal (same behavior as index) -->
+  <!-- Report modal -->
   <div class="modal-backdrop" id="reportModal" aria-hidden="true" style="position:fixed; inset:0; background: rgba(0,0,0,.35); display:none; align-items:center; justify-content:center; z-index: 100; padding: 18px;">
     <div class="modal" role="dialog" aria-modal="true" aria-label="Report job" style="width:100%; max-width:560px; background: rgba(255,255,255,.98); border:1px solid var(--line); border-radius:18px; box-shadow: var(--shadow); overflow:hidden;">
       <div class="modal-head" style="padding:14px 14px 10px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:10px; background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));">
@@ -573,7 +605,7 @@
 
         <div>
           <label for="complaintMsg">Message</label>
-          <textarea id="complaintMsg" placeholder="Describe what’s wrong with this posting…"></textarea>
+          <textarea id="complaintMsg" placeholder="Describe what’s wrong with this posting…" style="width:100%; padding:10px 12px; border-radius:12px; border:1px solid var(--line); background: rgba(255,255,255,.95); color:var(--text); outline:none; min-height:110px; resize:vertical;"></textarea>
         </div>
 
         <div class="muted" style="margin-top:10px;">
@@ -587,10 +619,13 @@
     </div>
   </div>
 
+  <noscript>
+    <div style="max-width:1200px;margin:16px auto;padding:12px 16px;color:#3e5a4a;">
+      This job detail page uses JavaScript to load the latest job content. Please enable JavaScript to view the full posting.
+    </div>
+  </noscript>
+
   <script>
-    // ----------------------------
-    // Config / State
-    // ----------------------------
     const API_BASE = (window.QH_CONFIG && window.QH_CONFIG.API_BASE) || "";
 
     const state = {
@@ -607,7 +642,7 @@
     };
 
     function qs(sel){ return document.querySelector(sel); }
-    function setText(el, txt){ el.textContent = txt; }
+    function setText(el, txt){ if (el) el.textContent = txt; }
 
     function escapeHtml(s){
       return String(s == null ? "" : s)
@@ -618,11 +653,39 @@
         .replaceAll("'","&#039;");
     }
 
+    function stripText(s){
+      return String(s == null ? "" : s).replace(/\s+/g, " ").trim();
+    }
+
+    function truncateText(s, max){
+      const v = stripText(s);
+      if (!v) return "";
+      return v.length > max ? (v.slice(0, max - 3) + "...") : v;
+    }
+
     function normalizeEmploymentType(v){
+      const s = String(v || "").trim().toLowerCase();
+      if (!s) return "";
+      if (s.includes("part")) return "PART_TIME";
+      if (s.includes("full")) return "FULL_TIME";
+      if (s.includes("contract")) return "CONTRACTOR";
+      if (s.includes("temp")) return "TEMPORARY";
+      if (s.includes("intern")) return "INTERN";
+      if (s.includes("volunteer")) return "VOLUNTEER";
+      if (s.includes("per diem")) return "PER_DIEM";
+      return String(v || "").trim().toUpperCase().replace(/\s+/g, "_");
+    }
+
+    function normalizeEmploymentTypeLabel(v){
       const s = String(v || "").trim().toLowerCase();
       if (!s) return "";
       if (s.includes("part")) return "Part Time";
       if (s.includes("full")) return "Full Time";
+      if (s.includes("contract")) return "Contract";
+      if (s.includes("temp")) return "Temporary";
+      if (s.includes("intern")) return "Internship";
+      if (s.includes("volunteer")) return "Volunteer";
+      if (s.includes("per diem")) return "Per Diem";
       return String(v || "").trim();
     }
 
@@ -635,33 +698,136 @@
       }
     }
 
-    function setCanonicalForJob(jobId){
-      try{
-        const canonical = "https://jobboard.quickhireagency.com/job.html?job_id=" + encodeURIComponent(jobId);
-        const link = document.querySelector('link[rel="canonical"]');
-        if (link) link.setAttribute("href", canonical);
+    function setRobots(content){
+      const tag = document.querySelector('meta[name="robots"]');
+      if (tag) tag.setAttribute("content", content);
+    }
 
-        // keep robots already index/follow; update description lightly
-      }catch(e){ /* ignore */ }
+    function setCanonicalForJob(jobId){
+      const canonicalUrl = "https://jobboard.quickhireagency.com/job.html?job_id=" + encodeURIComponent(jobId);
+      const link = document.querySelector('link[rel="canonical"]');
+      if (link) link.setAttribute("href", canonicalUrl);
+      return canonicalUrl;
+    }
+
+    function setMetaTag(selector, content){
+      const el = document.querySelector(selector);
+      if (el) el.setAttribute("content", content);
+    }
+
+    function isoDateOrNull(v){
+      if (!v) return null;
+      const d = new Date(v);
+      return isNaN(d.getTime()) ? null : d.toISOString();
+    }
+
+    function buildJobDescription(j){
+      const pieces = [];
+      if (j.job_title) pieces.push(String(j.job_title));
+      if (j.company_name) pieces.push("at " + String(j.company_name));
+      const loc = [j.city, j.state].filter(Boolean).join(", ");
+      if (loc) pieces.push("in " + loc);
+      if (j.job_description) pieces.push(String(j.job_description));
+      return truncateText(pieces.join(" "), 160);
+    }
+
+    function updateSchemaForJob(j, canonicalUrl){
+      const script = document.getElementById("jobPostingSchema");
+      if (!script) return;
+
+      const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim() || "QuickHire™ Employer";
+      const companySite = String(j.company_website || j.website || "").trim();
+      const companyLogo = String(j.company_logo_url || j.logo_url || "").trim();
+      const locCity = String(j.city || "").trim();
+      const locState = String(j.state || "").trim();
+      const locCountry = String(j.country || "US").trim() || "US";
+      const payMin = j.pay_min != null && String(j.pay_min).trim() !== "" ? Number(j.pay_min) : null;
+      const payMax = j.pay_max != null && String(j.pay_max).trim() !== "" ? Number(j.pay_max) : null;
+      const payCurrency = String(j.pay_currency || "USD").trim() || "USD";
+      const employmentType = normalizeEmploymentType(j.employment_type);
+      const datePosted = isoDateOrNull(j.posted_at || j.created_at || j.updated_at);
+      const validThrough = isoDateOrNull(j.expires_at || j.valid_through);
+
+      const schema = {
+        "@context": "https://schema.org",
+        "@type": "JobPosting",
+        "title": String(j.job_title || "Job Opening"),
+        "description": String(j.job_description || ""),
+        "identifier": {
+          "@type": "PropertyValue",
+          "name": "QuickHire™",
+          "value": String(j.job_id || state.jobId || "")
+        },
+        "datePosted": datePosted || undefined,
+        "validThrough": validThrough || undefined,
+        "employmentType": employmentType || undefined,
+        "hiringOrganization": {
+          "@type": "Organization",
+          "name": companyName,
+          "sameAs": companySite || undefined,
+          "logo": companyLogo || undefined
+        },
+        "jobLocation": (locCity || locState) ? {
+          "@type": "Place",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": locCity || undefined,
+            "addressRegion": locState || undefined,
+            "addressCountry": locCountry || "US"
+          }
+        } : undefined,
+        "applicantLocationRequirements": {
+          "@type": "Country",
+          "name": locCountry || "US"
+        },
+        "industry": String(j.category || "").trim() || undefined,
+        "directApply": !String(j.apply_url || "").trim(),
+        "url": canonicalUrl
+      };
+
+      if (payMin !== null || payMax !== null){
+        schema.baseSalary = {
+          "@type": "MonetaryAmount",
+          "currency": payCurrency,
+          "value": {
+            "@type": "QuantitativeValue",
+            "minValue": payMin !== null ? payMin : undefined,
+            "maxValue": payMax !== null ? payMax : undefined,
+            "unitText": "HOUR"
+          }
+        };
+      }
+
+      script.textContent = JSON.stringify(schema, null, 2);
     }
 
     function setMetaFromJob(j){
-      try{
-        const title = j && j.job_title ? (String(j.job_title) + " — QuickHire™ Job Board") : "QuickHire™ — Job Detail";
-        document.title = title;
+      const canonicalUrl = setCanonicalForJob(state.jobId);
+      const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
+      const loc = [j.city, j.state].filter(Boolean).join(", ");
+      const titleParts = [j.job_title || "Job Opening"];
+      if (companyName) titleParts.push(companyName);
+      if (loc) titleParts.push(loc);
+      const pageTitle = titleParts.join(" | ") + " | QuickHire™ Job Board";
 
-        const desc = String(j && (j.job_description || "") || "").replace(/\s+/g," ").trim();
-        const snippet = (desc.length > 155) ? (desc.slice(0, 152) + "...") : (desc || "View this job posting on QuickHire™.");
-        const metaDesc = document.querySelector('meta[name="description"]');
-        if (metaDesc) metaDesc.setAttribute("content", snippet);
-      }catch(e){ /* ignore */ }
+      document.title = pageTitle;
+
+      const description = buildJobDescription(j) || "View this job posting on the QuickHire™ Job Board.";
+      setMetaTag('meta[name="description"]', description);
+      setMetaTag('meta[property="og:title"]', pageTitle);
+      setMetaTag('meta[property="og:description"]', description);
+      setMetaTag('meta[property="og:url"]', canonicalUrl);
+      setMetaTag('meta[name="twitter:title"]', pageTitle);
+      setMetaTag('meta[name="twitter:description"]', description);
+
+      updateSchemaForJob(j, canonicalUrl);
+      setRobots("index,follow");
     }
 
     async function apiGet(params){
       const url = API_BASE + "?" + new URLSearchParams(params).toString();
       const res = await fetch(url, { method:"GET" });
-      const json = await res.json();
-      return json;
+      return await res.json();
     }
 
     async function apiPost(body){
@@ -670,18 +836,15 @@
         headers: { "Content-Type":"application/json" },
         body: JSON.stringify(body)
       });
-      const json = await res.json();
-      return json;
+      return await res.json();
     }
 
-    // ----------------------------
-    // Account UI
-    // ----------------------------
     function syncAccountUi(){
       state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
       const sess = state.session || {};
       const isCandidate = !!sess.session_token && sess.role === "job_seeker";
-      qs("#acctWrap").style.display = isCandidate ? "inline-flex" : "none";
+      const acctWrap = qs("#acctWrap");
+      if (acctWrap) acctWrap.style.display = isCandidate ? "inline-flex" : "none";
     }
 
     function closeAccountMenu(){
@@ -691,20 +854,42 @@
       if (btn) btn.setAttribute("aria-expanded","false");
     }
 
-    // ----------------------------
-    // Render
-    // ----------------------------
     function renderNotFound(msg){
+      setRobots("noindex,follow");
+      document.title = "Job Not Found | QuickHire™ Job Board";
+      setMetaTag('meta[name="description"]', "This job posting is unavailable or no longer active on the QuickHire™ Job Board.");
+      setMetaTag('meta[property="og:title"]', "Job Not Found | QuickHire™ Job Board");
+      setMetaTag('meta[property="og:description"]', "This job posting is unavailable or no longer active on the QuickHire™ Job Board.");
+      setMetaTag('meta[property="og:url"]', window.location.href);
+      setMetaTag('meta[name="twitter:title"]', "Job Not Found | QuickHire™ Job Board");
+      setMetaTag('meta[name="twitter:description"]', "This job posting is unavailable or no longer active on the QuickHire™ Job Board.");
+
+      const schema = document.getElementById("jobPostingSchema");
+      if (schema) {
+        schema.textContent = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "name": "Job Not Found | QuickHire™ Job Board",
+          "url": window.location.href
+        }, null, 2);
+      }
+
       setText(qs("#detailMeta"), "Not found");
-      qs("#applyBtn").disabled = true;
-      qs("#reportBtn").disabled = true;
+      setText(qs("#crumbCurrent"), "Job Not Found");
+
+      const applyBtn = qs("#applyBtn");
+      const reportBtn = qs("#reportBtn");
+      if (applyBtn) applyBtn.disabled = true;
+      if (reportBtn) reportBtn.disabled = true;
+
       qs("#jobDetail").innerHTML = `
         <h1>Job not found</h1>
-        <div class="muted">${escapeHtml(msg || "This job link is invalid or the job is no longer available.")}</div>
+        <p class="lede">${escapeHtml(msg || "This job link is invalid or the job is no longer available.")}</p>
         <div class="box">
           <div class="muted" style="font-weight:900; margin-bottom:6px;">Next step</div>
-          <div class="muted">
-            <a class="btn" href="${PATHS.jobBoard}" target="_self" style="margin-top:8px;">Back to Job Board</a>
+          <div class="muted">Return to the QuickHire™ Job Board to browse current openings.</div>
+          <div style="margin-top:10px;">
+            <a class="btn" href="${PATHS.jobBoard}" target="_self">Back to Job Board</a>
           </div>
         </div>
       `;
@@ -712,27 +897,38 @@
 
     function renderJob(j){
       const loc = [j.city, j.state, j.country].filter(Boolean).join(", ") || (j.location || "");
-      const empType = normalizeEmploymentType(j.employment_type);
-      const pay = (j.pay_min || j.pay_max) ? `${j.pay_min||""} – ${j.pay_max||""} ${j.pay_currency||""}`.trim() : "";
+      const empTypeLabel = normalizeEmploymentTypeLabel(j.employment_type);
+      const pay = (j.pay_min || j.pay_max) ? `${j.pay_min || ""} – ${j.pay_max || ""} ${j.pay_currency || ""}`.trim() : "";
       const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
-
-      // company fields (same logic as index.html right panel)
       const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
       const companyLogo = String(j.company_logo_url || j.logo_url || "").trim();
       const companySite = String(j.company_website || j.website || "").trim();
+      const postedAt = j.posted_at ? new Date(j.posted_at) : null;
+      const postedLabel = postedAt && !isNaN(postedAt.getTime())
+        ? postedAt.toLocaleDateString(undefined, { year:"numeric", month:"long", day:"numeric" })
+        : "";
 
-      setText(qs("#detailMeta"), "Job detail");
-      qs("#applyBtn").disabled = false;
-      qs("#reportBtn").disabled = false;
+      setText(qs("#detailMeta"), postedLabel ? ("Posted " + postedLabel) : "Job detail");
+      setText(qs("#crumbCurrent"), j.job_title || "Job Detail");
+
+      const applyBtn = qs("#applyBtn");
+      const reportBtn = qs("#reportBtn");
+      if (applyBtn) applyBtn.disabled = false;
+      if (reportBtn) reportBtn.disabled = false;
 
       qs("#jobDetail").innerHTML = `
         <h1>${escapeHtml(j.job_title || "Untitled role")}</h1>
+        <p class="lede">
+          ${escapeHtml(companyName || "Employer")} ${loc ? ("is hiring in " + escapeHtml(loc)) : "is hiring now"}.
+        </p>
 
         <div class="facts" aria-label="Job facts">
           ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
-          ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
+          ${empTypeLabel ? `<span class="pill">${escapeHtml(empTypeLabel)}</span>` : ``}
           ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
           ${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
+          ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
+          ${postedLabel ? `<span class="pill">Posted ${escapeHtml(postedLabel)}</span>` : ``}
           ${verified ? `
             <span class="verified-inline">
               <img class="verified-badge" src="/QuickHireVerifiedEmployerBadge.png" alt="Verified Employer" />
@@ -741,51 +937,47 @@
         </div>
 
         ${(companyName || companyLogo || companySite) ? `
-          <div class="company-block" aria-label="Company information">
+          <section class="company-block" aria-label="Company information">
             ${companyLogo ? `<img class="company-logo" src="${escapeHtml(companyLogo)}" alt="${escapeHtml(companyName || "Company logo")}" loading="lazy" />` : ``}
             ${companyName ? `<div class="company-name">${escapeHtml(companyName)}</div>` : ``}
             ${companySite ? `<div class="company-site"><a href="${escapeHtml(companySite)}" target="_blank" rel="noopener">${escapeHtml(companySite)}</a></div>` : ``}
-          </div>
+          </section>
         ` : ``}
 
         <div class="muted" style="margin-top:10px;">Job ID: ${escapeHtml(j.job_id || state.jobId || "")}</div>
 
-        <div class="box" style="margin-top:14px;">
+        <section class="box" aria-label="Job description" style="margin-top:14px;">
           <div class="muted" style="margin-bottom:6px; font-weight:900;">Description</div>
-          <pre>${escapeHtml(j.job_description || "")}</pre>
-        </div>
+          <div class="body-copy">${escapeHtml(j.job_description || "")}</div>
+        </section>
 
         ${j.benefits_summary ? `
-          <div class="box">
+          <section class="box" aria-label="Benefits summary">
             <div class="muted" style="margin-bottom:6px; font-weight:900;">Benefits Summary</div>
-            <pre>${escapeHtml(j.benefits_summary)}</pre>
-          </div>
+            <div class="body-copy">${escapeHtml(j.benefits_summary)}</div>
+          </section>
         ` : ``}
 
         ${String(j.apply_url || "").trim() ? `
-          <div class="box">
+          <section class="box" aria-label="How to apply">
             <div class="muted" style="margin-bottom:6px; font-weight:900;">External apply</div>
             <div class="muted">This job has an external application link. Clicking Apply will take you to the employer’s site.</div>
-          </div>
+          </section>
         ` : `
-          <div class="box">
+          <section class="box" aria-label="How to apply">
             <div class="muted" style="margin-bottom:6px; font-weight:900;">How to apply</div>
             <div class="muted">You must have a Job Seeker account and be logged in to apply.</div>
-          </div>
+          </section>
         `}
       `;
     }
 
-    // ----------------------------
-    // Apply / Report
-    // ----------------------------
     async function goApply(){
       if (!state.jobId) return;
 
       const current = state.job || {};
       const external = String(current.apply_url || "").trim();
 
-      // External apply branch + log click
       if (external){
         try{
           const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
@@ -796,13 +988,12 @@
             job_id: state.jobId,
             apply_url: external
           });
-        }catch(e){ /* ignore */ }
+        }catch(e){}
 
         window.location.href = external;
         return;
       }
 
-      // Internal apply unchanged
       state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
       const sess = state.session || {};
       const applyUrl = PATHS.applyPage + "?job_id=" + encodeURIComponent(state.jobId);
@@ -889,16 +1080,13 @@
       }
     }
 
-    // ----------------------------
-    // Load job
-    // ----------------------------
     async function loadJob(){
       if (!API_BASE){
         renderNotFound("Missing API base. Set it in /config/config.js");
         return;
       }
 
-      qs("#jobDetail").innerHTML = `<div class="muted">Loading job…</div>`;
+      qs("#jobDetail").innerHTML = `<h1>Loading job…</h1><p class="lede">QuickHire™ is loading this job posting now.</p>`;
       setText(qs("#detailMeta"), "Loading…");
 
       const jobId = getJobIdFromUrl();
@@ -908,8 +1096,6 @@
         renderNotFound("No job_id provided in the URL.");
         return;
       }
-
-      setCanonicalForJob(jobId);
 
       const json = await apiGet({
         mode:"public_api",
@@ -927,38 +1113,38 @@
       renderJob(state.job);
     }
 
-    // ----------------------------
-    // Wire up
-    // ----------------------------
+    function getJobIdFromUrl(){
+      try{
+        const url = new URL(window.location.href);
+        return (url.searchParams.get("job_id") || "").trim();
+      }catch(e){
+        return "";
+      }
+    }
+
     function init(){
-      // year
-      (function () {
-        var y = new Date().getFullYear();
-        var el = document.getElementById('qh-year');
-        if (el) el.textContent = String(y);
-      })();
+      var y = new Date().getFullYear();
+      var yearEl = document.getElementById("qh-year");
+      if (yearEl) yearEl.textContent = String(y);
 
       syncAccountUi();
 
-      // Candidate login
       qs("#loginBtn").addEventListener("click", () => {
         const here = window.location.pathname + window.location.search;
         window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
       });
 
-      // Employer portal: if not logged in as employer, force employer role in login (matches index flow)
       qs("#employerBtn").addEventListener("click", (e) => {
         try{
           const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
           const isEmployer = !!sess.session_token && (sess.role === "employer");
           if (isEmployer) return;
-        }catch(err){ /* ignore */ }
+        }catch(err){}
 
         e.preventDefault();
         window.location.href = PATHS.candidateLogin + "?role=employer&next=" + encodeURIComponent(PATHS.employerPortal);
       });
 
-      // My Account dropdown toggle + logout
       qs("#acctBtn").addEventListener("click", (e) => {
         e.preventDefault();
         const wrap = qs("#acctWrap");
@@ -971,20 +1157,18 @@
         try{
           if (window.QH && typeof QH.clearSession === "function") QH.clearSession();
           else localStorage.removeItem("qh_session");
-        }catch(e){ /* ignore */ }
+        }catch(e){}
         closeAccountMenu();
         syncAccountUi();
         alert("Logged out.");
       });
 
-      // close menu on outside click
       document.addEventListener("click", (e) => {
         const wrap = qs("#acctWrap");
         if (!wrap) return;
         if (!wrap.contains(e.target)) closeAccountMenu();
       });
 
-      // Apply + Report
       qs("#applyBtn").addEventListener("click", goApply);
       qs("#reportBtn").addEventListener("click", openReportModal);
 
@@ -992,7 +1176,6 @@
       qs("#reportCancelBtn").addEventListener("click", closeReportModal);
       qs("#reportSubmitBtn").addEventListener("click", submitReport);
 
-      // click outside modal to close
       qs("#reportModal").addEventListener("click", (e) => {
         if (e.target === qs("#reportModal")) closeReportModal();
       });
