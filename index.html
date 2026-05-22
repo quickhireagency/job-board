@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QuickHire™ Job Board | Search Jobs, Careers & Hiring Opportunities</title>
 
-  <!-- QuickHire™ Job Board v8.0.0 Alpha | Last Updated: 2026-05-22T19:32:23Z UTC | Developed by Cook Technology Services -->
+  <!-- QuickHire™ Job Board v9.0.0 Alpha | Last Updated: 2026-05-22T19:46:56Z UTC | Developed by Cook Technology Services -->
 
   <!-- SEO: indexable main page -->
   <meta name="robots" content="index,follow" />
@@ -719,7 +719,7 @@
           <div class="empty">Loading jobs…</div>
         </div>
 
-        <!-- v8.0.0 Alpha: infinite scroll + Load More fallback -->
+        <!-- v9.0.0 Alpha: infinite scroll + Load More fallback -->
         <div class="pager" aria-label="Job list loading">
           <div class="meta" id="pageMeta">Loading jobs…</div>
           <button class="btn primary" id="loadMoreBtn" type="button" disabled>Load More Jobs</button>
@@ -856,7 +856,7 @@
       </p>
 
       <p style="text-align:center; color:var(--muted); font-size:12px; line-height:1.55; margin-top:-2px;">
-        QuickHire™ Job Board v8.0.0 Alpha | Last Updated: 2026-05-22T19:32:23Z UTC<br>
+        QuickHire™ Job Board v9.0.0 Alpha | Last Updated: 2026-05-22T19:46:56Z UTC<br>
         Developed by Cook Technology Services<br>
         Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
       </p>
@@ -979,20 +979,20 @@
 
   <script>
     // =============================================================================
-    // QuickHire™ Job Board Frontend — v8.0.0 Alpha
-    // Last Updated: 2026-05-22T19:32:23Z UTC
+    // QuickHire™ Job Board Frontend — v9.0.0 Alpha
+    // Last Updated: 2026-05-22T19:46:56Z UTC
     // Developed by Cook Technology Services
     // Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
     //
     // Performance model:
-    // - First paint loads 100 lightweight job cards.
-    // - Background prefetch fills the list to 500 cards.
+    // - First paint loads 100 lightweight JobIndex cards.
+    // - No startup facets wait, no auto-prefetch storm, no automatic detail call.
     // - Infinite scroll / Load More fetches another 100 at a time.
-    // - Full job details still load through get_job only when selected.
+    // - Full job details load through get_job only when the user clicks a job.
     // =============================================================================
 
-    const QH_BUILD_VERSION = "v8.0.0 Alpha";
-    const QH_BUILD_UTC = "2026-05-22T19:32:23Z";
+    const QH_BUILD_VERSION = "v9.0.0 Alpha";
+    const QH_BUILD_UTC = "2026-05-22T19:46:56Z";
 
     // ----------------------------
     // Config / State
@@ -1020,7 +1020,7 @@
         requestKey: "",
         loading: false,
         prefetching: false,
-        autoPrefetchTarget: 500
+        autoPrefetchTarget: 0
       }
     };
 
@@ -1094,6 +1094,39 @@
       if (s.includes("part")) return "Part Time";
       if (s.includes("full")) return "Full Time";
       return String(v || "").trim();
+    }
+
+
+    function getJobLocationText(j){
+      const direct = [j.city, j.state].filter(Boolean).join(", ").trim();
+      if (direct) return direct;
+      const candidates = [
+        j.location,
+        j.job_location,
+        j.location_text,
+        j.work_location,
+        j.address,
+        j.search_location
+      ];
+      for (let i=0; i<candidates.length; i++) {
+        const v = String(candidates[i] || "").trim();
+        if (v) return v;
+      }
+      return "Location not listed";
+    }
+
+    function getJobSearchText(j){
+      return [
+        j.job_title,
+        j.company_name,
+        j.company_id,
+        getJobLocationText(j),
+        j.city,
+        j.state,
+        j.category,
+        j.employment_type,
+        j.work_arrangement
+      ].map(x => String(x || "").toLowerCase()).join(" ");
     }
 
     function setUrlJobId(jobId){
@@ -1242,17 +1275,16 @@
         state.paging.cursor = json.nextCursor ? (state.paging.cursor || "") : state.paging.cursor;
         state.paging.nextCursor = json.nextCursor || "";
         state.paging.totalMatched = Number(json.totalMatched || 0) || 0;
+        state.paging.countLabel = String(json.countLabel || "");
 
         if (json.nextCursor) {
-          // The backend cursor is the cursor for the next request.
+          // The backend cursor is opaque and points to the next chunk.
           state.paging.cursor = json.nextCursor;
+        } else {
+          state.paging.cursor = "";
         }
 
         await applyRadiusIfNeededThenRender();
-
-        if (!background) {
-          scheduleAutoPrefetch();
-        }
       }catch(e){
         if (!state.jobs.length) {
           qs("#jobList").innerHTML = `<div class="empty">Unable to load jobs. Please refresh and try again.</div>`;
@@ -1316,15 +1348,18 @@
       const urlJobId = (new URL(window.location.href)).searchParams.get("job_id") || "";
       if (urlJobId && state.filtered.some(j => j.job_id === urlJobId)){
         state.selectedJobId = urlJobId;
+        renderSelectedJob(urlJobId);
+        return;
       }
 
-      if (!state.selectedJobId || !state.filtered.some(j => j.job_id === state.selectedJobId)){
-        state.selectedJobId = state.filtered[0].job_id;
+      // v9.0.0 Alpha: do NOT auto-load the first job detail. First paint should
+      // show jobs immediately; details load only after a user click or job_id URL.
+      if (!state.selectedJobId) {
+        setText(qs("#detailMeta"), "Select a job on the left");
+        qs("#applyBtn").disabled = true;
+        qs("#reportBtn").disabled = true;
+        qs("#jobDetail").innerHTML = `<div class="muted">Select a job to view details. Jobs are ready to browse on the left.</div>`;
       }
-
-      setUrlJobId(state.selectedJobId);
-      renderSelectedJob(state.selectedJobId);
-      renderJobs();
     }
 
     function renderJobs(){
@@ -1338,7 +1373,7 @@
 
       list.innerHTML = jobs.map(j => {
         const active = (j.job_id === state.selectedJobId) ? "active" : "";
-        const loc = [j.city, j.state].filter(Boolean).join(", ") || (j.location || "Location");
+        const loc = getJobLocationText(j);
         const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
 
         const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
@@ -1408,7 +1443,7 @@
         document.title = (j.job_title ? (j.job_title + " — QuickHire™ Job Board") : "QuickHire™ Job Board");
       }catch(e){}
 
-      const loc = [j.city, j.state, j.country].filter(Boolean).join(", ") || (j.location || "");
+      const loc = getJobLocationText(j);
       const pay = (j.pay_min || j.pay_max) ? `${j.pay_min||""} – ${j.pay_max||""} ${j.pay_currency||""}`.trim() : "";
       const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
 
@@ -1484,7 +1519,8 @@
         if (state.paging.loading && !loaded) {
           meta.textContent = "Loading jobs…";
         } else {
-          meta.textContent = `Showing ${loaded.toLocaleString()} of ${total.toLocaleString()} results`;
+          const label = state.paging.countLabel || (total ? total.toLocaleString() + " results" : "jobs");
+          meta.textContent = `Showing ${loaded.toLocaleString()} ${label ? "of " + label : "jobs"}`;
         }
       }
 
@@ -1682,10 +1718,12 @@
 
       const city = String(job.city||"").trim();
       const st = String(job.state||"").trim();
-      if (!city || !st) return null;
+      const fallbackLoc = getJobLocationText(job);
+      const queryText = (city && st) ? (city + ", " + st + ", USA") : fallbackLoc;
+      if (!queryText || queryText === "Location not listed") return null;
 
       try{
-        const q = encodeURIComponent(city + ", " + st + ", USA");
+        const q = encodeURIComponent(queryText);
         const url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=" + q;
         const res = await fetch(url, { headers: { "Accept":"application/json" } });
         const arr = await res.json();
@@ -1825,9 +1863,10 @@
 
       qs("#radiusSel").addEventListener("change", debounce(() => applyRadiusIfNeededThenRender(), 200));
 
-      await loadFacets();
       state.paging.requestKey = currentRequestKey();
       await loadJobs(true);
+      // Load dropdown facets after jobs are already visible.
+      loadFacets();
     }
 
     init();
