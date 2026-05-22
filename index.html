@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QuickHire™ Job Board | Search Jobs, Careers & Hiring Opportunities</title>
 
-  <!-- QuickHire™ Job Board v9.0.0 Alpha | Last Updated: 2026-05-22T19:46:56Z UTC | Developed by Cook Technology Services -->
+  <!-- QuickHire™ Job Board v10.0.0 Alpha | Last Updated: 2026-05-22T19:57:00Z UTC | Developed by Cook Technology Services -->
 
   <!-- SEO: indexable main page -->
   <meta name="robots" content="index,follow" />
@@ -719,7 +719,7 @@
           <div class="empty">Loading jobs…</div>
         </div>
 
-        <!-- v9.0.0 Alpha: infinite scroll + Load More fallback -->
+        <!-- v10.0.0 Alpha: infinite scroll + Load More fallback -->
         <div class="pager" aria-label="Job list loading">
           <div class="meta" id="pageMeta">Loading jobs…</div>
           <button class="btn primary" id="loadMoreBtn" type="button" disabled>Load More Jobs</button>
@@ -856,7 +856,7 @@
       </p>
 
       <p style="text-align:center; color:var(--muted); font-size:12px; line-height:1.55; margin-top:-2px;">
-        QuickHire™ Job Board v9.0.0 Alpha | Last Updated: 2026-05-22T19:46:56Z UTC<br>
+        QuickHire™ Job Board v10.0.0 Alpha | Last Updated: 2026-05-22T19:57:00Z UTC<br>
         Developed by Cook Technology Services<br>
         Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
       </p>
@@ -979,20 +979,20 @@
 
   <script>
     // =============================================================================
-    // QuickHire™ Job Board Frontend — v9.0.0 Alpha
-    // Last Updated: 2026-05-22T19:46:56Z UTC
+    // QuickHire™ Job Board Frontend — v10.0.0 Alpha
+    // Last Updated: 2026-05-22T19:57:00Z UTC
     // Developed by Cook Technology Services
     // Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
     //
     // Performance model:
-    // - First paint loads 100 lightweight JobIndex cards.
+    // - First paint renders /data/jobs-seed.json or cached jobs before Apps Script.
     // - No startup facets wait, no auto-prefetch storm, no automatic detail call.
     // - Infinite scroll / Load More fetches another 100 at a time.
     // - Full job details load through get_job only when the user clicks a job.
     // =============================================================================
 
-    const QH_BUILD_VERSION = "v9.0.0 Alpha";
-    const QH_BUILD_UTC = "2026-05-22T19:46:56Z";
+    const QH_BUILD_VERSION = "v10.0.0 Alpha";
+    const QH_BUILD_UTC = "2026-05-22T19:57:00Z";
 
     // ----------------------------
     // Config / State
@@ -1138,6 +1138,95 @@
       }catch(e){ /* ignore */ }
     }
 
+    const QH_SEED_URL = "/data/jobs-seed.json?v=10.0.0";
+    const QH_LOCAL_CACHE_KEY = "qh_job_seed_cache_v10";
+
+    function hasActiveFilters(){
+      const f = currentFilters();
+      return !!(f.keyword || f.category || f.workArrangement || f.city || f.stateVal);
+    }
+
+    function normalizeSeedPayload(payload){
+      if (!payload) return [];
+      if (Array.isArray(payload)) return payload;
+      if (Array.isArray(payload.jobs)) return payload.jobs;
+      return [];
+    }
+
+    function ingestJobs(incoming, replaceExisting){
+      if (replaceExisting) {
+        state.jobs = [];
+        state.filtered = [];
+        state.seenJobIds = {};
+      }
+      (incoming || []).forEach(j => {
+        const id = String(j && j.job_id || "").trim();
+        if (!id || state.seenJobIds[id]) return;
+        state.seenJobIds[id] = true;
+        state.jobs.push(j);
+      });
+    }
+
+    function saveSeedCacheFromCurrentJobs(){
+      try{
+        if (hasActiveFilters()) return;
+        const jobs = (state.jobs || []).slice(0, 100);
+        if (!jobs.length) return;
+        localStorage.setItem(QH_LOCAL_CACHE_KEY, JSON.stringify({
+          version: QH_BUILD_VERSION,
+          cached_at_utc: new Date().toISOString(),
+          jobs: jobs
+        }));
+      }catch(e){ /* cache is optional */ }
+    }
+
+    function renderSeedMessage(sourceName){
+      if (!state.jobs.length) return;
+      const meta = qs("#pageMeta");
+      if (meta) meta.textContent = "Showing latest jobs" + (sourceName ? " from " + sourceName : "") + " while live results refresh…";
+      setText(qs("#jobCount"), String(state.jobs.length));
+    }
+
+    async function loadInstantSeedJobs(){
+      let painted = false;
+
+      // 1) Fastest: render cached successful jobs from the last visit immediately.
+      try{
+        const raw = localStorage.getItem(QH_LOCAL_CACHE_KEY);
+        if (raw) {
+          const cachedJobs = normalizeSeedPayload(JSON.parse(raw));
+          if (cachedJobs.length) {
+            ingestJobs(cachedJobs, true);
+            state.filtered = state.jobs.slice();
+            renderJobs();
+            ensureSelection();
+            renderSeedMessage("cache");
+            painted = true;
+          }
+        }
+      }catch(e){ /* ignore cache */ }
+
+      // 2) Static repo seed. This is the true first-visit instant path.
+      try{
+        const res = await fetch(QH_SEED_URL, { method:"GET", cache:"force-cache" });
+        if (res && res.ok) {
+          const payload = await res.json();
+          const seedJobs = normalizeSeedPayload(payload);
+          if (seedJobs.length) {
+            ingestJobs(seedJobs, true);
+            state.filtered = state.jobs.slice();
+            state.paging.totalMatched = Number(payload.totalIndexed || payload.count || seedJobs.length) || seedJobs.length;
+            renderJobs();
+            ensureSelection();
+            renderSeedMessage("static seed");
+            painted = true;
+          }
+        }
+      }catch(e){ /* static seed is optional but strongly recommended */ }
+
+      return painted;
+    }
+
     function currentRequestKey(){
       return JSON.stringify(currentFilters());
     }
@@ -1225,10 +1314,19 @@
       const token = ++state.paging.loadToken;
       const requestKey = currentRequestKey();
 
+      const keepExisting = !!opts.keepExisting;
+      const replaceOnSuccess = !!opts.replaceOnSuccess;
+
       if (resetCursor){
-        resetJobPaging();
+        if (!keepExisting) {
+          resetJobPaging();
+          qs("#jobList").innerHTML = `<div class="empty">Loading jobs…</div>`;
+        } else {
+          state.paging.cursor = "";
+          state.paging.nextCursor = "";
+          state.paging.totalMatched = state.jobs.length || 0;
+        }
         state.paging.requestKey = requestKey;
-        qs("#jobList").innerHTML = `<div class="empty">Loading jobs…</div>`;
       }
 
       state.paging.loading = true;
@@ -1265,12 +1363,8 @@
         }
 
         const incoming = json.jobs || [];
-        incoming.forEach(j => {
-          const id = String(j.job_id || "").trim();
-          if (!id || state.seenJobIds[id]) return;
-          state.seenJobIds[id] = true;
-          state.jobs.push(j);
-        });
+        ingestJobs(incoming, replaceOnSuccess);
+        saveSeedCacheFromCurrentJobs();
 
         state.paging.cursor = json.nextCursor ? (state.paging.cursor || "") : state.paging.cursor;
         state.paging.nextCursor = json.nextCursor || "";
@@ -1287,7 +1381,10 @@
         await applyRadiusIfNeededThenRender();
       }catch(e){
         if (!state.jobs.length) {
-          qs("#jobList").innerHTML = `<div class="empty">Unable to load jobs. Please refresh and try again.</div>`;
+          qs("#jobList").innerHTML = `<div class="empty">Unable to load live jobs. Please refresh and try again.</div>`;
+        } else {
+          const meta = qs("#pageMeta");
+          if (meta) meta.textContent = "Showing saved/latest jobs. Live refresh is still warming up.";
         }
       }finally{
         if (token === state.paging.loadToken || !resetCursor) {
@@ -1352,7 +1449,7 @@
         return;
       }
 
-      // v9.0.0 Alpha: do NOT auto-load the first job detail. First paint should
+      // v10.0.0 Alpha: do NOT auto-load the first job detail. First paint should
       // show jobs immediately; details load only after a user click or job_id URL.
       if (!state.selectedJobId) {
         setText(qs("#detailMeta"), "Select a job on the left");
@@ -1864,9 +1961,24 @@
       qs("#radiusSel").addEventListener("change", debounce(() => applyRadiusIfNeededThenRender(), 200));
 
       state.paging.requestKey = currentRequestKey();
-      await loadJobs(true);
+
+      // v10.0.0 Alpha: instant first paint.
+      // Render static/cached jobs first, without waiting on Apps Script.
+      const seedPainted = await loadInstantSeedJobs();
+      if (!seedPainted) {
+        qs("#jobList").innerHTML = `<div class="empty">Loading latest jobs…</div>`;
+      }
+
+      // Live backend refresh happens after first paint. It replaces seed jobs when
+      // fresh results arrive, but does not blank the page while Apps Script warms up.
+      loadJobs(true, {
+        background: true,
+        keepExisting: seedPainted,
+        replaceOnSuccess: true
+      });
+
       // Load dropdown facets after jobs are already visible.
-      loadFacets();
+      setTimeout(loadFacets, 250);
     }
 
     init();
