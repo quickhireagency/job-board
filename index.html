@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QuickHire™ Job Board | Search Jobs, Careers & Hiring Opportunities</title>
 
+  <!-- QuickHire™ Job Board v8.0.0 Alpha | Last Updated: 2026-05-22T19:32:23Z UTC | Developed by Cook Technology Services -->
+
   <!-- SEO: indexable main page -->
   <meta name="robots" content="index,follow" />
   <meta name="description" content="Search jobs, careers, and hiring opportunities on the QuickHire™ Job Board. Browse openings by keyword, city, state, category, and work arrangement. Apply online and connect with employers hiring now." />
@@ -418,6 +420,13 @@
       padding:8px 10px;
       border-radius: 12px;
     }
+    .pager .btn:disabled{
+      opacity:.62;
+      cursor:not-allowed;
+    }
+    .pager .meta{
+      text-align:center;
+    }
 
     /* My Account dropdown */
     .dropdown{
@@ -710,11 +719,10 @@
           <div class="empty">Loading jobs…</div>
         </div>
 
-        <!-- Next/Prev pager (cursor paging) -->
-        <div class="pager" aria-label="Job list pagination">
-          <button class="btn" id="prevPageBtn" type="button" disabled>Prev</button>
-          <div class="meta" id="pageMeta">Page 1</div>
-          <button class="btn" id="nextPageBtn" type="button" disabled>Next</button>
+        <!-- v8.0.0 Alpha: infinite scroll + Load More fallback -->
+        <div class="pager" aria-label="Job list loading">
+          <div class="meta" id="pageMeta">Loading jobs…</div>
+          <button class="btn primary" id="loadMoreBtn" type="button" disabled>Load More Jobs</button>
         </div>
       </div>
 
@@ -847,6 +855,12 @@
         <strong>Copyright © 2017-<span id="qh-year"></span> | QuickHire Agency™</strong> — All Rights Reserved
       </p>
 
+      <p style="text-align:center; color:var(--muted); font-size:12px; line-height:1.55; margin-top:-2px;">
+        QuickHire™ Job Board v8.0.0 Alpha | Last Updated: 2026-05-22T19:32:23Z UTC<br>
+        Developed by Cook Technology Services<br>
+        Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+      </p>
+
       <div class="qh-footer-grid">
         <section aria-label="Contact Us">
           <h3>Contact Us</h3>
@@ -964,13 +978,31 @@
   </div>
 
   <script>
+    // =============================================================================
+    // QuickHire™ Job Board Frontend — v8.0.0 Alpha
+    // Last Updated: 2026-05-22T19:32:23Z UTC
+    // Developed by Cook Technology Services
+    // Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+    //
+    // Performance model:
+    // - First paint loads 100 lightweight job cards.
+    // - Background prefetch fills the list to 500 cards.
+    // - Infinite scroll / Load More fetches another 100 at a time.
+    // - Full job details still load through get_job only when selected.
+    // =============================================================================
+
+    const QH_BUILD_VERSION = "v8.0.0 Alpha";
+    const QH_BUILD_UTC = "2026-05-22T19:32:23Z";
+
     // ----------------------------
     // Config / State
     // ----------------------------
     const API_BASE = (window.QH_CONFIG && window.QH_CONFIG.API_BASE) || "";
+
     const state = {
       jobs: [],
       filtered: [],
+      seenJobIds: {},
       selectedJobId: "",
       selectedJob: null,
       session: (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {}),
@@ -982,10 +1014,13 @@
       paging: {
         cursor: "",
         nextCursor: "",
-        prevStack: [],
-        page: 1,
         totalMatched: 0,
-        limit: 50
+        limit: 100,
+        loadToken: 0,
+        requestKey: "",
+        loading: false,
+        prefetching: false,
+        autoPrefetchTarget: 500
       }
     };
 
@@ -997,7 +1032,7 @@
     };
 
     function qs(sel){ return document.querySelector(sel); }
-    function setText(el, txt){ el.textContent = txt; }
+    function setText(el, txt){ if (el) el.textContent = txt; }
 
     function toast(msg){ alert(msg); }
 
@@ -1006,7 +1041,7 @@
     // ----------------------------
     async function apiGet(params){
       const url = API_BASE + "?" + new URLSearchParams(params).toString();
-      const res = await fetch(url, { method:"GET" });
+      const res = await fetch(url, { method:"GET", cache:"no-store" });
       const json = await res.json();
       return json;
     }
@@ -1058,7 +1093,6 @@
       if (!s) return "";
       if (s.includes("part")) return "Part Time";
       if (s.includes("full")) return "Full Time";
-      // fallback: title case
       return String(v || "").trim();
     }
 
@@ -1069,6 +1103,21 @@
         else url.searchParams.delete("job_id");
         window.history.replaceState({}, "", url.toString());
       }catch(e){ /* ignore */ }
+    }
+
+    function currentRequestKey(){
+      return JSON.stringify(currentFilters());
+    }
+
+    function resetJobPaging(){
+      state.jobs = [];
+      state.filtered = [];
+      state.seenJobIds = {};
+      state.selectedJobId = "";
+      state.selectedJob = null;
+      state.paging.cursor = "";
+      state.paging.nextCursor = "";
+      state.paging.totalMatched = 0;
     }
 
     // ----------------------------
@@ -1083,12 +1132,41 @@
 
     function initStates(){
       const sel = qs("#stateSel");
+      if (!sel) return;
       sel.innerHTML = `<option value="">Any</option>` +
         US_STATES_AND_TERRITORIES.map(s => `<option value="${s}">${s}</option>`).join("");
     }
 
+    function populateSelect(sel, values, firstLabel, preserveValue){
+      if (!sel) return;
+      const prev = preserveValue == null ? sel.value : preserveValue;
+      const clean = (values || [])
+        .map(v => String(v || "").trim())
+        .filter(Boolean)
+        .filter((v, i, arr) => arr.indexOf(v) === i)
+        .sort();
+
+      sel.innerHTML = `<option value="">${escapeHtml(firstLabel || "All")}</option>` +
+        clean.map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join("");
+
+      if (prev && clean.indexOf(prev) >= 0) sel.value = prev;
+    }
+
+    async function loadFacets(){
+      if (!API_BASE) return;
+      try{
+        const json = await apiGet({ mode:"public_api", action:"job_facets" });
+        if (!json || !json.ok) return;
+
+        populateSelect(qs("#categorySel"), json.categories || [], "All");
+        populateSelect(qs("#waSel"), json.work_arrangements || [], "All");
+      }catch(e){
+        // Facets are helpful, but jobs can still load if facets fail.
+      }
+    }
+
     // ----------------------------
-    // Job loading + filtering + CURSOR PAGING
+    // Job loading + filtering + infinite scroll
     // ----------------------------
     function currentFilters(){
       const keyword = (qs("#searchInput").value || "").trim();
@@ -1100,20 +1178,28 @@
       return { keyword, category, workArrangement, city, stateVal };
     }
 
-    async function loadJobs(resetCursor){
+    async function loadJobs(resetCursor, opts){
+      opts = opts || {};
+      const background = !!opts.background;
+
       if (!API_BASE){
         toast("Missing API base. Set it in /config/config.js");
         return;
       }
 
+      if (state.paging.loading && !resetCursor) return;
+
+      const token = ++state.paging.loadToken;
+      const requestKey = currentRequestKey();
+
       if (resetCursor){
-        state.paging.cursor = "";
-        state.paging.nextCursor = "";
-        state.paging.prevStack = [];
-        state.paging.page = 1;
+        resetJobPaging();
+        state.paging.requestKey = requestKey;
+        qs("#jobList").innerHTML = `<div class="empty">Loading jobs…</div>`;
       }
 
-      qs("#jobList").innerHTML = `<div class="empty">Loading jobs…</div>`;
+      state.paging.loading = true;
+      setPagerUi();
 
       const f = currentFilters();
 
@@ -1121,57 +1207,87 @@
         mode:"public_api",
         action:"list_jobs",
         limit: String(state.paging.limit),
-        sort:"posted_at_desc",
+        sort:"posted_at_desc"
       };
 
       if (state.paging.cursor) params.cursor = state.paging.cursor;
       if (f.keyword) params.search = f.keyword;
-
-      // Pass through backend filters (supported by your backend)
       if (f.stateVal) params.state = f.stateVal;
       if (f.city) params.city = f.city;
       if (f.category) params.category = f.category;
       if (f.workArrangement) params.work_arrangement = f.workArrangement;
 
-      const json = await apiGet(params);
+      try{
+        const json = await apiGet(params);
 
-      if (!json.ok){
-        qs("#jobList").innerHTML = `<div class="empty">Error loading jobs: ${escapeHtml(json.error || "Unknown error")}</div>`;
-        setPagerUi();
-        return;
+        // If the user changed filters while this request was running, discard stale response.
+        if (token !== state.paging.loadToken && resetCursor) return;
+        if (requestKey !== state.paging.requestKey && !resetCursor) return;
+
+        if (!json.ok){
+          if (!state.jobs.length) {
+            qs("#jobList").innerHTML = `<div class="empty">Error loading jobs: ${escapeHtml(json.error || "Unknown error")}</div>`;
+          }
+          return;
+        }
+
+        const incoming = json.jobs || [];
+        incoming.forEach(j => {
+          const id = String(j.job_id || "").trim();
+          if (!id || state.seenJobIds[id]) return;
+          state.seenJobIds[id] = true;
+          state.jobs.push(j);
+        });
+
+        state.paging.cursor = json.nextCursor ? (state.paging.cursor || "") : state.paging.cursor;
+        state.paging.nextCursor = json.nextCursor || "";
+        state.paging.totalMatched = Number(json.totalMatched || 0) || 0;
+
+        if (json.nextCursor) {
+          // The backend cursor is the cursor for the next request.
+          state.paging.cursor = json.nextCursor;
+        }
+
+        await applyRadiusIfNeededThenRender();
+
+        if (!background) {
+          scheduleAutoPrefetch();
+        }
+      }catch(e){
+        if (!state.jobs.length) {
+          qs("#jobList").innerHTML = `<div class="empty">Unable to load jobs. Please refresh and try again.</div>`;
+        }
+      }finally{
+        if (token === state.paging.loadToken || !resetCursor) {
+          state.paging.loading = false;
+          setPagerUi();
+        }
       }
-
-      state.jobs = json.jobs || [];
-      state.filtered = state.jobs; // current page (radius filter still applies after)
-      state.paging.nextCursor = json.nextCursor || "";
-      state.paging.totalMatched = Number(json.totalMatched || 0) || 0;
-
-      hydrateFilterOptionsFromJobs(state.jobs);
-      applyRadiusIfNeededThenRender();
-      setPagerUi();
     }
 
-    function hydrateFilterOptionsFromJobs(jobs){
-      // Note: with paging, this reflects the current page.
-      // It's fine for now; if you want global options later, we'd add a facet endpoint.
-      const cats = new Set();
-      const wa = new Set();
-      jobs.forEach(j => {
-        if (j.category) cats.add(String(j.category));
-        if (j.work_arrangement) wa.add(String(j.work_arrangement));
-      });
+    function scheduleAutoPrefetch(){
+      if (state.paging.prefetching) return;
+      if (!state.paging.nextCursor) return;
+      if (state.jobs.length >= state.paging.autoPrefetchTarget) return;
 
-      const catSel = qs("#categorySel");
-      const waSel = qs("#waSel");
+      const key = state.paging.requestKey;
+      state.paging.prefetching = true;
 
-      const prevCat = catSel.value;
-      const prevWa = waSel.value;
-
-      catSel.innerHTML = `<option value="">All</option>` + [...cats].sort().map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join("");
-      waSel.innerHTML  = `<option value="">All</option>` + [...wa].sort().map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join("");
-
-      catSel.value = prevCat;
-      waSel.value = prevWa;
+      setTimeout(async () => {
+        try{
+          while (
+            state.paging.nextCursor &&
+            state.jobs.length < state.paging.autoPrefetchTarget &&
+            state.paging.requestKey === key
+          ) {
+            await loadJobs(false, { background:true });
+            await new Promise(r => setTimeout(r, 75));
+          }
+        } finally {
+          state.paging.prefetching = false;
+          setPagerUi();
+        }
+      }, 250);
     }
 
     async function applyRadiusIfNeededThenRender(){
@@ -1186,7 +1302,6 @@
 
       renderJobs();
       ensureSelection();
-      // Show total matched (server-side), not only the current page count
       setText(qs("#jobCount"), String(state.paging.totalMatched || state.filtered.length));
     }
 
@@ -1198,7 +1313,6 @@
         return;
       }
 
-      // If URL has job_id, honor it
       const urlJobId = (new URL(window.location.href)).searchParams.get("job_id") || "";
       if (urlJobId && state.filtered.some(j => j.job_id === urlJobId)){
         state.selectedJobId = urlJobId;
@@ -1213,56 +1327,56 @@
       renderJobs();
     }
 
-function renderJobs(){
-  const list = qs("#jobList");
-  const jobs = state.filtered || [];
+    function renderJobs(){
+      const list = qs("#jobList");
+      const jobs = state.filtered || [];
 
-  if (!jobs.length){
-    list.innerHTML = `<div class="empty">No jobs found.</div>`;
-    return;
-  }
+      if (!jobs.length){
+        list.innerHTML = `<div class="empty">No jobs found.</div>`;
+        return;
+      }
 
-  list.innerHTML = jobs.map(j => {
-    const active = (j.job_id === state.selectedJobId) ? "active" : "";
-    const loc = [j.city, j.state].filter(Boolean).join(", ") || (j.location || "Location");
-    const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
+      list.innerHTML = jobs.map(j => {
+        const active = (j.job_id === state.selectedJobId) ? "active" : "";
+        const loc = [j.city, j.state].filter(Boolean).join(", ") || (j.location || "Location");
+        const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
 
-    const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
-    const empType = normalizeEmploymentType(j.employment_type);
-    const jobUrl = "/job.html?job_id=" + encodeURIComponent(j.job_id || "");
+        const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
+        const empType = normalizeEmploymentType(j.employment_type);
+        const jobUrl = "/job.html?job_id=" + encodeURIComponent(j.job_id || "");
 
-    return `
-      <a class="item ${active}" data-job="${escapeHtml(j.job_id || "")}" href="${jobUrl}" aria-label="${escapeHtml(j.job_title || "Job opening")}">
-        <div class="title">${escapeHtml(j.job_title || "Untitled role")}</div>
-        ${companyName ? `<div class="company">${escapeHtml(companyName)}</div>` : ``}
-        <div class="sub">
-          <span>${escapeHtml(loc)}</span>
-          ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
-          ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
-          ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
-          ${verified ? `<span class="pill verified">Verified</span>` : ``}
-        </div>
-      </a>
-    `;
-  }).join("");
+        return `
+          <a class="item ${active}" data-job="${escapeHtml(j.job_id || "")}" href="${jobUrl}" aria-label="${escapeHtml(j.job_title || "Job opening")}">
+            <div class="title">${escapeHtml(j.job_title || "Untitled role")}</div>
+            ${companyName ? `<div class="company">${escapeHtml(companyName)}</div>` : ``}
+            <div class="sub">
+              <span>${escapeHtml(loc)}</span>
+              ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
+              ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
+              ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
+              ${verified ? `<span class="pill verified">Verified</span>` : ``}
+            </div>
+          </a>
+        `;
+      }).join("");
 
-  list.querySelectorAll(".item").forEach(el => {
-    el.addEventListener("click", (e) => {
-      const isModifiedClick =
-        e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
+      list.querySelectorAll(".item").forEach(el => {
+        el.addEventListener("click", (e) => {
+          const isModifiedClick =
+            e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
 
-      if (isModifiedClick) return; // allow open in new tab, etc.
+          if (isModifiedClick) return;
 
-      e.preventDefault();
+          e.preventDefault();
 
-      const id = el.getAttribute("data-job");
-      state.selectedJobId = id;
-      setUrlJobId(id);
-      renderJobs();
-      renderSelectedJob(id);
-    });
-  });
-}
+          const id = el.getAttribute("data-job");
+          state.selectedJobId = id;
+          setUrlJobId(id);
+          renderJobs();
+          renderSelectedJob(id);
+        });
+      });
+    }
 
     async function renderSelectedJob(jobId){
       if (!jobId){
@@ -1276,7 +1390,7 @@ function renderJobs(){
       const json = await apiGet({
         mode:"public_api",
         action:"get_job",
-        job_id: jobId,
+        job_id: jobId
       });
 
       if (!json.ok){
@@ -1290,7 +1404,6 @@ function renderJobs(){
       const j = json.job || {};
       state.selectedJob = j;
 
-      // SEO-ish: update meta title for sharing (still a SPA; dedicated job pages come next)
       try{
         document.title = (j.job_title ? (j.job_title + " — QuickHire™ Job Board") : "QuickHire™ Job Board");
       }catch(e){}
@@ -1299,7 +1412,6 @@ function renderJobs(){
       const pay = (j.pay_min || j.pay_max) ? `${j.pay_min||""} – ${j.pay_max||""} ${j.pay_currency||""}`.trim() : "";
       const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
 
-      // company fields (preferred if backend join exists)
       const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
       const companyLogo = String(j.company_logo_url || j.logo_url || "").trim();
       const companySite = String(j.company_website || j.website || "").trim();
@@ -1314,7 +1426,6 @@ function renderJobs(){
       qs("#jobDetail").innerHTML = `
         <h1>${escapeHtml(j.job_title || "Untitled role")}</h1>
 
-        <!-- Top facts (order per your spec) -->
         <div class="facts">
           ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
           ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
@@ -1328,7 +1439,6 @@ function renderJobs(){
           ` : ``}
         </div>
 
-        <!-- Company block -->
         ${(companyName || companyLogo || companySite) ? `
           <div class="company-block" aria-label="Company information">
             ${companyLogo ? `<img class="company-logo" src="${escapeHtml(companyLogo)}" alt="${escapeHtml(companyName || "Company logo")}" loading="lazy" />` : ``}
@@ -1363,33 +1473,37 @@ function renderJobs(){
     }
 
     function setPagerUi(){
-      const prevBtn = qs("#prevPageBtn");
-      const nextBtn = qs("#nextPageBtn");
+      const btn = qs("#loadMoreBtn");
       const meta = qs("#pageMeta");
 
-      const hasPrev = state.paging.prevStack.length > 0;
+      const loaded = state.filtered.length || state.jobs.length;
+      const total = state.paging.totalMatched || loaded;
       const hasNext = !!state.paging.nextCursor;
 
-      prevBtn.disabled = !hasPrev;
-      nextBtn.disabled = !hasNext;
+      if (meta) {
+        if (state.paging.loading && !loaded) {
+          meta.textContent = "Loading jobs…";
+        } else {
+          meta.textContent = `Showing ${loaded.toLocaleString()} of ${total.toLocaleString()} results`;
+        }
+      }
 
-      meta.textContent = "Page " + String(state.paging.page);
+      if (btn) {
+        btn.disabled = state.paging.loading || !hasNext;
+        btn.textContent = state.paging.loading
+          ? "Loading…"
+          : (hasNext ? "Load More Jobs" : "All Loaded");
+      }
     }
 
-    async function goNext(){
-      if (!state.paging.nextCursor) return;
-      state.paging.prevStack.push(state.paging.cursor || "");
-      state.paging.cursor = state.paging.nextCursor;
-      state.paging.page += 1;
-      await loadJobs(false);
-    }
+    function maybeLoadMoreFromScroll(){
+      const list = qs("#jobList");
+      if (!list || state.paging.loading || !state.paging.nextCursor) return;
 
-    async function goPrev(){
-      if (!state.paging.prevStack.length) return;
-      const prevCursor = state.paging.prevStack.pop();
-      state.paging.cursor = prevCursor || "";
-      state.paging.page = Math.max(1, state.paging.page - 1);
-      await loadJobs(false);
+      const remaining = list.scrollHeight - list.scrollTop - list.clientHeight;
+      if (remaining < 420) {
+        loadJobs(false);
+      }
     }
 
     // ----------------------------
@@ -1401,7 +1515,6 @@ function renderJobs(){
       const current = state.selectedJob || {};
       const external = String(current.apply_url || "").trim();
 
-      // EXTERNAL APPLY: same Apply button redirects out + logs click
       if (external){
         try{
           const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
@@ -1419,7 +1532,6 @@ function renderJobs(){
         return;
       }
 
-      // INTERNAL APPLY: same as before
       state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
       const sess = state.session || {};
       const applyUrl = PATHS.applyPage + "?job_id=" + encodeURIComponent(state.selectedJobId);
@@ -1510,7 +1622,7 @@ function renderJobs(){
     }
 
     // ----------------------------
-    // Location + radius filtering (unchanged; works on current page set)
+    // Location + radius filtering (loaded-window only)
     // ----------------------------
     async function useMyLocation(){
       if (!navigator.geolocation){
@@ -1532,7 +1644,7 @@ function renderJobs(){
           if (st && US_STATES_AND_TERRITORIES.includes(st)) qs("#stateSel").value = st;
         }
 
-        qs("#locNote").textContent = "Location captured. Radius filter will use this.";
+        qs("#locNote").textContent = "Location captured. Radius filter applies to loaded jobs.";
         await loadJobs(true);
       }, (err) => {
         qs("#locNote").textContent = "Location permission denied or unavailable.";
@@ -1590,7 +1702,7 @@ function renderJobs(){
       const baseLat = state.geo.lat, baseLon = state.geo.lon;
       if (baseLat == null || baseLon == null) return;
 
-      qs("#locNote").textContent = "Applying radius filter… (first time may take a moment)";
+      qs("#locNote").textContent = "Applying radius filter to loaded jobs…";
       const jobs = state.filtered.slice();
 
       const out = [];
@@ -1600,10 +1712,10 @@ function renderJobs(){
         if (!g || isNaN(g.lat) || isNaN(g.lon)) continue;
         const d = haversineMiles(baseLat, baseLon, g.lat, g.lon);
         if (d <= radiusMiles) out.push(j);
-        await new Promise(r => setTimeout(r, 150));
+        await new Promise(r => setTimeout(r, 80));
       }
       state.filtered = out;
-      qs("#locNote").textContent = "Radius filter applied.";
+      qs("#locNote").textContent = "Radius filter applied to loaded jobs.";
     }
 
     // ----------------------------
@@ -1628,32 +1740,26 @@ function renderJobs(){
     // ----------------------------
     // Wire up
     // ----------------------------
-    function init(){
+    async function init(){
       initStates();
       syncAccountUi();
 
-      // pager
-      qs("#prevPageBtn").addEventListener("click", goPrev);
-      qs("#nextPageBtn").addEventListener("click", goNext);
+      const list = qs("#jobList");
+      if (list) list.addEventListener("scroll", maybeLoadMoreFromScroll);
+      qs("#loadMoreBtn").addEventListener("click", () => loadJobs(false));
 
-      // Candidate login (default candidate behavior already in login.html)
       qs("#loginBtn").addEventListener("click", () => {
         const here = window.location.pathname + window.location.search;
         window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
       });
 
-      // Employer portal: auto-select employer role on login if not already employer
       qs("#employerBtn").addEventListener("click", (e) => {
         try{
           const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
           const isEmployer = !!sess.session_token && (sess.role === "employer");
-          if (isEmployer){
-            // allow normal navigation to dashboard
-            return;
-          }
+          if (isEmployer) return;
         }catch(err){ /* ignore */ }
 
-        // Not logged in as employer -> go to login with role preset + next redirect
         e.preventDefault();
         const next = PATHS.employerPortal;
         window.location.href = PATHS.candidateLogin + "?role=employer&next=" + encodeURIComponent(next);
@@ -1666,12 +1772,10 @@ function renderJobs(){
       qs("#reportCancelBtn").addEventListener("click", closeReportModal);
       qs("#reportSubmitBtn").addEventListener("click", submitReport);
 
-      // click outside modal to close
       qs("#reportModal").addEventListener("click", (e) => {
         if (e.target === qs("#reportModal")) closeReportModal();
       });
 
-      // My Account dropdown toggle + logout
       qs("#acctBtn").addEventListener("click", (e) => {
         e.preventDefault();
         const wrap = qs("#acctWrap");
@@ -1690,7 +1794,6 @@ function renderJobs(){
         toast("Logged out.");
       });
 
-      // close menu on outside click
       document.addEventListener("click", (e) => {
         const wrap = qs("#acctWrap");
         if (!wrap) return;
@@ -1698,6 +1801,7 @@ function renderJobs(){
       });
 
       qs("#refreshBtn").addEventListener("click", () => loadJobs(true));
+
       qs("#clearFiltersBtn").addEventListener("click", () => {
         qs("#searchInput").value = "";
         qs("#categorySel").value = "";
@@ -1705,29 +1809,25 @@ function renderJobs(){
         qs("#cityInput").value = "";
         qs("#stateSel").value = "";
         qs("#radiusSel").value = "";
-
-        // reset cursor when filters cleared
         loadJobs(true);
       });
 
       qs("#useLocationBtn").addEventListener("click", useMyLocation);
 
-      // filter triggers:
-      // keyword triggers server search + cursor reset
-      qs("#searchInput").addEventListener("input", debounce(() => loadJobs(true), 300));
+      const resetSearch = debounce(() => loadJobs(true), 350);
+      const resetFilters = debounce(() => loadJobs(true), 250);
 
-      // other filters trigger server filter + cursor reset
-      const onChangeReset = debounce(() => loadJobs(true), 250);
-      qs("#categorySel").addEventListener("change", onChangeReset);
-      qs("#waSel").addEventListener("change", onChangeReset);
-      qs("#cityInput").addEventListener("input", onChangeReset);
-      qs("#stateSel").addEventListener("change", onChangeReset);
+      qs("#searchInput").addEventListener("input", resetSearch);
+      qs("#categorySel").addEventListener("change", resetFilters);
+      qs("#waSel").addEventListener("change", resetFilters);
+      qs("#cityInput").addEventListener("input", resetFilters);
+      qs("#stateSel").addEventListener("change", resetFilters);
 
-      // radius only re-filters current page set
       qs("#radiusSel").addEventListener("change", debounce(() => applyRadiusIfNeededThenRender(), 200));
 
-      // If page opened with ?job_id=..., keep it as selection if it appears in current page.
-      loadJobs(true);
+      await loadFacets();
+      state.paging.requestKey = currentRequestKey();
+      await loadJobs(true);
     }
 
     init();
