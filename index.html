@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QuickHire™ Job Board | Search Jobs, Careers & Hiring Opportunities</title>
 
-  <!-- QuickHire™ Job Board v9.0.0 Alpha | Last Updated: 2026-05-22T19:46:56Z UTC | Developed by Cook Technology Services -->
+  <!-- QuickHire™ Job Board v11.0.0 Alpha | Last Updated: 2026-05-26T13:24:42Z UTC | Developed by Cook Technology Services -->
 
   <!-- SEO: indexable main page -->
   <meta name="robots" content="index,follow" />
@@ -715,11 +715,13 @@
           </div>
         </div>
 
+        <div id="indexAlert" class="empty" style="display:none; margin:0 16px 12px; text-align:left; border-color:#f4c542; background:#fff8db; color:#6b4e00;"></div>
+
         <div class="list" id="jobList">
           <div class="empty">Loading jobs…</div>
         </div>
 
-        <!-- v9.0.0 Alpha: infinite scroll + Load More fallback -->
+        <!-- v11.0.0 Alpha: infinite scroll + Load More fallback -->
         <div class="pager" aria-label="Job list loading">
           <div class="meta" id="pageMeta">Loading jobs…</div>
           <button class="btn primary" id="loadMoreBtn" type="button" disabled>Load More Jobs</button>
@@ -973,8 +975,8 @@
 
   <script>
     // =============================================================================
-    // QuickHire™ Job Board Frontend — v9.0.0 Alpha
-    // Last Updated: 2026-05-22T19:46:56Z UTC
+    // QuickHire™ Job Board Frontend — v11.0.0 Alpha
+    // Last Updated: 2026-05-26T13:24:42Z UTC
     // Developed by Cook Technology Services
     // Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
     //
@@ -985,8 +987,8 @@
     // - Full job details load through get_job only when the user clicks a job.
     // =============================================================================
 
-    const QH_BUILD_VERSION = "v9.0.0 Alpha";
-    const QH_BUILD_UTC = "2026-05-22T19:46:56Z";
+    const QH_BUILD_VERSION = "v11.0.0 Alpha";
+    const QH_BUILD_UTC = "2026-05-26T13:24:42Z";
 
     // ----------------------------
     // Config / State
@@ -999,6 +1001,7 @@
       seenJobIds: {},
       selectedJobId: "",
       selectedJob: null,
+      indexWarning: "",
       session: (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {}),
       geo: {
         enabled: false,
@@ -1136,6 +1139,19 @@
       return JSON.stringify(currentFilters());
     }
 
+    function setIndexWarning(json){
+      const el = qs("#indexAlert");
+      if (!el) return;
+      if (json && json.needs_index_rebuild){
+        const note = json.note || "QuickHire is rebuilding the job index. A small emergency preview may be shown until JobIndex is ready.";
+        el.style.display = "block";
+        el.innerHTML = `<b>Job index rebuild needed.</b><div style="margin-top:6px;">${escapeHtml(note)}</div>`;
+      } else {
+        el.style.display = "none";
+        el.innerHTML = "";
+      }
+    }
+
     function resetJobPaging(){
       state.jobs = [];
       state.filtered = [];
@@ -1258,6 +1274,8 @@
           return;
         }
 
+        setIndexWarning(json);
+
         const incoming = json.jobs || [];
         incoming.forEach(j => {
           const id = String(j.job_id || "").trim();
@@ -1340,13 +1358,14 @@
       }
 
       const urlJobId = (new URL(window.location.href)).searchParams.get("job_id") || "";
-      if (urlJobId && state.filtered.some(j => j.job_id === urlJobId)){
+      if (urlJobId && !state.selectedJobId){
         state.selectedJobId = urlJobId;
+        renderJobs();
         renderSelectedJob(urlJobId);
         return;
       }
 
-      // v9.0.0 Alpha: do NOT auto-load the first job detail. First paint should
+      // v11.0.0 Alpha: do NOT auto-load the first job detail. First paint should
       // show jobs immediately; details load only after a user click or job_id URL.
       if (!state.selectedJobId) {
         setText(qs("#detailMeta"), "Select a job on the left");
