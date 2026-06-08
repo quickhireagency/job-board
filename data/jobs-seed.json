@@ -1,0 +1,9 @@
+{
+  "ok": true,
+  "version": "v11.0.0 Alpha",
+  "generated_at_utc": "2026-05-26T13:35:00Z",
+  "source": "placeholder_until_generated_from_JobIndex",
+  "note": "QuickHire v11 public job browsing should read live jobs from the Apps Script JobIndex endpoint. This static file is only a safe repo placeholder so /data/jobs-seed.json exists and does not 404.",
+  "count": 0,
+  "jobs": []
+}

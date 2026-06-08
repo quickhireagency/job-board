@@ -1,0 +1,1521 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <!-- QuickHire™ global favicon and app-icon data -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48 96x96" />
+  <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-48x48.png" type="image/png" sizes="48x48" />
+  <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+  <link rel="icon" href="/favicon-192x192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#1f7a4a" />
+  <link rel="stylesheet" href="/assets/global-shell.css?v=20260608-203812" />
+  <script src="/assets/global-shell.js?v=20260608-203812"></script>
+<title>QuickHire™ — Employer Dashboard</title>
+
+  <!-- Config + shared helpers -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+      flex: 1 1 auto;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{ height:102px; width:auto; display:block; }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1 1 auto;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+    .btn.danger{
+      border-color: rgba(180,35,24,.35);
+      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
+      color: #4a0f0a;
+    }
+    .btn.green{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.22), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; filter:saturate(.9); }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .col{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      min-width:0;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    .muted{ color:var(--muted); font-size:12px; line-height:1.35; }
+    .hr{ height:1px; background: rgba(10,30,20,.12); margin:12px 0; }
+
+    .note{
+      background: rgba(10,30,20,.04);
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .row2{ display:grid; grid-template-columns: 1fr 1fr; gap:10px; }
+    @media (max-width: 720px){ .row2{grid-template-columns:1fr} }
+
+    .plans{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    @media (max-width: 980px){ .plans{grid-template-columns:1fr} }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:2px 8px;
+      border-radius:999px;
+      border:1px solid rgba(10,30,20,.14);
+      background: rgba(255,255,255,.75);
+      font-size:11px;
+      font-weight:800;
+      color: var(--muted);
+      margin-left:6px;
+    }
+    .badge.ok{
+      border-color: rgba(31,122,74,.35);
+      color: rgba(31,122,74,.95);
+      background: rgba(43,154,94,.12);
+    }
+    .badge.warn{
+      border-color: rgba(180,35,24,.25);
+      color: rgba(180,35,24,.90);
+      background: rgba(180,35,24,.08);
+    }
+
+    /* Applicants controls */
+    .app-status{
+      width:auto;
+      min-width: 160px;
+      padding:6px 8px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.95);
+      font-weight:800;
+      font-size:12px;
+    }
+
+    /* applicant row + resume card */
+    .app-row{
+      display:grid;
+      grid-template-columns: 46px 1fr 1fr;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 6px 16px rgba(16,24,40,.06);
+    }
+    .app-row > div{ min-width:0; }
+    @media (max-width: 980px){
+      .app-row{ grid-template-columns: 46px 1fr; grid-auto-rows:auto; }
+    }
+    .app-row + .app-row{ margin-top:10px; }
+
+    .cell-compact{
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .chk{
+      width:22px;
+      height:22px;
+      border-radius:8px;
+      border:1px solid rgba(10,30,20,.18);
+      background: rgba(255,255,255,.95);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:1000;
+      user-select:none;
+    }
+    .chk.on{
+      border-color: rgba(180,35,24,.35);
+      background: rgba(180,35,24,.08);
+      color: rgba(180,35,24,.95);
+    }
+    .app-row.xoff{ opacity:.75; }
+
+    .nameLink{
+      font-weight:1000;
+      color: var(--blue);
+      cursor:pointer;
+      text-decoration:none;
+    }
+    .nameLink:hover{ text-decoration:underline; }
+
+    .app-card{
+      margin-top:10px;
+      padding:12px;
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:16px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 6px 18px rgba(16,24,40,.08);
+      display:none;
+    }
+    .app-card.open{ display:block; }
+
+    .mini{ font-size:12px; color: var(--muted); line-height:1.4; }
+
+    .resumeFrame{
+      border:1px solid rgba(10,30,20,.14);
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+      height: 640px;
+    }
+    .resumeFrame iframe{
+      width:100%;
+      height:100%;
+      border:0;
+      display:block;
+      background:#fff;
+    }
+    @media (max-width: 700px){ .resumeFrame{ height:520px; } }
+
+    /* Form elements */
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:900;
+      margin:0 0 6px;
+      color:var(--muted);
+    }
+    input, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      font-size:13px;
+      outline:none;
+      font-family: var(--font);
+    }
+    textarea{ min-height: 140px; resize: vertical; }
+
+    /* Company card */
+    .companyCardTop{
+      display:flex;
+      gap:14px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .companyLogo{
+      width:120px;
+      height:120px;
+      border-radius:18px;
+      border:1px solid rgba(10,30,20,.14);
+      background: rgba(255,255,255,.9);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .companyLogo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      display:block;
+      background:#fff;
+    }
+    .companyMeta{
+      flex:1;
+      min-width: 240px;
+    }
+    .companyNameBig{
+      font-weight:1000;
+      font-size:16px;
+      letter-spacing:.2px;
+      margin:0;
+    }
+    .companySiteBig{
+      margin-top:6px;
+      font-weight:800;
+      font-size:13px;
+      word-break:break-word;
+    }
+    .inlineActions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+
+    /* Footer logo + legal links */
+    .qh-footer-logo-wrap{ display:flex; justify-content:center; margin: 14px 0 8px; }
+    .qh-footer-logo-wrap a{ display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+    .qh-footer-logo{ height:102px; width:auto; display:block; }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{ color: var(--blue); text-decoration:underline; }
+
+    /* Password modal (keeps Company card clean) */
+    .qh-modal-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 9999;
+    }
+    .qh-modal-overlay.open{ display:flex; }
+
+    .qh-modal{
+      width: min(620px, 100%);
+      background: rgba(255,255,255,.98);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 24px 60px rgba(16,24,40,.22);
+      overflow: hidden;
+    }
+    .qh-modal-head{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(255,255,255,.88));
+    }
+    .qh-modal-head h3{ margin:0; font-size:14px; }
+    .qh-modal-body{ padding: 14px; }
+    .qh-modal-foot{
+      padding: 14px;
+      border-top: 1px solid var(--line);
+      display:flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body>
+    <div id="qh-global-header"></div>
+  <script>window.QHGlobalShell && window.QHGlobalShell.mountHeader();</script>
+
+  <div class="wrap">
+    <div class="grid">
+      <!-- LEFT COLUMN -->
+      <div class="col">
+        <!-- Company Info / Account card (NEW, ABOVE ENTITLEMENTS) -->
+        <div class="panel" aria-label="Company and Account">
+          <div class="panel-header">
+            <div>
+              <h2>Company &amp; Account</h2>
+              <div class="meta">Update your company info and account settings</div>
+            </div>
+            <div class="inlineActions">
+              <button class="btn" id="btnEditCompany" type="button">Edit</button>
+              <button class="btn green" id="btnSaveCompany" type="button" style="display:none;">Save Changes</button>
+              <button class="btn" id="btnCancelCompany" type="button" style="display:none;">Cancel</button>
+            </div>
+          </div>
+
+          <div class="content">
+            <div class="companyCardTop">
+              <div class="companyLogo" aria-label="Company logo">
+                <img id="companyLogoImg" src="/QuickHireTransparentLogo02.png" alt="Company logo" onerror="this.style.display='none';" />
+              </div>
+
+              <div class="companyMeta">
+                <!-- READ MODE -->
+                <div id="companyRead">
+                  <div class="companyNameBig" id="companyNameText">Loading…</div>
+                  <div class="companySiteBig" id="companySiteText"></div>
+                  <div class="muted" id="companyContactText" style="margin-top:8px;"></div>
+                </div>
+
+                <!-- EDIT MODE -->
+                <div id="companyEdit" style="display:none;">
+                  <div class="row2">
+                    <div>
+                      <label for="company_name">Company name</label>
+                      <input id="company_name" placeholder="Company name">
+                    </div>
+                    <div>
+                      <label for="company_website">Company website</label>
+                      <input id="company_website" placeholder="https://...">
+                    </div>
+                  </div>
+
+                  <div style="height:10px;"></div>
+
+                  <div class="row2">
+                    <div>
+                      <label for="company_logo_url">Company logo URL</label>
+                      <input id="company_logo_url" placeholder="https://...">
+                    </div>
+                    <div>
+                      <label for="employer_email">Account email</label>
+                      <input id="employer_email" placeholder="you@company.com">
+                    </div>
+                  </div>
+
+                  <div style="height:10px;"></div>
+
+                  <div class="row2">
+                    <div>
+                      <label for="employer_phone">Phone (optional)</label>
+                      <input id="employer_phone" placeholder="(317) 555-1234">
+                    </div>
+                    <div>
+                      <label for="company_preview_note">Preview</label>
+                      <div class="note muted" id="company_preview_note">
+                        Your company card updates after you save.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Password actions (Option A): ONLY show while editing -->
+                <div id="pwEditActions" style="display:none;">
+                  <div class="hr"></div>
+                  <div class="row2">
+                    <div>
+                      <div style="font-weight:1000; margin-bottom:6px;">Account Security</div>
+                      <div class="muted">
+                        Password updates are hidden by default so your Company Info card stays clean.
+                      </div>
+                    </div>
+                    <div style="display:flex; align-items:flex-end; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+                      <button class="btn blue" id="btnOpenPwModal" type="button">Update Password</button>
+                      <a class="btn" href="/auth/reset" target="_self" rel="noopener">Forgot Password?</a>
+                    </div>
+                  </div>
+
+                  <div class="muted" id="pwOut" style="margin-top:10px;"></div>
+                </div>
+
+                <div class="muted" id="companyOut" style="margin-top:10px;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Subscription / Applicants / Plans -->
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <h2>Your Subscription &amp; Entitlements</h2>
+              <div class="meta">Manage your plan and Verified status</div>
+            </div>
+          </div>
+
+          <div class="content">
+            <div id="entBox" class="note">Loading…</div>
+
+            <div class="hr"></div>
+            <div style="font-weight:1000; margin-bottom:6px;">Quick Actions</div>
+            <div class="muted">Post a job or manage your existing jobs.</div>
+
+            <div class="hr"></div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <a class="btn primary" href="/employer/post-job.html">Post a Job</a>
+              <a class="btn blue" href="/employer/jobs.html">Manage Jobs</a>
+            </div>
+
+            <!-- Applicants panel -->
+            <div class="hr"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div style="font-weight:1000;">Applicants</div>
+              <button class="btn" id="btnLoadApplicants" type="button">Load Applicants</button>
+            </div>
+            <div class="muted" style="margin-top:6px;">
+              Row shows only: <b>Job Title | Name</b>. Checkbox toggles <b>X-off</b>. Click candidate name to open card. Remove Candidate is inside the card.
+            </div>
+            <div id="applicantsBox" class="note" style="margin-top:10px;">
+              Click "Load Applicants" to see all applicants.
+            </div>
+
+            <!-- EEO Aggregate panel — MOVED ABOVE BUY/UPGRADE -->
+            <div class="hr"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div style="font-weight:1000;">EEO Aggregate</div>
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <label class="muted" style="margin:0;">Days</label>
+                <select id="eeoDays" style="width:auto; padding:8px 10px; border-radius:12px; border:1px solid var(--line); background:rgba(255,255,255,.95);">
+                  <option value="30">30</option>
+                  <option value="60">60</option>
+                  <option value="90">90</option>
+                  <option value="180">180</option>
+                  <option value="270">270</option>
+                  <option value="365">365</option>
+                </select>
+                <button class="btn" id="btnLoadEeo" type="button">Load EEO</button>
+              </div>
+            </div>
+            <div id="eeoBox" class="note" style="margin-top:10px;">Loading…</div>
+
+            <!-- Buy / Upgrade Plan -->
+            <div class="hr"></div>
+            <div style="font-weight:1000; margin-bottom:6px;">Buy / Upgrade Plan</div>
+            <div class="muted">
+              <b>Important:</b> Pay with the same Stripe checkout email as your QuickHire employer account email to avoid delays.
+              <br><br>
+              After paying, return to <b>/billing/success</b> (Stripe will send you back automatically) and attach using your session id.
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="plans">
+              <div class="note">
+                <div style="font-weight:1000;">QuickHire Local</div>
+                <div class="muted">$49.99/mo</div>
+                <div style="margin-top:8px;">
+                  <a class="btn" href="https://buy.stripe.com/dRm00bblue5Gbz61ufbfO00" target="_blank" rel="noopener">Buy Local</a>
+                </div>
+              </div>
+
+              <div class="note">
+                <div style="font-weight:1000;">QuickHire Business</div>
+                <div class="muted">$99.99/mo</div>
+                <div style="margin-top:8px;">
+                  <a class="btn" href="https://buy.stripe.com/4gM7sDahq9PqeLi3CnbfO05" target="_blank" rel="noopener">Buy Business</a>
+                </div>
+              </div>
+
+              <div class="note">
+                <div style="font-weight:1000;">QuickHire Corporate</div>
+                <div class="muted">$249.99/mo</div>
+                <div style="margin-top:8px;">
+                  <a class="btn" href="https://buy.stripe.com/14AaEP9dm4v6dHe8WHbfO02" target="_blank" rel="noopener">Buy Corporate</a>
+                </div>
+              </div>
+
+              <div class="note">
+                <div style="font-weight:1000;">Verified Employer (Add-on)</div>
+                <div class="muted">$14.99/mo</div>
+                <div style="margin-top:8px;">
+                  <a class="btn" href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Buy Verified</a>
+                </div>
+                <div class="muted" style="margin-top:8px;">
+                  If you are on Corporate, Verified is already included.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN (Quick Post remains) -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Post a Job</h2>
+            <div class="meta">Requires an active plan</div>
+          </div>
+        </div>
+
+        <div class="content">
+          <div class="muted">
+            Posting requires an active plan. Complete the form below and click Post Job to publish.
+          </div>
+
+          <div class="hr"></div>
+
+          <label for="job_title">Job Title</label>
+          <input id="job_title" placeholder="e.g., Warehouse Associate">
+
+          <div style="height:10px;"></div>
+
+          <label for="job_description">Job Description</label>
+          <textarea id="job_description" placeholder="Full job description..."></textarea>
+
+          <div class="hr"></div>
+
+          <div class="row2">
+            <div>
+              <label for="city">City</label>
+              <input id="city" placeholder="Indianapolis">
+            </div>
+            <div>
+              <label for="state">State</label>
+              <input id="state" placeholder="IN">
+            </div>
+          </div>
+
+          <div style="height:10px;"></div>
+
+          <div class="row2">
+            <div>
+              <label for="employment_type">Employment Type</label>
+              <input id="employment_type" placeholder="Full-time / Part-time / Temp / Contract">
+            </div>
+            <div>
+              <label for="work_arrangement">Work Arrangement</label>
+              <input id="work_arrangement" placeholder="On-site / Hybrid / Remote">
+            </div>
+          </div>
+
+          <div style="height:10px;"></div>
+
+          <div class="row2">
+            <div>
+              <label for="pay_min">Pay Min</label>
+              <input id="pay_min" placeholder="e.g., 18">
+            </div>
+            <div>
+              <label for="pay_max">Pay Max</label>
+              <input id="pay_max" placeholder="e.g., 22">
+            </div>
+          </div>
+
+          <div style="height:10px;"></div>
+
+          <label for="apply_url">Apply URL (optional)</label>
+          <input id="apply_url" placeholder="https://...">
+
+          <label class="muted" style="margin-top:10px; display:flex; gap:10px; align-items:flex-start;">
+            <input type="checkbox" id="honesty_attestation" style="width:auto; margin-top:2px;">
+            <span>I attest the job details are accurate and not misleading.</span>
+          </label>
+
+          <div class="hr"></div>
+          <button class="btn green" id="btnPost">Post Job</button>
+          <div id="postOut" class="muted" style="margin-top:10px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer (same as index.html) -->
+    
+
+        <div id="qh-global-footer"></div>
+    <script>window.QHGlobalShell && window.QHGlobalShell.mountFooter();</script>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+  <!-- Password Modal (hidden by default) -->
+  <div class="qh-modal-overlay" id="pwModalOverlay" aria-hidden="true">
+    <div class="qh-modal" role="dialog" aria-modal="true" aria-labelledby="pwModalTitle">
+      <div class="qh-modal-head">
+        <div>
+          <h3 id="pwModalTitle">Update Password</h3>
+          <div class="muted">Enter your old password to set a new one.</div>
+        </div>
+        <button class="btn" id="btnClosePwModal" type="button">Close</button>
+      </div>
+
+      <div class="qh-modal-body">
+        <div class="row2">
+          <div>
+            <label for="pw_old_modal">Old password</label>
+            <input id="pw_old_modal" type="password" autocomplete="current-password" placeholder="Old password">
+          </div>
+          <div>
+            <label for="pw_new_modal">New password</label>
+            <input id="pw_new_modal" type="password" autocomplete="new-password" placeholder="New password">
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="row2">
+          <div>
+            <label for="pw_confirm_modal">Confirm new password</label>
+            <input id="pw_confirm_modal" type="password" autocomplete="new-password" placeholder="Confirm new password">
+          </div>
+          <div class="note muted">
+            Forgot your old password?
+            <a href="/auth/reset" target="_self" rel="noopener">Forgot Password?</a>
+          </div>
+        </div>
+
+        <div class="muted" id="pwModalOut" style="margin-top:10px;"></div>
+      </div>
+
+      <div class="qh-modal-foot">
+        <button class="btn" id="btnCancelPwModal" type="button">Cancel</button>
+        <button class="btn blue" id="btnSavePwModal" type="button">Save Password</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const session = QH.requireSession("employer");
+  if (!session) throw new Error("No session");
+
+  document.getElementById("btnLogout").addEventListener("click", () => {
+    QH.clearSession();
+    window.location.href = "/";
+  });
+
+  // ----------------------------
+  // Company/Account Card (NEW)
+  // ----------------------------
+  let __profile = null;       // profile + company info (loaded)
+  let __profileDraft = null;  // edit buffer
+
+  function isHttpUrl(u){
+    const s = String(u||"").trim();
+    if (!s) return true; // allow empty website/logo
+    return /^https?:\/\/.+/i.test(s);
+  }
+
+  function safeLinkText(url){
+    const s = String(url||"").trim();
+    if (!s) return "";
+    return s;
+  }
+
+  function renderCompanyCard(){
+    const name = String(__profile?.company_name || "").trim() || "(Company)";
+    const site = String(__profile?.company_website || "").trim();
+    const logo = String(__profile?.company_logo_url || "").trim();
+
+    // logo preview (KEEP CURRENT SIZE/STYLES — DO NOT CHANGE)
+    const img = document.getElementById("companyLogoImg");
+    if (logo && isHttpUrl(logo)){
+      img.style.display = "block";
+      img.src = logo;
+    } else {
+      img.style.display = "block";
+      img.src = "/QuickHireTransparentLogo02.png";
+    }
+
+    document.getElementById("companyNameText").textContent = name;
+
+    const siteWrap = document.getElementById("companySiteText");
+    if (site && isHttpUrl(site)){
+      siteWrap.innerHTML = `<a href="${escapeHtml(site)}" target="_blank" rel="noopener">${escapeHtml(safeLinkText(site))}</a>`;
+    } else {
+      siteWrap.innerHTML = `<span class="muted">${site ? escapeHtml(site) : "Website not set"}</span>`;
+    }
+
+    const email = String(__profile?.employer_email || "").trim();
+    const phone = String(__profile?.employer_phone || "").trim();
+
+    const parts = [];
+    parts.push(email ? ("Email: " + email) : "Email not set");
+    parts.push(phone ? ("Phone: " + phone) : "Phone not set");
+
+    document.getElementById("companyContactText").innerHTML =
+      `<span class="muted">${escapeHtml(parts.join(" • "))}</span>`;
+  }
+
+  function enterCompanyEdit(){
+    if (!__profile) return;
+
+    __profileDraft = JSON.parse(JSON.stringify(__profile));
+
+    document.getElementById("companyRead").style.display = "none";
+    document.getElementById("companyEdit").style.display = "block";
+
+    document.getElementById("btnEditCompany").style.display = "none";
+    document.getElementById("btnSaveCompany").style.display = "inline-flex";
+    document.getElementById("btnCancelCompany").style.display = "inline-flex";
+
+    document.getElementById("company_name").value = String(__profileDraft.company_name || "");
+    document.getElementById("company_website").value = String(__profileDraft.company_website || "");
+    document.getElementById("company_logo_url").value = String(__profileDraft.company_logo_url || "");
+    document.getElementById("employer_email").value = String(__profileDraft.employer_email || "");
+    document.getElementById("employer_phone").value = String(__profileDraft.employer_phone || "");
+
+    document.getElementById("companyOut").textContent = "";
+
+    // Option A: password actions ONLY show while editing
+    document.getElementById("pwEditActions").style.display = "block";
+    document.getElementById("pwOut").textContent = "";
+  }
+
+  function exitCompanyEdit(discard){
+    if (discard) __profileDraft = null;
+
+    document.getElementById("companyRead").style.display = "block";
+    document.getElementById("companyEdit").style.display = "none";
+
+    document.getElementById("btnEditCompany").style.display = "inline-flex";
+    document.getElementById("btnSaveCompany").style.display = "none";
+    document.getElementById("btnCancelCompany").style.display = "none";
+
+    document.getElementById("companyOut").textContent = "";
+
+    // Option A: hide password actions when not editing
+    document.getElementById("pwEditActions").style.display = "none";
+    document.getElementById("pwOut").textContent = "";
+  }
+
+  // Endpoints used (we’ll implement backend later in one pass):
+  // - get_employer_profile
+  // - update_employer_profile
+  // - change_password
+  async function loadEmployerProfile(){
+    const out = document.getElementById("companyOut");
+    out.textContent = "Loading…";
+
+    // Primary attempt
+    let res = await QH.apiGet("get_employer_profile", { session_token: session.session_token });
+
+    // Fallback: use entitlements payload if profile endpoint not implemented yet
+    if (!res || !res.ok){
+      const ent = await QH.apiGet("get_employer_entitlements", { session_token: session.session_token });
+      if (ent && ent.ok && ent.entitlements){
+        // Best-effort mapping if your entitlements already include these fields
+        res = {
+          ok: true,
+          profile: {
+            employer_email: ent.entitlements.employer_email || "",
+            employer_phone: ent.entitlements.employer_phone || "",
+            company_name: ent.entitlements.company_name || "",
+            company_website: ent.entitlements.company_website || ent.entitlements.website || "",
+            company_logo_url: ent.entitlements.company_logo_url || ent.entitlements.logo_url || ""
+          }
+        };
+      }
+    }
+
+    if (!res || !res.ok){
+      out.textContent = "Company info will appear here once your profile endpoint is connected.";
+      __profile = {
+        employer_email: "",
+        employer_phone: "",
+        company_name: "",
+        company_website: "",
+        company_logo_url: ""
+      };
+      renderCompanyCard();
+      return;
+    }
+
+    __profile = res.profile || res.company || res.data || res || {};
+    out.textContent = "";
+    renderCompanyCard();
+  }
+
+  async function saveEmployerProfile(){
+    const out = document.getElementById("companyOut");
+    out.textContent = "";
+
+    const company_name = document.getElementById("company_name").value.trim();
+    const company_website = document.getElementById("company_website").value.trim();
+    const company_logo_url = document.getElementById("company_logo_url").value.trim();
+    const employer_email = document.getElementById("employer_email").value.trim();
+    const employer_phone = document.getElementById("employer_phone").value.trim();
+
+    if (!company_name) return QH.toast("Required", "Company name is required.");
+    if (!isHttpUrl(company_website)) return QH.toast("Website", "Website must start with http:// or https://");
+    if (!isHttpUrl(company_logo_url)) return QH.toast("Logo URL", "Logo URL must start with http:// or https://");
+
+    const values_map = {
+      company_name,
+      company_website,
+      company_logo_url,
+      employer_email,
+      employer_phone
+    };
+
+    document.getElementById("btnSaveCompany").disabled = true;
+    out.textContent = "Saving…";
+
+    const res = await QH.apiPost("update_employer_profile", {
+      session_token: session.session_token,
+      values_map
+    });
+
+    document.getElementById("btnSaveCompany").disabled = false;
+
+    if (!res || !res.ok){
+      out.textContent = "❌ " + (res && res.error ? res.error : "Unable to save changes.");
+      return QH.toast("Failed", (res && res.error) ? res.error : "Could not save changes.");
+    }
+
+    // Update local view
+    __profile.company_name = company_name;
+    __profile.company_website = company_website;
+    __profile.company_logo_url = company_logo_url;
+    __profile.employer_email = employer_email;
+    __profile.employer_phone = employer_phone;
+
+    renderCompanyCard();
+    exitCompanyEdit(true);
+
+    out.textContent = "✅ Saved.";
+    QH.toast("Saved", "Company info updated.");
+    setTimeout(()=>{ out.textContent=""; }, 1400);
+  }
+
+  // ----------------------------
+  // Password modal logic (Option A)
+  // ----------------------------
+  const pwOverlay = document.getElementById("pwModalOverlay");
+
+  function openPwModal(){
+    document.getElementById("pwModalOut").textContent = "";
+    pwOverlay.classList.add("open");
+    pwOverlay.setAttribute("aria-hidden", "false");
+    setTimeout(()=>{ document.getElementById("pw_old_modal").focus(); }, 0);
+  }
+
+  function closePwModal(){
+    pwOverlay.classList.remove("open");
+    pwOverlay.setAttribute("aria-hidden", "true");
+    document.getElementById("pwModalOut").textContent = "";
+  }
+
+  async function changePassword(){
+    const outInline = document.getElementById("pwOut");
+    const outModal = document.getElementById("pwModalOut");
+    if (outInline) outInline.textContent = "";
+    if (outModal) outModal.textContent = "";
+
+    const old_password = document.getElementById("pw_old_modal").value;
+    const new_password = document.getElementById("pw_new_modal").value;
+    const confirm = document.getElementById("pw_confirm_modal").value;
+
+    if (!old_password || !new_password || !confirm) {
+      QH.toast("Required", "Fill out all password fields.");
+      if (outModal) outModal.textContent = "Please fill out all fields.";
+      return;
+    }
+    if (new_password.length < 8) {
+      QH.toast("Password", "New password must be at least 8 characters.");
+      if (outModal) outModal.textContent = "New password must be at least 8 characters.";
+      return;
+    }
+    if (new_password !== confirm) {
+      QH.toast("Password", "New password and confirmation do not match.");
+      if (outModal) outModal.textContent = "New password and confirmation do not match.";
+      return;
+    }
+
+    const btn = document.getElementById("btnSavePwModal");
+    btn.disabled = true;
+    if (outModal) outModal.textContent = "Updating…";
+
+    const res = await QH.apiPost("change_password", {
+      session_token: session.session_token,
+      old_password,
+      new_password
+    });
+
+    btn.disabled = false;
+
+    if (!res || !res.ok){
+      const msg = (res && res.error) ? res.error : "Unable to update password.";
+      if (outModal) outModal.textContent = "❌ " + msg;
+      QH.toast("Failed", msg);
+      return;
+    }
+
+    // Clear fields
+    document.getElementById("pw_old_modal").value = "";
+    document.getElementById("pw_new_modal").value = "";
+    document.getElementById("pw_confirm_modal").value = "";
+
+    if (outInline) outInline.textContent = "✅ Password updated.";
+    QH.toast("Updated", "Password updated.");
+
+    closePwModal();
+    setTimeout(()=>{ if (outInline) outInline.textContent = ""; }, 1400);
+  }
+
+  document.getElementById("btnEditCompany").addEventListener("click", enterCompanyEdit);
+  document.getElementById("btnCancelCompany").addEventListener("click", () => exitCompanyEdit(true));
+  document.getElementById("btnSaveCompany").addEventListener("click", saveEmployerProfile);
+
+  document.getElementById("btnOpenPwModal").addEventListener("click", openPwModal);
+  document.getElementById("btnClosePwModal").addEventListener("click", closePwModal);
+  document.getElementById("btnCancelPwModal").addEventListener("click", closePwModal);
+  document.getElementById("btnSavePwModal").addEventListener("click", changePassword);
+
+  // Click outside to close
+  pwOverlay.addEventListener("click", (e) => {
+    if (e.target === pwOverlay) closePwModal();
+  });
+
+  // ESC to close
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && pwOverlay.classList.contains("open")) closePwModal();
+  });
+
+  // ----------------------------
+  // Existing dashboard logic
+  // ----------------------------
+  let __entitlements = null;
+  const APP_STATUS_OPTIONS = ["Applied","Reviewed","Interview","Offer","Hired","Rejected"];
+
+  function normalizeStatus(s){
+    const v = String(s || "").trim();
+    if (!v) return "Applied";
+    if (v.toLowerCase() === "new") return "Applied";
+    if (APP_STATUS_OPTIONS.indexOf(v) >= 0) return v;
+    const low = v.toLowerCase();
+    if (low === "screening") return "Reviewed";
+    if (low === "accepted") return "Hired";
+    return v;
+  }
+
+  function renderEeoAggregate(agg){
+    const eeoBox = document.getElementById("eeoBox");
+    if (!agg) {
+      eeoBox.textContent = "No EEO data found.";
+      return;
+    }
+
+    function section(title, obj){
+      const rows = Object.keys(obj || {}).sort().map(k => {
+        return `<tr><td>${k}</td><td style="font-weight:1000;">${obj[k]}</td></tr>`;
+      }).join("") || `<tr><td colspan="2" class="muted">No data</td></tr>`;
+
+      return `
+        <div style="font-weight:1000; margin:10px 0 6px;">${title}</div>
+        <table>
+          <thead><tr><th>Category</th><th>Count</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    eeoBox.innerHTML = `
+      <div><b>Total (in range):</b> <span class="badge ok">${agg.total || 0}</span></div>
+      ${section("Race / Ethnicity", agg.race_ethnicity)}
+      ${section("Sex", agg.sex)}
+      ${section("Veteran Status", agg.veteran_status)}
+      ${section("Disability Status", agg.disability_status)}
+    `;
+  }
+
+  async function loadEeo(){
+    const eeoBox = document.getElementById("eeoBox");
+
+    if (!__entitlements){
+      eeoBox.textContent = "Loading entitlements…";
+      await loadEntitlements();
+    }
+
+    if (!__entitlements || !__entitlements.eeo_export_included) {
+      eeoBox.innerHTML = `
+        <div style="font-weight:1000;">Corporate only</div>
+        <div class="muted" style="margin-top:6px;">
+          Upgrade to <b>QuickHire Corporate</b> to unlock EEO aggregate reporting.
+        </div>
+      `;
+      return;
+    }
+
+    eeoBox.textContent = "Loading EEO aggregate…";
+    const days = document.getElementById("eeoDays").value || "30";
+
+    const res = await QH.apiGet("get_eeo_aggregate_for_employer", {
+      session_token: session.session_token,
+      days: days
+    });
+
+    if (!res.ok){
+      eeoBox.textContent = "Error loading EEO: " + (res.error || "");
+      return;
+    }
+
+    renderEeoAggregate(res.aggregate);
+  }
+
+  async function loadEntitlements() {
+    const res = await QH.apiGet("get_employer_entitlements", { session_token: session.session_token });
+    const box = document.getElementById("entBox");
+
+    if (!res.ok) {
+      box.textContent = "Error loading entitlements: " + (res.error || "");
+      __entitlements = null;
+      return;
+    }
+    const e = res.entitlements || {};
+    __entitlements = e;
+
+    const planName = e.plan_name || "(none yet)";
+    const planId = e.plan_id || "(none)";
+    const verified = e.is_verified ? "YES" : "NO";
+    const eeo = e.eeo_export_included ? "YES (Corporate)" : "NO";
+
+    box.innerHTML = `
+      <div><b>Plan:</b> ${planName} <span class="badge">${planId}</span></div>
+      <div style="margin-top:6px;"><b>Verified Employer:</b> <span class="badge ${e.is_verified ? "ok":"warn"}">${verified}</span></div>
+      <div style="margin-top:6px;"><b>EEO Aggregate Access:</b> <span class="badge ${e.eeo_export_included ? "ok":"warn"}">${eeo}</span></div>
+      <div class="hr"></div>
+      <div class="muted">
+        If you just paid, go to <a href="/billing/success">/billing/success</a> and attach your purchase.
+      </div>
+    `;
+
+    await loadEeo();
+  }
+  loadEntitlements();
+  document.getElementById("btnLoadEeo").addEventListener("click", loadEeo);
+
+  // Helpers
+  const escapeHtml = (s) => String(s == null ? "" : s)
+    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+
+  function statusSelectHtml(current){
+    const cur = normalizeStatus(current);
+    const opts = APP_STATUS_OPTIONS.map(v => `<option value="${escapeHtml(v)}"${v===cur?" selected":""}>${escapeHtml(v)}</option>`).join("");
+    return `<select class="app-status" data-role="status">${opts}</select>`;
+  }
+
+  async function updateApplicationStatus(applicationId, newStatus){
+    return await QH.apiPost("update_application_status", {
+      session_token: session.session_token,
+      application_id: applicationId,
+      status: String(newStatus || "").trim()
+    });
+  }
+
+  async function toggleXOff(applicationId, xOffBool){
+    return await QH.apiPost("toggle_applicant_xoff", {
+      session_token: session.session_token,
+      application_id: applicationId,
+      x_off: xOffBool ? "TRUE" : "FALSE"
+    });
+  }
+
+  // remove candidate (soft remove from view only)
+  async function removeCandidate(applicationId){
+    return await QH.apiPost("remove_candidate", {
+      session_token: session.session_token,
+      application_id: applicationId,
+      remove: "TRUE"
+    });
+  }
+
+  // Resume URL normalization
+  function normalizeResumeUrl(url){
+    const u = String(url || "").trim();
+    if (!u) return "";
+    if (u.includes("/preview")) return u;
+    const m1 = u.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+    if (m1 && m1[1]) return `https://drive.google.com/file/d/${m1[1]}/preview`;
+    const m2 = u.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})\//);
+    if (m2 && m2[1]) return `https://drive.google.com/file/d/${m2[1]}/preview`;
+    return u;
+  }
+
+  function resumeIframeHtml(url){
+    const fixed = normalizeResumeUrl(url);
+    if (!fixed) return `<div class="muted">No resume on file.</div>`;
+    return `<div class="resumeFrame"><iframe src="${escapeHtml(fixed)}" title="Resume Preview" referrerpolicy="no-referrer"></iframe></div>`;
+  }
+
+  // Applicants
+  document.getElementById("btnLoadApplicants").addEventListener("click", async () => {
+    const box = document.getElementById("applicantsBox");
+    box.textContent = "Loading applicants…";
+
+    const res = await QH.apiPost("list_employer_applicants", {
+      session_token: session.session_token
+    });
+
+    if (!res.ok) {
+      box.textContent = "Error loading applicants: " + (res.error || "");
+      return;
+    }
+
+    const rows = Array.isArray(res.applicants) ? res.applicants : [];
+    if (!rows.length) {
+      box.innerHTML = `<div class="muted">No applicants yet.</div>`;
+      return;
+    }
+
+    box.innerHTML = `
+      <div style="font-weight:1000; margin-bottom:8px;">Applicants (${rows.length})</div>
+      <div class="muted" style="margin-bottom:10px;">
+        Click the candidate name to open the card (resume preview). Checkbox toggles X-off.
+      </div>
+      <div id="appsRows"></div>
+    `;
+
+    const wrap = box.querySelector("#appsRows");
+    wrap.innerHTML = rows.map(r => {
+      const appId = String(r.application_id || "");
+      const name = [r.candidate_first_name, r.candidate_last_name].filter(Boolean).join(" ").trim() || "(Candidate)";
+      const email = String(r.candidate_email || "");
+      const phone = String(r.candidate_phone || "");
+      const jobTitle = String(r.job_title || r.job_id || "");
+      const status = normalizeStatus(r.status || "Applied");
+      const xoff = !!r.is_x_off;
+      const resumeUrl = normalizeResumeUrl(String(r.resume_file_url || ""));
+      const loc = [r.city, r.state].filter(Boolean).join(", ");
+      const appliedAt = String(r.applied_at || "");
+      const cover = String(r.cover_letter_text || "");
+
+      return `
+        <div class="app-row-wrap" data-app-id="${escapeHtml(appId)}">
+          <div class="app-row ${xoff ? "xoff":""}" data-row="1">
+            <div>
+              <button class="chk ${xoff ? "on":""}" data-role="xoff" title="Cross off (X-off)">${xoff ? "☑" : "☐"}</button>
+            </div>
+
+            <div class="cell-compact" title="${escapeHtml(jobTitle)}"><b>${escapeHtml(jobTitle)}</b></div>
+
+            <div class="cell-compact">
+              <a href="#" class="nameLink" data-role="toggleCard">${escapeHtml(name)}</a>
+            </div>
+          </div>
+
+          <div class="app-card" data-card="1">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div>
+                <div style="font-weight:1000; font-size:14px;">${escapeHtml(name)}</div>
+                <div class="mini" style="margin-top:2px;">
+                  <b>Job:</b> ${escapeHtml(jobTitle)}${loc ? (" • " + escapeHtml(loc)) : ""}<br>
+                  ${email ? ("<b>Email:</b> " + escapeHtml(email) + "<br>") : ""}
+                  ${phone ? ("<b>Phone:</b> " + escapeHtml(phone) + "<br>") : ""}
+                  ${appliedAt ? ("<b>Applied:</b> " + escapeHtml(appliedAt) + "<br>") : ""}
+                </div>
+              </div>
+
+              <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <label class="mini" style="margin:0; font-weight:1000;">Status</label>
+                ${statusSelectHtml(status)}
+                <button class="btn danger" data-role="removeCandidate" type="button">Remove Candidate</button>
+                <button class="btn" data-role="closeCard" type="button">Close</button>
+              </div>
+            </div>
+
+            ${cover ? `<div class="hr"></div><div style="font-weight:1000; margin-bottom:6px;">Cover Letter</div><div class="mini">${escapeHtml(cover)}</div>` : ``}
+
+            <div class="hr"></div>
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+              <div style="font-weight:1000;">Resume</div>
+              <div class="mini">${resumeUrl ? "Preview below." : "No resume on file."}</div>
+            </div>
+            <div style="margin-top:10px;">
+              ${resumeIframeHtml(resumeUrl)}
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    // Delegated handlers
+    box.__qhBound = box.__qhBound || { change:false, click:false };
+
+    if (!box.__qhBound.change){
+      box.addEventListener("change", async (ev) => {
+        const sel = ev.target;
+        if (!sel || sel.getAttribute("data-role") !== "status") return;
+
+        const wrapEl = sel.closest("[data-app-id]");
+        if (!wrapEl) return;
+
+        const appId = wrapEl.getAttribute("data-app-id") || "";
+        const prev = sel.getAttribute("data-prev") || normalizeStatus(sel.value);
+        const next = normalizeStatus(sel.value);
+        sel.setAttribute("data-prev", prev);
+
+        const r = await updateApplicationStatus(appId, next);
+        if (!r.ok) {
+          sel.value = prev;
+          QH.toast("Failed", r.error || "Could not update status.");
+          return;
+        }
+
+        wrapEl.querySelectorAll('select[data-role="status"]').forEach(s2 => {
+          s2.value = next;
+          s2.setAttribute("data-prev", next);
+        });
+
+        QH.toast("Updated", "Status set to " + next + ".");
+      });
+      box.__qhBound.change = true;
+    }
+
+    if (!box.__qhBound.click){
+      box.addEventListener("click", async (ev) => {
+        const t = ev.target;
+
+        if (t && t.getAttribute && t.getAttribute("data-role") === "toggleCard") {
+          ev.preventDefault();
+          const wrapEl = t.closest("[data-app-id]");
+          if (!wrapEl) return;
+          const card = wrapEl.querySelector("[data-card]");
+          if (!card) return;
+          card.classList.toggle("open");
+          return;
+        }
+
+        if (t && t.getAttribute && t.getAttribute("data-role") === "closeCard") {
+          ev.preventDefault();
+          const wrapEl = t.closest("[data-app-id]");
+          if (!wrapEl) return;
+          const card = wrapEl.querySelector("[data-card]");
+          if (card) card.classList.remove("open");
+          return;
+        }
+
+        if (t && t.getAttribute && t.getAttribute("data-role") === "xoff") {
+          ev.preventDefault();
+          const wrapEl = t.closest("[data-app-id]");
+          if (!wrapEl) return;
+
+          const appId = wrapEl.getAttribute("data-app-id") || "";
+          const row = wrapEl.querySelector(".app-row");
+          const isOn = t.classList.contains("on");
+          const nextOn = !isOn;
+
+          // optimistic UI
+          if (nextOn){ t.classList.add("on"); t.textContent = "☑"; }
+          else { t.classList.remove("on"); t.textContent = "☐"; }
+          if (row){ nextOn ? row.classList.add("xoff") : row.classList.remove("xoff"); }
+
+          const r = await toggleXOff(appId, nextOn);
+          if (!r.ok) {
+            // revert
+            if (nextOn){ t.classList.remove("on"); t.textContent = "☐"; }
+            else { t.classList.add("on"); t.textContent = "☑"; }
+            if (row){ nextOn ? row.classList.remove("xoff") : row.classList.add("xoff"); }
+            QH.toast("Failed", r.error || "Could not toggle X.");
+            return;
+          }
+          QH.toast("Saved", nextOn ? "Applicant crossed off." : "Cross-off removed.");
+          return;
+        }
+
+        // Remove Candidate
+        if (t && t.getAttribute && t.getAttribute("data-role") === "removeCandidate") {
+          ev.preventDefault();
+          const wrapEl = t.closest("[data-app-id]");
+          if (!wrapEl) return;
+          const appId = wrapEl.getAttribute("data-app-id") || "";
+          if (!appId) return;
+
+          const ok = window.confirm(
+            "Remove this candidate from your Applicants view?\n\n" +
+            "This does NOT delete the application. It only hides it from your view.\n\n" +
+            "Click OK to remove."
+          );
+          if (!ok) return;
+
+          t.disabled = true;
+          const r = await removeCandidate(appId);
+          t.disabled = false;
+
+          if (!r.ok) {
+            QH.toast("Failed", r.error || "Could not remove candidate.");
+            return;
+          }
+
+          wrapEl.remove();
+          QH.toast("Removed", "Candidate removed from your view.");
+          return;
+        }
+      });
+      box.__qhBound.click = true;
+    }
+
+    box.querySelectorAll('select[data-role="status"]').forEach(sel => {
+      sel.setAttribute("data-prev", normalizeStatus(sel.value));
+    });
+  });
+
+  // Quick Post (unchanged)
+  document.getElementById("btnPost").addEventListener("click", async () => {
+    const job_title = document.getElementById("job_title").value.trim();
+    const job_description = document.getElementById("job_description").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const state = document.getElementById("state").value.trim().toUpperCase();
+    const employment_type = document.getElementById("employment_type").value.trim();
+    const work_arrangement = document.getElementById("work_arrangement").value.trim();
+    const pay_min = document.getElementById("pay_min").value.trim();
+    const pay_max = document.getElementById("pay_max").value.trim();
+    const apply_url = document.getElementById("apply_url").value.trim();
+    const honesty_attestation = document.getElementById("honesty_attestation").checked;
+
+    if (!job_title || !job_description) return QH.toast("Missing fields", "Job Title and Job Description are required.");
+    if (!honesty_attestation) return QH.toast("Required", "You must check the honesty attestation.");
+
+    const values_map = {
+      job_title,
+      job_description,
+      city,
+      state,
+      employment_type,
+      work_arrangement,
+      pay_min,
+      pay_max,
+      apply_type: apply_url ? "external" : "internal",
+      apply_url: apply_url,
+      honesty_attestation: honesty_attestation ? "TRUE" : "FALSE",
+      status: "live"
+    };
+
+    const res = await QH.apiPost("create_job", { session_token: session.session_token, values_map });
+    const out = document.getElementById("postOut");
+
+    if (!res.ok) {
+      out.textContent = "❌ " + (res.error || "Failed to post.");
+      return QH.toast("Failed", res.error || "Could not post.");
+    }
+
+    out.textContent = "✅ Posted. Job ID: " + res.job_id;
+    QH.toast("Posted", "Job created successfully.");
+  });
+
+  // Kick off loads
+  loadEmployerProfile();
+</script>
+</body>
+</html>

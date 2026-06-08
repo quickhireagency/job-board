@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <!-- QuickHire™ global favicon and app-icon data -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48 96x96" />
+  <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-48x48.png" type="image/png" sizes="48x48" />
+  <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+  <link rel="icon" href="/favicon-192x192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#1f7a4a" />
+  <link rel="stylesheet" href="/assets/global-shell.css?v=20260608-203812" />
+  <script src="/assets/global-shell.js?v=20260608-203812"></script>
+<title>QuickHire™ — Payment Success</title>
+
+  <!-- Config + shared helpers -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+    .btn.green{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.22), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+    input, select{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+      font-family: var(--font);
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .hr{
+      height:1px;
+      background: rgba(10,30,20,.12);
+      margin:12px 0;
+    }
+
+    .note{
+      background: rgba(10,30,20,.04);
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    code{
+      background: rgba(0,0,0,.05);
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    .hide{ display:none !important; }
+
+    /* Footer logo + legal links (match index.html) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
+</head>
+
+<body>
+    <div id="qh-global-header"></div>
+  <script>window.QHGlobalShell && window.QHGlobalShell.mountHeader();</script>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>IMPORTANT: Use the same checkout email</h2>
+          <div class="meta">Pay with the same Stripe email as your QuickHire account email to avoid delays.</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="note">
+          <b>Use the same email.</b> Your purchase will only attach if your Stripe checkout email matches your QuickHire account email.
+          <ul style="margin:10px 0 0; padding-left:18px;">
+            <li>This page uses your Stripe <b>Checkout Session ID</b> (<code>cs_...</code>) to attach your plan or add-on.</li>
+            <li>If you are logged in, we auto-check the email on your account.</li>
+            <li>If you are not logged in, you must enter the same <b>E-mail + Username</b> for your QuickHire employer account.</li>
+          </ul>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="grid">
+          <!-- Attach -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Attach Purchase</h2>
+                <div class="meta">Uses session_id from the URL</div>
+              </div>
+            </div>
+
+            <div class="content">
+              <label for="sessionId">Stripe Session ID</label>
+              <input id="sessionId" placeholder="cs_..." readonly />
+
+              <div class="hr"></div>
+
+              <!-- Logged out attach -->
+              <div id="manualBlock" class="hide">
+                <label for="email">Employer E-mail (must match Stripe checkout)</label>
+                <input id="email" placeholder="you@example.com"/>
+
+                <div style="height:10px;"></div>
+
+                <label for="username">Employer Username</label>
+                <input id="username" placeholder="yourusername"/>
+
+                <div class="hr"></div>
+              </div>
+
+              <button class="btn green" id="btnAttach" type="button">Attach Now</button>
+
+              <div class="muted" style="margin-top:8px;">
+                If you see “email mismatch”, you paid with a different email than your QuickHire employer account.
+              </div>
+
+              <div class="hr"></div>
+              <div id="attachOut" class="muted"></div>
+            </div>
+          </div>
+
+          <!-- Links -->
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <h2>Plan Links</h2>
+                <div class="meta">Stripe Payment Links</div>
+              </div>
+            </div>
+
+            <div class="content">
+              <div class="muted">
+                If you need to purchase again, use the correct link below. Then you will be returned here with your <code>session_id</code>.
+              </div>
+
+              <div class="hr"></div>
+
+              <div class="note">
+                <div><b>QuickHire Local</b> — $49.99/mo</div>
+                <div class="muted"><a href="https://buy.stripe.com/dRm00bblue5Gbz61ufbfO00" target="_blank" rel="noopener">Open Payment Link</a></div>
+                <div class="hr"></div>
+
+                <div><b>QuickHire Business</b> — $99.99/mo</div>
+                <div class="muted"><a href="https://buy.stripe.com/4gM7sDahq9PqeLi3CnbfO05" target="_blank" rel="noopener">Open Payment Link</a></div>
+                <div class="hr"></div>
+
+                <div><b>QuickHire Corporate</b> — $249.99/mo</div>
+                <div class="muted"><a href="https://buy.stripe.com/14AaEP9dm4v6dHe8WHbfO02" target="_blank" rel="noopener">Open Payment Link</a></div>
+                <div class="hr"></div>
+
+                <div><b>Verified Employer</b> — $14.99/mo</div>
+                <div class="muted"><a href="https://buy.stripe.com/7sY9AL9dm2mY0Useh1bfO06" target="_blank" rel="noopener">Open Payment Link</a></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer (same as index.html) -->
+    
+
+        <div id="qh-global-footer"></div>
+    <script>window.QHGlobalShell && window.QHGlobalShell.mountFooter();</script>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+  (function () {
+    const here = window.location.pathname + window.location.search;
+    const loginBtn = document.getElementById("loginBtn");
+    if (loginBtn) loginBtn.href = "/auth/login.html?next=" + encodeURIComponent(here);
+
+    const qs = new URLSearchParams(window.location.search);
+    const sessionId = (qs.get("session_id") || "").trim();
+    const sessionEl = document.getElementById("sessionId");
+    if (sessionEl) sessionEl.value = sessionId;
+
+    // Show manual block only if NOT logged in
+    const manualBlock = document.getElementById("manualBlock");
+    const sess = (typeof QH !== "undefined" && QH.getSession) ? QH.getSession() : null;
+    const isLoggedIn = !!(sess && sess.session_token);
+    if (!isLoggedIn && manualBlock) manualBlock.classList.remove("hide");
+
+    // If missing session_id, hard stop
+    if (!sessionId || sessionId.indexOf("cs_") !== 0) {
+      const out = document.getElementById("attachOut");
+      if (out) out.innerHTML = "❌ Missing <code>session_id</code>. Please return to this page using Stripe’s success link.";
+      const btn = document.getElementById("btnAttach");
+      if (btn) btn.disabled = true;
+    }
+  })();
+
+  document.getElementById("btnAttach").addEventListener("click", async () => {
+    const out = document.getElementById("attachOut");
+    const qs = new URLSearchParams(window.location.search);
+    const session_id = (qs.get("session_id") || "").trim();
+
+    if (!session_id || session_id.indexOf("cs_") !== 0) {
+      if (out) out.innerHTML = "❌ Missing <code>session_id</code>.";
+      return QH.toast("Missing session_id", "Your Stripe success link must include session_id.");
+    }
+
+    const sess = QH.getSession ? QH.getSession() : null;
+    const isLoggedIn = !!(sess && sess.session_token);
+
+    const payload = { session_id };
+    if (isLoggedIn) {
+      payload.session_token = sess.session_token; // backend will use session email
+    } else {
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const username = document.getElementById("username").value.trim().toLowerCase();
+      if (!email || !username) return QH.toast("Missing info", "Enter E-mail and Username.");
+      payload.email = email;
+      payload.username = username;
+    }
+
+    // NEW backend endpoint we will add next:
+    const res = await QH.apiPost("claim_purchase_by_session", payload);
+
+    if (!res.ok) {
+      const msg = res.error || "Attach failed.";
+      if (out) out.innerHTML = "❌ " + QH.esc(msg);
+      return QH.toast("Attach failed", msg);
+    }
+
+    const msg = res.message || "Attached successfully.";
+    if (out) out.innerHTML = "✅ " + QH.esc(msg);
+
+    // Show warning/upgrade message if backend provided it
+    if (res.warning) {
+      if (out) out.innerHTML += "<div style='margin-top:10px;' class='muted'>⚠️ " + QH.esc(res.warning) + "</div>";
+    }
+
+    QH.toast("Attached", msg);
+
+    // Redirect target from backend (employer dashboard)
+    const redirectTo = (res.redirect_to && String(res.redirect_to).startsWith("/")) ? res.redirect_to : "/employer/dashboard.html";
+    setTimeout(() => { window.location.href = redirectTo; }, 900);
+  });
+</script>
+</body>
+</html>

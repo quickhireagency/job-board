@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <!-- QuickHire™ global favicon and app-icon data -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48 96x96" />
+  <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-48x48.png" type="image/png" sizes="48x48" />
+  <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+  <link rel="icon" href="/favicon-192x192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#1f7a4a" />
+  <link rel="stylesheet" href="/assets/global-shell.css?v=20260608-203812" />
+  <script src="/assets/global-shell.js?v=20260608-203812"></script>
+<title>QuickHire™ — EEO Policy</title>
+
+  <!-- Match index pages: include config + app (safe; does not change content) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match index) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h1{margin:0; font-size:16px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    /* Typography inside policy */
+    h3{ margin:18px 0 8px; font-size:14px; }
+    p{ margin: 0 0 10px; line-height: 1.65; }
+    ul{ margin: 8px 0 12px; padding-left: 18px; line-height: 1.65; }
+
+    /* Footer logo + legal links (match index.html) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
+</head>
+
+<body>
+    <div id="qh-global-header"></div>
+  <script>window.QHGlobalShell && window.QHGlobalShell.mountHeader();</script>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h1>EQUAL EMPLOYMENT OPPORTUNITY (EEO) POLICY</h1>
+          <div class="meta">QuickHire™ • Effective Date: 30 September 2025</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <p>
+          QuickHire™ is an equal opportunity employer and staffing company. We are committed to providing a workplace and client assignments
+          that are free from unlawful discrimination, harassment, and retaliation, and to ensuring equal employment opportunity for all applicants,
+          employees, and assigned personnel.
+        </p>
+
+        <p>
+          This policy applies to all terms, conditions, and privileges of employment, including but not limited to recruitment, hiring, placement,
+          assignment, promotion, transfer, compensation, benefits, training, discipline, and termination.
+        </p>
+
+        <h3>1. POLICY STATEMENT</h3>
+        <p>QuickHire™ strictly prohibits discrimination or harassment against applicants, employees, assigned personnel, or any individual based on:</p>
+        <ul>
+          <li>Race</li>
+          <li>Color</li>
+          <li>Religion</li>
+          <li>Sex (including pregnancy, childbirth, or related medical conditions)</li>
+          <li>Sexual orientation</li>
+          <li>Gender identity or expression</li>
+          <li>National origin</li>
+          <li>Age</li>
+          <li>Disability (physical or mental)</li>
+          <li>Genetic information</li>
+          <li>Veteran or military status</li>
+          <li>Citizenship or immigration status</li>
+          <li>Any other characteristic protected under federal, state, or local law.</li>
+        </ul>
+        <p>This policy extends to conduct occurring in the workplace, at client sites, during assignments, and at company-sponsored activities.</p>
+
+        <h3>2. ANTI-HARASSMENT POLICY</h3>
+        <p>QuickHire™ prohibits all forms of unlawful harassment, including sexual harassment, whether by supervisors, coworkers, client personnel, vendors, or others.</p>
+        <p>Harassment includes verbal, physical, or visual conduct that creates an intimidating, hostile, or offensive work environment or interferes with an individual’s work performance. Examples include, but are not limited to:</p>
+        <ul>
+          <li>Unwelcome sexual advances or propositions;</li>
+          <li>Inappropriate physical contact;</li>
+          <li>Derogatory comments, slurs, or epithets;</li>
+          <li>Offensive jokes or displays;</li>
+          <li>Retaliation against individuals who report harassment or participate in investigations.</li>
+        </ul>
+
+        <h3>3. REASONABLE ACCOMMODATION</h3>
+        <p>QuickHire™ provides reasonable accommodations to qualified applicants and employees with disabilities, as required by the Americans with Disabilities Act (ADA) and applicable state or local law.</p>
+        <p>We also accommodate sincerely held religious beliefs, observances, and practices unless doing so would impose an undue hardship.</p>
+        <p>Employees or applicants in need of accommodation should contact Human Resources or their QuickHire™ representative.</p>
+
+        <h3>4. REPORTING AND COMPLAINT PROCEDURES</h3>
+        <p>Any applicant, employee, or assigned personnel who believes they have experienced or witnessed discrimination, harassment, or retaliation should report the conduct immediately to QuickHire™ management or Human Resources.</p>
+        <p>Reports can be made verbally or in writing. QuickHire™ will promptly investigate complaints in a confidential and impartial manner to the extent possible, consistent with a thorough investigation.</p>
+        <p>Retaliation is strictly prohibited. QuickHire™ will not tolerate retaliation against any individual who in good faith reports discrimination or harassment or participates in an investigation.</p>
+
+        <h3>5. ENFORCEMENT AND DISCIPLINARY ACTION</h3>
+        <p>Violations of this policy will result in appropriate corrective action, up to and including termination of employment or assignment, consistent with applicable laws and agreements.</p>
+        <p>Where discriminatory or harassing behavior occurs at client worksites, QuickHire™ will work with the client to take prompt and effective remedial measures.</p>
+
+        <h3>6. APPLICABLE LAW</h3>
+        <p>This policy complies with applicable federal laws, including but not limited to:</p>
+        <ul>
+          <li>Title VII of the Civil Rights Act of 1964</li>
+          <li>Americans with Disabilities Act (ADA)</li>
+          <li>Age Discrimination in Employment Act (ADEA)</li>
+          <li>Genetic Information Nondiscrimination Act (GINA)</li>
+          <li>Uniformed Services Employment and Reemployment Rights Act (USERRA)</li>
+          <li>Equal Pay Act</li>
+        </ul>
+        <p>It also complies with relevant state and local equal employment opportunity and anti-discrimination laws.</p>
+
+        <h3>7. POLICY DISTRIBUTION AND POSTING</h3>
+        <p>This EEO / Anti-Discrimination Policy Notice is:</p>
+        <ul>
+          <li>Provided to all applicants, employees, and assigned personnel upon hire or onboarding;</li>
+          <li>Posted at QuickHire™ offices and made available at client worksites;</li>
+          <li>Included in employee handbooks, client onboarding packets, and other standard documentation.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer (same as index.html) -->
+    
+
+        <div id="qh-global-footer"></div>
+    <script>window.QHGlobalShell && window.QHGlobalShell.mountFooter();</script>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
+  </div>
+</body>
+</html>

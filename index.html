@@ -1,0 +1,1697 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <!-- QuickHire™ global favicon and app-icon data -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48 96x96" />
+  <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-48x48.png" type="image/png" sizes="48x48" />
+  <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+  <link rel="icon" href="/favicon-192x192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#1f7a4a" />
+  <link rel="stylesheet" href="/assets/global-shell.css?v=20260608-203812" />
+  <script src="/assets/global-shell.js?v=20260608-203812"></script>
+<title>QuickHire™ Job Board | Search Jobs, Careers & Hiring Opportunities</title>
+
+  <!-- QuickHire™ Job Board v11.0.0 Alpha | Last Updated: 2026-05-26T13:24:42Z UTC | Developed by Cook Technology Services -->
+
+  <!-- SEO: indexable main page -->
+  <meta name="robots" content="index,follow" />
+  <meta name="description" content="Search jobs, careers, and hiring opportunities on the QuickHire™ Job Board. Browse openings by keyword, city, state, category, and work arrangement. Apply online and connect with employers hiring now." />
+  <link rel="canonical" href="https://jobboard.quickhireagency.com/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="QuickHire™ Job Board | Search Jobs, Careers & Hiring Opportunities" />
+  <meta property="og:description" content="Search jobs, careers, and hiring opportunities on the QuickHire™ Job Board. Browse openings by keyword, city, state, category, and work arrangement." />
+  <meta property="og:url" content="https://jobboard.quickhireagency.com/" />
+  <meta property="og:site_name" content="QuickHire™ Job Board" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="QuickHire™ Job Board | Search Jobs, Careers & Hiring Opportunities" />
+  <meta name="twitter:description" content="Search jobs, careers, and hiring opportunities on the QuickHire™ Job Board." />
+
+  <!-- Config (API base) -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* QuickHire-ish palette (greens / yellows / blues) */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+
+    .controls{
+      flex:1;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .searchbar{
+      flex: 1;
+      min-width: 220px;
+      max-width: 520px;
+      display:flex; gap:8px; align-items:center;
+      background: rgba(255,255,255,.9);
+      border:1px solid var(--line);
+      border-radius: 999px;
+      padding:10px 12px;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+    }
+    .searchbar input{
+      width:100%;
+      background:transparent;
+      border:none;
+      outline:none;
+      color:var(--text);
+      font-size:14px;
+    }
+
+    /* NEW: button row wrapper (desktop stays same; mobile gets clean layout) */
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+      position:relative;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.primary{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.18), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+    .btn.danger{
+      border-color: rgba(180,35,24,.35);
+      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
+      color: #3a0f0b;
+    }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .notice{
+      background: linear-gradient(135deg, rgba(255,255,255,.92), rgba(255,255,255,.70));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:14px;
+      box-shadow: var(--shadow);
+      margin-bottom:14px;
+    }
+    .notice h3{margin:0 0 8px 0; font-size:14px}
+    .notice .muted{color:var(--muted); font-size:13px; line-height:1.45}
+    .notice .lines{margin-top:8px}
+    .notice .line{margin:4px 0}
+    .notice .strong{color:var(--text); font-weight:900}
+
+    /* Filter bar */
+    .filters{
+      background: rgba(255,255,255,.85);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      padding:12px;
+      box-shadow: var(--shadow);
+      margin-bottom:14px;
+    }
+    .filters-grid{
+      display:grid;
+      grid-template-columns: 1.2fr .9fr .9fr .8fr;
+      gap:10px;
+      align-items:end;
+    }
+    @media (max-width: 1100px){
+      .filters-grid{grid-template-columns: 1fr 1fr}
+    }
+    @media (max-width: 720px){
+      .filters-grid{grid-template-columns: 1fr}
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      color:var(--text);
+      outline:none;
+    }
+    textarea{min-height:110px; resize:vertical;}
+
+    .filter-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+      align-items:center;
+      justify-content:space-between;
+    }
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    /* Two-panel grid */
+    .grid{
+      display:grid;
+      grid-template-columns: 420px 1fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      min-height: 520px;
+    }
+    @media (max-width: 980px){
+      .panel{min-height:auto}
+    }
+
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+
+    .list{
+      max-height: calc(100vh - 320px);
+      overflow:auto;
+    }
+    @media (max-width: 980px){
+      .list{max-height: 52vh}
+    }
+
+.item{
+  display:block;
+  padding:12px 14px;
+  border-bottom:1px solid rgba(10,30,20,.10);
+  cursor:pointer;
+  background: transparent;
+  color:inherit;
+  text-decoration:none;
+}
+    .item:hover{background: rgba(43,154,94,.06)}
+    .item.active{background: rgba(43,134,214,.08)}
+    .item .title{font-weight:900; font-size:14px; margin-bottom:4px}
+    .item .company{
+      margin-top:2px;
+      font-weight:900;
+      font-size:12px;
+      color: rgba(11,27,18,.88);
+    }
+    .item .sub{color:var(--muted); font-size:12px; display:flex; gap:10px; flex-wrap:wrap; margin-top:6px}
+
+    .pill{
+      border:1px solid rgba(10,30,20,.14);
+      border-radius:999px;
+      padding:2px 8px;
+      font-size:11px;
+      color:var(--muted);
+      background: rgba(255,255,255,.75);
+      font-weight:800;
+      display:inline-flex;
+      align-items:center;
+      line-height:1;
+      white-space:nowrap;
+    }
+
+    .pill.verified{
+      border-color: rgba(31,122,74,.35);
+      color: rgba(31,122,74,.95);
+      background: rgba(43,154,94,.12)
+    }
+
+    .empty{
+      padding:18px 14px;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .detail{
+      padding:16px;
+    }
+    .detail h1{margin:0 0 8px 0; font-size:18px}
+
+    /* right-side top facts row */
+    .detail .facts{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin:10px 0 12px;
+      align-items:center;
+    }
+
+    /* Verified badge inside facts row - does NOT affect other pills */
+    .verified-inline{
+      display:inline-flex;
+      align-items:center;
+      flex: 0 0 auto;         /* do not stretch */
+    }
+
+    .verified-badge{
+      height:90px;            /* <<< change ONLY this number to resize */
+      width:auto;
+      display:block;
+    }
+
+    .detail .box{
+      background: rgba(10,30,20,.04);
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      padding:12px;
+      margin-top:12px;
+    }
+    .detail pre{
+      margin:0;
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-family: inherit;
+      font-size:14px;
+      line-height:1.45;
+    }
+
+    /* Company block (right) */
+    .company-block{
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(10,30,20,.12);
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:8px;
+    }
+    .company-logo{
+      display:block;
+      max-width: 180px;
+      width: 100%;
+      height:auto;
+    }
+    .company-name{
+      font-weight: 1000;
+      letter-spacing:.2px;
+    }
+    .company-site{
+      font-weight: 800;
+      font-size: 13px;
+      word-break: break-word;
+    }
+
+    /* Pagination controls */
+    .pager{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 14px;
+      border-top:1px solid rgba(10,30,20,.10);
+      background: linear-gradient(180deg, rgba(255,255,255,.92), rgba(255,255,255,.80));
+    }
+    .pager .meta{
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .pager .btn{
+      padding:8px 10px;
+      border-radius: 12px;
+    }
+    .pager .btn:disabled{
+      opacity:.62;
+      cursor:not-allowed;
+    }
+    .pager .meta{
+      text-align:center;
+    }
+
+    /* My Account dropdown */
+    .dropdown{
+      position:relative;
+      display:inline-flex;
+    }
+    .menu{
+      position:absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      min-width: 180px;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      padding: 6px;
+      display:none;
+      z-index: 50;
+    }
+    .menu a, .menu button{
+      width:100%;
+      border:none;
+      background:transparent;
+      text-align:left;
+      padding:10px 10px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:800;
+      color: var(--text);
+      text-decoration:none;
+      display:block;
+    }
+    .menu a:hover, .menu button:hover{
+      background: rgba(43,134,214,.10);
+      text-decoration:none;
+    }
+    .menu .danger{
+      color: var(--danger);
+    }
+    .dropdown.open .menu{display:block}
+
+    /* Report modal */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background: rgba(0,0,0,.35);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index: 100;
+      padding: 18px;
+    }
+    .modal{
+      width: 100%;
+      max-width: 560px;
+      background: rgba(255,255,255,.98);
+      border:1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .modal-head{
+      padding: 14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .modal-head h3{margin:0; font-size:14px}
+    .modal-body{padding: 14px}
+    .modal-actions{
+      padding: 12px 14px 14px;
+      border-top:1px solid var(--line);
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .modal-backdrop.show{display:flex}
+
+    /* Footer logo + extra links */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+
+    /* ----------------------------
+       Responsive cleanup (KEY)
+       ---------------------------- */
+    @media (max-width: 720px){
+      .topbar-inner{
+        flex-wrap:wrap;
+        align-items:flex-start;
+      }
+      .brand{
+        min-width: 0;
+        width:100%;
+      }
+      .brand img{
+        height:78px; /* slightly smaller on mobile */
+      }
+
+      /* CRITICAL: controls become a clean vertical stack (no squish) */
+      .controls{
+        width:100%;
+        flex-direction:column;
+        align-items:stretch;
+        justify-content:flex-start;
+        gap:10px;
+      }
+
+      /* Searchbar is always first and full width */
+      .searchbar{
+        width:100%;
+        max-width:none;
+        min-width:0;
+        order: 1;
+      }
+
+      /* Buttons become a wrapped row UNDER the search bar */
+      .actions{
+        width:100%;
+        order: 2;
+        justify-content:flex-start;
+      }
+
+      /* Make buttons usable on mobile without squishing */
+      .actions .btn,
+      .actions .dropdown{
+        flex: 1 1 calc(50% - 10px);
+        min-width: 160px;
+      }
+
+      .panel-header{
+        flex-wrap:wrap;
+        align-items:flex-start;
+      }
+      .verified-badge{max-width: 200px;}
+      .company-logo{max-width: 160px;}
+    }
+  </style>
+</head>
+
+<body>
+    <div id="qh-global-header"></div>
+  <script>window.QHGlobalShell && window.QHGlobalShell.mountHeader();</script>
+
+  <div class="wrap">
+
+    <!-- Welcome message (candidate-facing) -->
+    <div class="notice">
+      <h1 style="margin:0 0 8px 0; font-size:22px; line-height:1.25;">QuickHire™ Job Board</h1>
+      <div class="muted" style="margin-bottom:10px; font-size:14px; line-height:1.5;">
+  Search jobs, careers, and hiring opportunities by keyword, category, city, state, and work arrangement. QuickHire™ helps job seekers connect with employers hiring now.
+</div>
+<div class="muted lines">
+        <div class="line"><span class="strong">Candidates:</span> Browse open positions, apply in minutes, and track your application status from your dashboard.</div>
+        <div class="line"><span class="strong">Employers:</span> Post jobs, review applicants all in one place.</div>
+        <div class="line">Use the search and filters below to find the right opportunity.</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters" aria-label="Job filters">
+      <div class="filters-grid">
+        <div>
+          <label for="categorySel">Category</label>
+          <select id="categorySel">
+            <option value="">All</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="waSel">Work arrangement</label>
+          <select id="waSel">
+            <option value="">All</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="cityInput">City</label>
+          <input id="cityInput" placeholder="e.g., Indianapolis" />
+        </div>
+
+        <div>
+          <label for="stateSel">State / Territory</label>
+          <select id="stateSel">
+            <option value="">Any</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <button class="btn" id="useLocationBtn">Use My Location</button>
+
+          <div style="min-width:180px;">
+            <label for="radiusSel">Radius (miles)</label>
+            <select id="radiusSel">
+              <option value="">Off</option>
+              <option>5</option><option>10</option><option>15</option><option>20</option><option>25</option>
+              <option>50</option><option>100</option><option>250</option>
+            </select>
+          </div>
+
+          <button class="btn" id="clearFiltersBtn">Clear filters</button>
+          <button class="btn primary" id="refreshBtn">Refresh</button>
+        </div>
+
+        <div class="muted" id="locNote">
+          Location filter uses your browser location. First use may take a moment (we cache results).
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Jobs</h2>
+            <div class="meta"><span id="jobCount">0</span> results</div>
+          </div>
+        </div>
+
+        <div id="indexAlert" class="empty" style="display:none; margin:0 16px 12px; text-align:left; border-color:#f4c542; background:#fff8db; color:#6b4e00;"></div>
+
+        <div class="list" id="jobList">
+          <div class="empty">Loading jobs…</div>
+        </div>
+
+        <!-- v11.0.0 Alpha: infinite scroll + Load More fallback -->
+        <div class="pager" aria-label="Job list loading">
+          <div class="meta" id="pageMeta">Loading jobs…</div>
+          <button class="btn primary" id="loadMoreBtn" type="button" disabled>Load More Jobs</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Overview</h2>
+            <div class="meta" id="detailMeta">Select a job on the left</div>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;">
+            <button class="btn danger" id="reportBtn" disabled>Report Job</button>
+            <button class="btn primary" id="applyBtn" disabled>Apply</button>
+          </div>
+        </div>
+
+        <div class="detail" id="jobDetail">
+          <div class="muted">
+            You can browse without an account. To apply, you’ll be sent to the candidate login page if needed.
+          </div>
+          <div class="box">
+            <pre>Use filters above to narrow results. Select a job on the left to view details.</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    
+
+        <div id="qh-global-footer"></div>
+    <script>window.QHGlobalShell && window.QHGlobalShell.mountFooter();</script>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
+
+  </div>
+
+  <!-- Report modal -->
+  <div class="modal-backdrop" id="reportModal" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-label="Report job">
+      <div class="modal-head">
+        <h3>Report this job</h3>
+        <button class="btn" id="reportCloseBtn" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="muted" style="margin-bottom:10px;">
+          Reports are reviewed by our team. Please be specific.
+        </div>
+
+        <div style="margin-bottom:10px;">
+          <label for="complaintTypeSel">Reason</label>
+          <select id="complaintTypeSel">
+            <option value="">Select a reason…</option>
+            <option>Scam / Fraud</option>
+            <option>Misleading job posting</option>
+            <option>Discrimination concern</option>
+            <option>Harassment / abusive content</option>
+            <option>Incorrect location / pay / details</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="complaintMsg">Message</label>
+          <textarea id="complaintMsg" placeholder="Describe what’s wrong with this posting…"></textarea>
+        </div>
+
+        <div class="muted" style="margin-top:10px;">
+          You must be logged in as a candidate to submit a report.
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" id="reportCancelBtn" type="button">Cancel</button>
+        <button class="btn danger" id="reportSubmitBtn" type="button">Submit Report</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =============================================================================
+    // QuickHire™ Job Board Frontend — v11.0.0 Alpha
+    // Last Updated: 2026-05-26T13:24:42Z UTC
+    // Developed by Cook Technology Services
+    // Copyright © 2025 Cook Services Company, LLC | All Rights Reserved.
+    //
+    // Performance model:
+    // - First paint loads 100 lightweight JobIndex cards.
+    // - No startup facets wait, no auto-prefetch storm, no automatic detail call.
+    // - Infinite scroll / Load More fetches another 100 at a time.
+    // - Full job details load through get_job only when the user clicks a job.
+    // =============================================================================
+
+    const QH_BUILD_VERSION = "v11.0.0 Alpha";
+    const QH_BUILD_UTC = "2026-05-26T13:24:42Z";
+
+    // ----------------------------
+    // Config / State
+    // ----------------------------
+    const API_BASE = (window.QH_CONFIG && window.QH_CONFIG.API_BASE) || "";
+
+    const state = {
+      jobs: [],
+      filtered: [],
+      seenJobIds: {},
+      selectedJobId: "",
+      selectedJob: null,
+      indexWarning: "",
+      session: (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {}),
+      geo: {
+        enabled: false,
+        lat: null,
+        lon: null
+      },
+      paging: {
+        cursor: "",
+        nextCursor: "",
+        totalMatched: 0,
+        limit: 100,
+        loadToken: 0,
+        requestKey: "",
+        loading: false,
+        prefetching: false,
+        autoPrefetchTarget: 0
+      }
+    };
+
+    // paths (canonical)
+    const PATHS = {
+      candidateLogin: "/auth/login.html",
+      employerPortal: "/employer/dashboard.html",
+      applyPage: "/apply/index.html"
+    };
+
+    function qs(sel){ return document.querySelector(sel); }
+    function setText(el, txt){ if (el) el.textContent = txt; }
+
+    function toast(msg){ alert(msg); }
+
+    // ----------------------------
+    // API helpers
+    // ----------------------------
+    async function apiGet(params){
+      const url = API_BASE + "?" + new URLSearchParams(params).toString();
+      const res = await fetch(url, { method:"GET", cache:"no-store" });
+      const json = await res.json();
+      return json;
+    }
+
+    async function apiPost(body){
+      const res = await fetch(API_BASE, {
+        method:"POST",
+        headers: { "Content-Type":"application/json" },
+        body: JSON.stringify(body)
+      });
+      const json = await res.json();
+      return json;
+    }
+
+    // ----------------------------
+    // Utilities
+    // ----------------------------
+    function escapeHtml(s){
+      return String(s == null ? "" : s)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function debounce(fn, ms){
+      let t = null;
+      return (...args) => {
+        if (t) clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    }
+
+    function haversineMiles(lat1, lon1, lat2, lon2){
+      const R = 3958.7613; // miles
+      const toRad = d => d * Math.PI / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+      return 2 * R * Math.asin(Math.sqrt(a));
+    }
+
+    function normalizeEmploymentType(v){
+      const s = String(v || "").trim().toLowerCase();
+      if (!s) return "";
+      if (s.includes("part")) return "Part Time";
+      if (s.includes("full")) return "Full Time";
+      return String(v || "").trim();
+    }
+
+
+    function getJobLocationText(j){
+      const direct = [j.city, j.state].filter(Boolean).join(", ").trim();
+      if (direct) return direct;
+      const candidates = [
+        j.location,
+        j.job_location,
+        j.location_text,
+        j.work_location,
+        j.address,
+        j.search_location
+      ];
+      for (let i=0; i<candidates.length; i++) {
+        const v = String(candidates[i] || "").trim();
+        if (v) return v;
+      }
+      return "Location not listed";
+    }
+
+    function getJobSearchText(j){
+      return [
+        j.job_title,
+        j.company_name,
+        j.company_id,
+        getJobLocationText(j),
+        j.city,
+        j.state,
+        j.category,
+        j.employment_type,
+        j.work_arrangement
+      ].map(x => String(x || "").toLowerCase()).join(" ");
+    }
+
+    function setUrlJobId(jobId){
+      try{
+        const url = new URL(window.location.href);
+        if (jobId) url.searchParams.set("job_id", jobId);
+        else url.searchParams.delete("job_id");
+        window.history.replaceState({}, "", url.toString());
+      }catch(e){ /* ignore */ }
+    }
+
+    function currentRequestKey(){
+      return JSON.stringify(currentFilters());
+    }
+
+    function setIndexWarning(json){
+      const el = qs("#indexAlert");
+      if (!el) return;
+      if (json && json.needs_index_rebuild){
+        const note = json.note || "QuickHire is rebuilding the job index. A small emergency preview may be shown until JobIndex is ready.";
+        el.style.display = "block";
+        el.innerHTML = `<b>Job index rebuild needed.</b><div style="margin-top:6px;">${escapeHtml(note)}</div>`;
+      } else {
+        el.style.display = "none";
+        el.innerHTML = "";
+      }
+    }
+
+    function resetJobPaging(){
+      state.jobs = [];
+      state.filtered = [];
+      state.seenJobIds = {};
+      state.selectedJobId = "";
+      state.selectedJob = null;
+      state.paging.cursor = "";
+      state.paging.nextCursor = "";
+      state.paging.totalMatched = 0;
+    }
+
+    // ----------------------------
+    // US states + required territories (USPS)
+    // ----------------------------
+    const US_STATES_AND_TERRITORIES = [
+      "AL","AK","AZ","AR","CA","CO","CT","DE","DC","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD",
+      "MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC",
+      "SD","TN","TX","UT","VT","VA","WA","WV","WI","WY",
+      "AS","GU","MP","PR","VI","UM"
+    ];
+
+    function initStates(){
+      const sel = qs("#stateSel");
+      if (!sel) return;
+      sel.innerHTML = `<option value="">Any</option>` +
+        US_STATES_AND_TERRITORIES.map(s => `<option value="${s}">${s}</option>`).join("");
+    }
+
+    function populateSelect(sel, values, firstLabel, preserveValue){
+      if (!sel) return;
+      const prev = preserveValue == null ? sel.value : preserveValue;
+      const clean = (values || [])
+        .map(v => String(v || "").trim())
+        .filter(Boolean)
+        .filter((v, i, arr) => arr.indexOf(v) === i)
+        .sort();
+
+      sel.innerHTML = `<option value="">${escapeHtml(firstLabel || "All")}</option>` +
+        clean.map(x => `<option value="${escapeHtml(x)}">${escapeHtml(x)}</option>`).join("");
+
+      if (prev && clean.indexOf(prev) >= 0) sel.value = prev;
+    }
+
+    async function loadFacets(){
+      if (!API_BASE) return;
+      try{
+        const json = await apiGet({ mode:"public_api", action:"job_facets" });
+        if (!json || !json.ok) return;
+
+        populateSelect(qs("#categorySel"), json.categories || [], "All");
+        populateSelect(qs("#waSel"), json.work_arrangements || [], "All");
+      }catch(e){
+        // Facets are helpful, but jobs can still load if facets fail.
+      }
+    }
+
+    // ----------------------------
+    // Job loading + filtering + infinite scroll
+    // ----------------------------
+    function currentFilters(){
+      const keyword = (qs("#searchInput").value || "").trim();
+      const category = (qs("#categorySel").value || "").trim();
+      const workArrangement = (qs("#waSel").value || "").trim();
+      const city = (qs("#cityInput").value || "").trim();
+      const stateVal = (qs("#stateSel").value || "").trim();
+
+      return { keyword, category, workArrangement, city, stateVal };
+    }
+
+    async function loadJobs(resetCursor, opts){
+      opts = opts || {};
+      const background = !!opts.background;
+
+      if (!API_BASE){
+        toast("Missing API base. Set it in /config/config.js");
+        return;
+      }
+
+      if (state.paging.loading && !resetCursor) return;
+
+      const token = ++state.paging.loadToken;
+      const requestKey = currentRequestKey();
+
+      if (resetCursor){
+        resetJobPaging();
+        state.paging.requestKey = requestKey;
+        qs("#jobList").innerHTML = `<div class="empty">Loading jobs…</div>`;
+      }
+
+      state.paging.loading = true;
+      setPagerUi();
+
+      const f = currentFilters();
+
+      const params = {
+        mode:"public_api",
+        action:"list_jobs",
+        limit: String(state.paging.limit),
+        sort:"posted_at_desc"
+      };
+
+      if (state.paging.cursor) params.cursor = state.paging.cursor;
+      if (f.keyword) params.search = f.keyword;
+      if (f.stateVal) params.state = f.stateVal;
+      if (f.city) params.city = f.city;
+      if (f.category) params.category = f.category;
+      if (f.workArrangement) params.work_arrangement = f.workArrangement;
+
+      try{
+        const json = await apiGet(params);
+
+        // If the user changed filters while this request was running, discard stale response.
+        if (token !== state.paging.loadToken && resetCursor) return;
+        if (requestKey !== state.paging.requestKey && !resetCursor) return;
+
+        if (!json.ok){
+          if (!state.jobs.length) {
+            qs("#jobList").innerHTML = `<div class="empty">Error loading jobs: ${escapeHtml(json.error || "Unknown error")}</div>`;
+          }
+          return;
+        }
+
+        setIndexWarning(json);
+
+        const incoming = json.jobs || [];
+        incoming.forEach(j => {
+          const id = String(j.job_id || "").trim();
+          if (!id || state.seenJobIds[id]) return;
+          state.seenJobIds[id] = true;
+          state.jobs.push(j);
+        });
+
+        state.paging.cursor = json.nextCursor ? (state.paging.cursor || "") : state.paging.cursor;
+        state.paging.nextCursor = json.nextCursor || "";
+        state.paging.totalMatched = Number(json.totalMatched || 0) || 0;
+        state.paging.countLabel = String(json.countLabel || "");
+
+        if (json.nextCursor) {
+          // The backend cursor is opaque and points to the next chunk.
+          state.paging.cursor = json.nextCursor;
+        } else {
+          state.paging.cursor = "";
+        }
+
+        await applyRadiusIfNeededThenRender();
+      }catch(e){
+        if (!state.jobs.length) {
+          qs("#jobList").innerHTML = `<div class="empty">Unable to load jobs. Please refresh and try again.</div>`;
+        }
+      }finally{
+        if (token === state.paging.loadToken || !resetCursor) {
+          state.paging.loading = false;
+          setPagerUi();
+        }
+      }
+    }
+
+    function scheduleAutoPrefetch(){
+      if (state.paging.prefetching) return;
+      if (!state.paging.nextCursor) return;
+      if (state.jobs.length >= state.paging.autoPrefetchTarget) return;
+
+      const key = state.paging.requestKey;
+      state.paging.prefetching = true;
+
+      setTimeout(async () => {
+        try{
+          while (
+            state.paging.nextCursor &&
+            state.jobs.length < state.paging.autoPrefetchTarget &&
+            state.paging.requestKey === key
+          ) {
+            await loadJobs(false, { background:true });
+            await new Promise(r => setTimeout(r, 75));
+          }
+        } finally {
+          state.paging.prefetching = false;
+          setPagerUi();
+        }
+      }, 250);
+    }
+
+    async function applyRadiusIfNeededThenRender(){
+      const radius = (qs("#radiusSel").value || "").trim();
+      const radiusMiles = radius ? Number(radius) : null;
+
+      state.filtered = state.jobs.slice();
+
+      if (radiusMiles && state.geo.lat != null && state.geo.lon != null){
+        await filterByRadius(radiusMiles);
+      }
+
+      renderJobs();
+      ensureSelection();
+      setText(qs("#jobCount"), String(state.paging.totalMatched || state.filtered.length));
+    }
+
+    function ensureSelection(){
+      if (!state.filtered.length){
+        state.selectedJobId = "";
+        state.selectedJob = null;
+        renderSelectedJob(null);
+        return;
+      }
+
+      const urlJobId = (new URL(window.location.href)).searchParams.get("job_id") || "";
+      if (urlJobId && !state.selectedJobId){
+        state.selectedJobId = urlJobId;
+        renderJobs();
+        renderSelectedJob(urlJobId);
+        return;
+      }
+
+      // v11.0.0 Alpha: do NOT auto-load the first job detail. First paint should
+      // show jobs immediately; details load only after a user click or job_id URL.
+      if (!state.selectedJobId) {
+        setText(qs("#detailMeta"), "Select a job on the left");
+        qs("#applyBtn").disabled = true;
+        qs("#reportBtn").disabled = true;
+        qs("#jobDetail").innerHTML = `<div class="muted">Select a job to view details. Jobs are ready to browse on the left.</div>`;
+      }
+    }
+
+    function renderJobs(){
+      const list = qs("#jobList");
+      const jobs = state.filtered || [];
+
+      if (!jobs.length){
+        list.innerHTML = `<div class="empty">No jobs found.</div>`;
+        return;
+      }
+
+      list.innerHTML = jobs.map(j => {
+        const active = (j.job_id === state.selectedJobId) ? "active" : "";
+        const loc = getJobLocationText(j);
+        const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
+
+        const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
+        const empType = normalizeEmploymentType(j.employment_type);
+        const jobUrl = "/job.html?job_id=" + encodeURIComponent(j.job_id || "");
+
+        return `
+          <a class="item ${active}" data-job="${escapeHtml(j.job_id || "")}" href="${jobUrl}" aria-label="${escapeHtml(j.job_title || "Job opening")}">
+            <div class="title">${escapeHtml(j.job_title || "Untitled role")}</div>
+            ${companyName ? `<div class="company">${escapeHtml(companyName)}</div>` : ``}
+            <div class="sub">
+              <span>${escapeHtml(loc)}</span>
+              ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
+              ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
+              ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
+              ${verified ? `<span class="pill verified">Verified</span>` : ``}
+            </div>
+          </a>
+        `;
+      }).join("");
+
+      list.querySelectorAll(".item").forEach(el => {
+        el.addEventListener("click", (e) => {
+          const isModifiedClick =
+            e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0;
+
+          if (isModifiedClick) return;
+
+          e.preventDefault();
+
+          const id = el.getAttribute("data-job");
+          state.selectedJobId = id;
+          setUrlJobId(id);
+          renderJobs();
+          renderSelectedJob(id);
+        });
+      });
+    }
+
+    async function renderSelectedJob(jobId){
+      if (!jobId){
+        setText(qs("#detailMeta"), "Select a job on the left");
+        qs("#applyBtn").disabled = true;
+        qs("#reportBtn").disabled = true;
+        qs("#jobDetail").innerHTML = `<div class="muted">Select a job to view details.</div>`;
+        return;
+      }
+
+      const json = await apiGet({
+        mode:"public_api",
+        action:"get_job",
+        job_id: jobId
+      });
+
+      if (!json.ok){
+        setText(qs("#detailMeta"), "Error");
+        qs("#applyBtn").disabled = true;
+        qs("#reportBtn").disabled = true;
+        qs("#jobDetail").innerHTML = `<div class="muted">Error loading job: ${escapeHtml(json.error || "Unknown")}</div>`;
+        return;
+      }
+
+      const j = json.job || {};
+      state.selectedJob = j;
+
+      try{
+        document.title = (j.job_title ? (j.job_title + " — QuickHire™ Job Board") : "QuickHire™ Job Board");
+      }catch(e){}
+
+      const loc = getJobLocationText(j);
+      const pay = (j.pay_min || j.pay_max) ? `${j.pay_min||""} – ${j.pay_max||""} ${j.pay_currency||""}`.trim() : "";
+      const verified = (String(j.verified_employer_snapshot || "").toUpperCase() === "TRUE");
+
+      const companyName = String(j.company_name || "").trim() || String(j.company_id || "").trim();
+      const companyLogo = String(j.company_logo_url || j.logo_url || "").trim();
+      const companySite = String(j.company_website || j.website || "").trim();
+
+      setText(qs("#detailMeta"), "Job detail");
+
+      qs("#applyBtn").disabled = false;
+      qs("#reportBtn").disabled = false;
+
+      const empType = normalizeEmploymentType(j.employment_type);
+
+      qs("#jobDetail").innerHTML = `
+        <h1>${escapeHtml(j.job_title || "Untitled role")}</h1>
+
+        <div class="facts">
+          ${loc ? `<span class="pill">${escapeHtml(loc)}</span>` : ``}
+          ${empType ? `<span class="pill">${escapeHtml(empType)}</span>` : ``}
+          ${j.work_arrangement ? `<span class="pill">${escapeHtml(j.work_arrangement)}</span>` : ``}
+          ${pay ? `<span class="pill">${escapeHtml(pay)}</span>` : ``}
+          ${j.category ? `<span class="pill">${escapeHtml(j.category)}</span>` : ``}
+          ${verified ? `
+            <span class="verified-inline">
+              <img class="verified-badge" src="/QuickHireVerifiedEmployerBadge.png" alt="Verified Employer" />
+            </span>
+          ` : ``}
+        </div>
+
+        ${(companyName || companyLogo || companySite) ? `
+          <div class="company-block" aria-label="Company information">
+            ${companyLogo ? `<img class="company-logo" src="${escapeHtml(companyLogo)}" alt="${escapeHtml(companyName || "Company logo")}" loading="lazy" />` : ``}
+            ${companyName ? `<div class="company-name">${escapeHtml(companyName)}</div>` : ``}
+            ${companySite ? `<div class="company-site"><a href="${escapeHtml(companySite)}" target="_blank" rel="noopener">${escapeHtml(companySite)}</a></div>` : ``}
+          </div>` : ``}
+
+        <div class="muted" style="margin-top:10px;">Job ID: ${escapeHtml(j.job_id || "")}</div>
+
+        <div class="box" style="margin-top:14px;">
+          <div class="muted" style="margin-bottom:6px; font-weight:900;">Description</div>
+          <pre>${escapeHtml(j.job_description || "")}</pre>
+        </div>
+
+        ${j.benefits_summary ? `
+          <div class="box">
+            <div class="muted" style="margin-bottom:6px; font-weight:900;">Benefits Summary</div>
+            <pre>${escapeHtml(j.benefits_summary)}</pre>
+          </div>` : ``}
+
+        ${String(j.apply_url || "").trim() ? `
+          <div class="box">
+            <div class="muted" style="margin-bottom:6px; font-weight:900;">External apply</div>
+            <div class="muted">This job has an external application link. Clicking Apply will take you to the employer’s site.</div>
+          </div>` : `
+          <div class="box">
+            <div class="muted" style="margin-bottom:6px; font-weight:900;">How to apply</div>
+            <div class="muted">You must have a Job Seeker account and be logged in to apply.</div>
+          </div>
+        `}
+      `;
+    }
+
+    function setPagerUi(){
+      const btn = qs("#loadMoreBtn");
+      const meta = qs("#pageMeta");
+
+      const loaded = state.filtered.length || state.jobs.length;
+      const total = state.paging.totalMatched || loaded;
+      const hasNext = !!state.paging.nextCursor;
+
+      if (meta) {
+        if (state.paging.loading && !loaded) {
+          meta.textContent = "Loading jobs…";
+        } else {
+          const label = state.paging.countLabel || (total ? total.toLocaleString() + " results" : "jobs");
+          meta.textContent = `Showing ${loaded.toLocaleString()} ${label ? "of " + label : "jobs"}`;
+        }
+      }
+
+      if (btn) {
+        btn.disabled = state.paging.loading || !hasNext;
+        btn.textContent = state.paging.loading
+          ? "Loading…"
+          : (hasNext ? "Load More Jobs" : "All Loaded");
+      }
+    }
+
+    function maybeLoadMoreFromScroll(){
+      const list = qs("#jobList");
+      if (!list || state.paging.loading || !state.paging.nextCursor) return;
+
+      const remaining = list.scrollHeight - list.scrollTop - list.clientHeight;
+      if (remaining < 420) {
+        loadJobs(false);
+      }
+    }
+
+    // ----------------------------
+    // Apply flow (external branch + internal unchanged)
+    // ----------------------------
+    async function goApply(){
+      if (!state.selectedJobId) return;
+
+      const current = state.selectedJob || {};
+      const external = String(current.apply_url || "").trim();
+
+      if (external){
+        try{
+          const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+          await apiPost({
+            mode: "public_api",
+            action: "external_apply_click",
+            session_token: (sess && sess.session_token) ? sess.session_token : "",
+            job_id: state.selectedJobId,
+            apply_url: external
+          });
+        }catch(e){
+          // logging failure should not block apply
+        }
+        window.location.href = external;
+        return;
+      }
+
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+      const applyUrl = PATHS.applyPage + "?job_id=" + encodeURIComponent(state.selectedJobId);
+
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(applyUrl);
+        return;
+      }
+
+      window.location.href = applyUrl;
+    }
+
+    // ----------------------------
+    // Report job flow
+    // ----------------------------
+    function openReportModal(){
+      if (!state.selectedJobId) return;
+
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        const here = window.location.pathname + window.location.search;
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
+        return;
+      }
+
+      qs("#complaintTypeSel").value = "";
+      qs("#complaintMsg").value = "";
+      qs("#reportModal").classList.add("show");
+      qs("#reportModal").setAttribute("aria-hidden","false");
+    }
+
+    function closeReportModal(){
+      qs("#reportModal").classList.remove("show");
+      qs("#reportModal").setAttribute("aria-hidden","true");
+    }
+
+    async function submitReport(){
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+
+      if (!sess.session_token || sess.role !== "job_seeker"){
+        toast("You must be logged in as a candidate to submit a report.");
+        closeReportModal();
+        return;
+      }
+
+      const complaintType = (qs("#complaintTypeSel").value || "").trim();
+      const message = (qs("#complaintMsg").value || "").trim();
+
+      if (!state.selectedJobId){
+        toast("Select a job first.");
+        return;
+      }
+      if (!complaintType){
+        toast("Please select a reason.");
+        return;
+      }
+      if (!message || message.length < 10){
+        toast("Please enter a message (at least 10 characters).");
+        return;
+      }
+
+      qs("#reportSubmitBtn").disabled = true;
+
+      try{
+        const json = await apiPost({
+          mode: "public_api",
+          action: "report_job",
+          session_token: sess.session_token,
+          job_id: state.selectedJobId,
+          complaint_type: complaintType,
+          message: message
+        });
+
+        if (!json.ok){
+          toast("Unable to submit report: " + (json.error || "Unknown error"));
+          return;
+        }
+
+        toast("Report submitted. Thank you.");
+        closeReportModal();
+      } catch(e){
+        toast("Unable to submit report. Please try again.");
+      } finally {
+        qs("#reportSubmitBtn").disabled = false;
+      }
+    }
+
+    // ----------------------------
+    // Location + radius filtering (loaded-window only)
+    // ----------------------------
+    async function useMyLocation(){
+      if (!navigator.geolocation){
+        toast("Geolocation is not supported by your browser.");
+        return;
+      }
+
+      qs("#locNote").textContent = "Getting your location…";
+      navigator.geolocation.getCurrentPosition(async (pos) => {
+        state.geo.lat = pos.coords.latitude;
+        state.geo.lon = pos.coords.longitude;
+        state.geo.enabled = true;
+
+        const place = await reverseGeocode(state.geo.lat, state.geo.lon);
+        if (place && place.city) qs("#cityInput").value = place.city;
+
+        if (place && place.state) {
+          const st = (place.state.length === 2 ? place.state.toUpperCase() : "");
+          if (st && US_STATES_AND_TERRITORIES.includes(st)) qs("#stateSel").value = st;
+        }
+
+        qs("#locNote").textContent = "Location captured. Radius filter applies to loaded jobs.";
+        await loadJobs(true);
+      }, (err) => {
+        qs("#locNote").textContent = "Location permission denied or unavailable.";
+        toast("Unable to get your location: " + (err && err.message ? err.message : "Unknown error"));
+      }, { enableHighAccuracy:false, timeout:8000, maximumAge:60000 });
+    }
+
+    async function reverseGeocode(lat, lon){
+      try{
+        const url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + encodeURIComponent(lat) + "&lon=" + encodeURIComponent(lon);
+        const res = await fetch(url, { headers: { "Accept":"application/json" } });
+        const json = await res.json();
+        const a = json.address || {};
+        const city = a.city || a.town || a.village || a.hamlet || "";
+        const stateCode = a.state_code || "";
+        const state = stateCode || (a.state && a.state.length === 2 ? a.state : "");
+        return { city, state };
+      } catch(e){
+        return null;
+      }
+    }
+
+    function jobGeoCacheKey(job){
+      const city = String(job.city||"").trim();
+      const st = String(job.state||"").trim();
+      return "qh_geo_" + (city + "_" + st).toLowerCase().replace(/[^a-z0-9_]+/g,"_");
+    }
+
+    async function geocodeJob(job){
+      const key = jobGeoCacheKey(job);
+      const cached = localStorage.getItem(key);
+      if (cached){
+        try { return JSON.parse(cached); } catch(e){ /* ignore */ }
+      }
+
+      const city = String(job.city||"").trim();
+      const st = String(job.state||"").trim();
+      const fallbackLoc = getJobLocationText(job);
+      const queryText = (city && st) ? (city + ", " + st + ", USA") : fallbackLoc;
+      if (!queryText || queryText === "Location not listed") return null;
+
+      try{
+        const q = encodeURIComponent(queryText);
+        const url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&q=" + q;
+        const res = await fetch(url, { headers: { "Accept":"application/json" } });
+        const arr = await res.json();
+        if (!arr || !arr.length) return null;
+        const out = { lat: Number(arr[0].lat), lon: Number(arr[0].lon) };
+        localStorage.setItem(key, JSON.stringify(out));
+        return out;
+      } catch(e){
+        return null;
+      }
+    }
+
+    async function filterByRadius(radiusMiles){
+      const baseLat = state.geo.lat, baseLon = state.geo.lon;
+      if (baseLat == null || baseLon == null) return;
+
+      qs("#locNote").textContent = "Applying radius filter to loaded jobs…";
+      const jobs = state.filtered.slice();
+
+      const out = [];
+      for (let i=0; i<jobs.length; i++){
+        const j = jobs[i];
+        const g = await geocodeJob(j);
+        if (!g || isNaN(g.lat) || isNaN(g.lon)) continue;
+        const d = haversineMiles(baseLat, baseLon, g.lat, g.lon);
+        if (d <= radiusMiles) out.push(j);
+        await new Promise(r => setTimeout(r, 80));
+      }
+      state.filtered = out;
+      qs("#locNote").textContent = "Radius filter applied to loaded jobs.";
+    }
+
+    // ----------------------------
+    // My Account dropdown (candidate only) - DOES NOT hide login button
+    // ----------------------------
+    function syncAccountUi(){
+      state.session = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+      const sess = state.session || {};
+      const isCandidate = !!sess.session_token && sess.role === "job_seeker";
+
+      const acctWrap = qs("#acctWrap");
+      acctWrap.style.display = isCandidate ? "inline-flex" : "none";
+    }
+
+    function closeAccountMenu(){
+      const wrap = qs("#acctWrap");
+      if (wrap) wrap.classList.remove("open");
+      const btn = qs("#acctBtn");
+      if (btn) btn.setAttribute("aria-expanded", "false");
+    }
+
+    // ----------------------------
+    // Wire up
+    // ----------------------------
+    async function init(){
+      initStates();
+      syncAccountUi();
+
+      const list = qs("#jobList");
+      if (list) list.addEventListener("scroll", maybeLoadMoreFromScroll);
+      qs("#loadMoreBtn").addEventListener("click", () => loadJobs(false));
+
+      qs("#loginBtn").addEventListener("click", () => {
+        const here = window.location.pathname + window.location.search;
+        window.location.href = PATHS.candidateLogin + "?next=" + encodeURIComponent(here);
+      });
+
+      qs("#employerBtn").addEventListener("click", (e) => {
+        try{
+          const sess = (window.QH && typeof QH.loadSession === "function" ? (QH.loadSession() || {}) : {});
+          const isEmployer = !!sess.session_token && (sess.role === "employer");
+          if (isEmployer) return;
+        }catch(err){ /* ignore */ }
+
+        e.preventDefault();
+        const next = PATHS.employerPortal;
+        window.location.href = PATHS.candidateLogin + "?role=employer&next=" + encodeURIComponent(next);
+      });
+
+      qs("#applyBtn").addEventListener("click", goApply);
+      qs("#reportBtn").addEventListener("click", openReportModal);
+
+      qs("#reportCloseBtn").addEventListener("click", closeReportModal);
+      qs("#reportCancelBtn").addEventListener("click", closeReportModal);
+      qs("#reportSubmitBtn").addEventListener("click", submitReport);
+
+      qs("#reportModal").addEventListener("click", (e) => {
+        if (e.target === qs("#reportModal")) closeReportModal();
+      });
+
+      qs("#acctBtn").addEventListener("click", (e) => {
+        e.preventDefault();
+        const wrap = qs("#acctWrap");
+        if (!wrap) return;
+        const open = wrap.classList.toggle("open");
+        qs("#acctBtn").setAttribute("aria-expanded", open ? "true" : "false");
+      });
+
+      qs("#logoutBtn").addEventListener("click", () => {
+        try{
+          if (window.QH && typeof QH.clearSession === "function") QH.clearSession();
+          else localStorage.removeItem("qh_session");
+        }catch(e){ /* ignore */ }
+        closeAccountMenu();
+        syncAccountUi();
+        toast("Logged out.");
+      });
+
+      document.addEventListener("click", (e) => {
+        const wrap = qs("#acctWrap");
+        if (!wrap) return;
+        if (!wrap.contains(e.target)) closeAccountMenu();
+      });
+
+      qs("#refreshBtn").addEventListener("click", () => loadJobs(true));
+
+      qs("#clearFiltersBtn").addEventListener("click", () => {
+        qs("#searchInput").value = "";
+        qs("#categorySel").value = "";
+        qs("#waSel").value = "";
+        qs("#cityInput").value = "";
+        qs("#stateSel").value = "";
+        qs("#radiusSel").value = "";
+        loadJobs(true);
+      });
+
+      qs("#useLocationBtn").addEventListener("click", useMyLocation);
+
+      const resetSearch = debounce(() => loadJobs(true), 350);
+      const resetFilters = debounce(() => loadJobs(true), 250);
+
+      qs("#searchInput").addEventListener("input", resetSearch);
+      qs("#categorySel").addEventListener("change", resetFilters);
+      qs("#waSel").addEventListener("change", resetFilters);
+      qs("#cityInput").addEventListener("input", resetFilters);
+      qs("#stateSel").addEventListener("change", resetFilters);
+
+      qs("#radiusSel").addEventListener("change", debounce(() => applyRadiusIfNeededThenRender(), 200));
+
+      state.paging.requestKey = currentRequestKey();
+      await loadJobs(true);
+      // Load dropdown facets after jobs are already visible.
+      loadFacets();
+    }
+
+    init();
+  </script>
+</body>
+</html>

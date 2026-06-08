@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <!-- QuickHire™ global favicon and app-icon data -->
+  <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48 96x96" />
+  <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" />
+  <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
+  <link rel="icon" href="/favicon-48x48.png" type="image/png" sizes="48x48" />
+  <link rel="icon" href="/favicon-96x96.png" type="image/png" sizes="96x96" />
+  <link rel="icon" href="/favicon-192x192.png" type="image/png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="theme-color" content="#1f7a4a" />
+  <link rel="stylesheet" href="/assets/global-shell.css?v=20260608-203812" />
+  <script src="/assets/global-shell.js?v=20260608-203812"></script>
+<title>QuickHire™ — Post a Job</title>
+
+  <!-- Config + shared helpers -->
+  <script src="/config/config.js"></script>
+  <script src="/assets/app.js"></script>
+
+  <style>
+    :root{
+      /* Match index.html palette (same as Employer Dashboard) */
+      --bg1:#f7fbf7;
+      --bg2:#f1fff6;
+      --card:#ffffff;
+      --text:#0b1b12;
+      --muted:#3e5a4a;
+      --line:rgba(10,30,20,.14);
+
+      --green:#1f7a4a;
+      --green2:#2b9a5e;
+
+      --blue:#1b6fb8;
+      --blue2:#2b86d6;
+
+      --yellow:#ffd66b;
+      --yellow2:#ffe7a6;
+
+      --danger:#b42318;
+
+      --shadow: 0 10px 30px rgba(16, 24, 40, .10);
+      --radius:16px;
+      --radius2:20px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:var(--font);
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 10% 0%, rgba(43,154,94,.18), transparent 60%),
+        radial-gradient(900px 520px at 100% 0%, rgba(43,134,214,.14), transparent 55%),
+        radial-gradient(700px 420px at 55% -10%, rgba(255,214,107,.22), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    a{color:var(--blue); text-decoration:none}
+    a:hover{text-decoration:underline}
+
+    /* Top bar (match Employer Dashboard) */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .topbar-inner{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 280px;
+      flex: 1 1 auto;
+    }
+    .brand a{display:flex; align-items:center; gap:12px; color:inherit; text-decoration:none}
+    .brand img{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+    .brand .sub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:2px;
+      line-height:1.1;
+    }
+    .controls{
+      flex:1 1 auto;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.9);
+      color:var(--text);
+      padding:10px 12px;
+      border-radius: 12px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow: 0 3px 10px rgba(0,0,0,.05);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .btn:hover{border-color: rgba(10,30,20,.28)}
+    .btn.blue{
+      border-color: rgba(27,111,184,.35);
+      background: linear-gradient(135deg, rgba(43,134,214,.16), rgba(255,255,255,.95));
+      color: #0b2540;
+    }
+    .btn.danger{
+      border-color: rgba(180,35,24,.35);
+      background: linear-gradient(135deg, rgba(180,35,24,.10), rgba(255,255,255,.95));
+      color: #4a0f0a;
+    }
+    .btn.green{
+      border-color: rgba(31,122,74,.35);
+      background: linear-gradient(135deg, rgba(43,154,94,.22), rgba(255,255,255,.95));
+      color: #0b2a19;
+    }
+    .btn[disabled]{ opacity:.55; cursor:not-allowed; filter:saturate(.9); }
+
+    .wrap{
+      max-width:1200px;
+      margin:0 auto;
+      padding:18px 16px 26px;
+    }
+
+    .panel{
+      background: rgba(255,255,255,.88);
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel-header{
+      padding:14px 14px 10px;
+      border-bottom:1px solid var(--line);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(255,255,255,.80));
+    }
+    .panel-header h2{margin:0; font-size:14px}
+    .panel-header .meta{color:var(--muted); font-size:12px}
+    .content{padding:16px}
+
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin:0 0 6px;
+      font-weight:800;
+      letter-spacing:.01em;
+    }
+    input, textarea, select{
+      width:100%;
+      padding:10px 12px;
+      border-radius: 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.95);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+      font-family: var(--font);
+    }
+    textarea{
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .muted{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
+    }
+    .hr{
+      height:1px;
+      background: rgba(10,30,20,.12);
+      margin:12px 0;
+    }
+
+    .row2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 720px){
+      .row2{grid-template-columns:1fr}
+      .brand{min-width:0}
+      .brand img{height:78px}
+      .controls{justify-content:flex-start}
+    }
+
+    .note{
+      background: rgba(10,30,20,.04);
+      border:1px solid rgba(10,30,20,.12);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    /* Footer logo + legal links (match Employer Dashboard) */
+    .qh-footer-logo-wrap{
+      display:flex;
+      justify-content:center;
+      margin: 14px 0 8px;
+    }
+    .qh-footer-logo-wrap a{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+    }
+    .qh-footer-logo{
+      height:102px; /* 3x larger */
+      width:auto;
+      display:block;
+    }
+
+    .qh-powered{
+      text-align:center;
+      margin-top: 10px;
+      font-weight:900;
+      letter-spacing:.02em;
+    }
+    .qh-powered a{
+      color: var(--blue);
+      text-decoration:underline;
+    }
+  </style>
+</head>
+
+<body>
+    <div id="qh-global-header"></div>
+  <script>window.QHGlobalShell && window.QHGlobalShell.mountHeader();</script>
+
+  <div class="wrap">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <h2>Create Job Posting</h2>
+          <div class="meta">Requires an active plan. Writes to Job Board sheet through the backend.</div>
+        </div>
+      </div>
+
+      <div class="content">
+        <div class="note muted" style="margin-bottom:12px;">
+          <b>Required:</b> Title, Description, City, State, Zip Code, Employment Type, Work Arrangement, Pay Type, Pay Min/Max, Honesty Attestation.
+          <br>
+          <b>Apply routing:</b> If Apply URL is provided, Apply becomes <b>external</b>. Otherwise it’s <b>internal</b>.
+        </div>
+
+        <label for="job_title">Job Title <span class="muted">(required)</span></label>
+        <input id="job_title" placeholder="e.g., Warehouse Associate">
+
+        <div style="height:10px;"></div>
+
+        <label for="job_description">Job Description <span class="muted">(required)</span></label>
+        <textarea id="job_description" placeholder="Full job description..."></textarea>
+
+        <div class="hr"></div>
+
+        <div class="row2">
+          <div>
+            <label for="city">City <span class="muted">(required)</span></label>
+            <input id="city" placeholder="Indianapolis">
+          </div>
+          <div>
+            <label for="state">State <span class="muted">(required, 2-letter)</span></label>
+            <input id="state" placeholder="IN" maxlength="2">
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="row2">
+          <div>
+            <label for="zipcode">Zip Code <span class="muted">(required)</span></label>
+            <input id="zipcode" placeholder="46204" inputmode="numeric">
+          </div>
+          <div>
+            <label for="country">Country <span class="muted">(default)</span></label>
+            <input id="country" value="USA">
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row2">
+          <div>
+            <label for="category">Category <span class="muted">(optional)</span></label>
+            <input id="category" placeholder="e.g., Logistics, Healthcare, IT">
+          </div>
+          <div>
+            <label for="schedule">Schedule <span class="muted">(optional)</span></label>
+            <input id="schedule" placeholder="e.g., Day shift, Night shift, Weekends">
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="row2">
+          <div>
+            <label for="experience_level">Experience Level <span class="muted">(optional)</span></label>
+            <input id="experience_level" placeholder="Entry, Mid, Senior">
+          </div>
+          <div>
+            <label for="education_level">Education Level <span class="muted">(optional)</span></label>
+            <input id="education_level" placeholder="HS, Associate, Bachelor, etc.">
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row2">
+          <div>
+            <label for="employment_type">Employment Type <span class="muted">(required)</span></label>
+            <input id="employment_type" placeholder="Full-time / Part-time / Temp / Contract">
+          </div>
+          <div>
+            <label for="work_arrangement">Work Arrangement <span class="muted">(required)</span></label>
+            <input id="work_arrangement" placeholder="On-site / Hybrid / Remote">
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="row2">
+          <div>
+            <label for="hours_per_week">Hours per week <span class="muted">(optional)</span></label>
+            <input id="hours_per_week" placeholder="e.g., 40" inputmode="numeric">
+          </div>
+          <div>
+            <label for="exempt_status">Exempt status <span class="muted">(optional)</span></label>
+            <select id="exempt_status">
+              <option value="">(optional)</option>
+              <option value="Exempt">Exempt</option>
+              <option value="Non-exempt">Non-exempt</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row2">
+          <div>
+            <label for="pay_type">Pay Type <span class="muted">(required)</span></label>
+            <select id="pay_type">
+              <option value="">Select…</option>
+              <option value="Hourly">Hourly</option>
+              <option value="Salary">Salary</option>
+              <option value="Commission">Commission</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label for="pay_currency">Currency <span class="muted">(default)</span></label>
+            <input id="pay_currency" value="USD">
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="row2">
+          <div>
+            <label for="pay_min">Pay Min <span class="muted">(required)</span></label>
+            <input id="pay_min" placeholder="e.g., 18" inputmode="decimal">
+          </div>
+          <div>
+            <label for="pay_max">Pay Max <span class="muted">(required)</span></label>
+            <input id="pay_max" placeholder="e.g., 22" inputmode="decimal">
+          </div>
+        </div>
+
+        <div style="height:10px;"></div>
+
+        <div class="row2">
+          <div>
+            <label for="commission_flag">Commission? <span class="muted">(optional)</span></label>
+            <select id="commission_flag">
+              <option value="">No</option>
+              <option value="TRUE">Yes</option>
+            </select>
+          </div>
+          <div>
+            <label for="commission_details">Commission details <span class="muted">(optional)</span></label>
+            <input id="commission_details" placeholder="e.g., OTE, percentage, bonus structure">
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <div class="row2">
+          <div>
+            <label for="skills">Skills <span class="muted">(optional)</span></label>
+            <input id="skills" placeholder="e.g., Forklift, Excel, Customer Service">
+          </div>
+          <div>
+            <label for="benefits_summary">Benefits Summary <span class="muted">(optional)</span></label>
+            <input id="benefits_summary" placeholder="e.g., Health, dental, 401k, PTO">
+          </div>
+        </div>
+
+        <div class="hr"></div>
+
+        <label for="apply_url">Apply URL <span class="muted">(optional; external apply)</span></label>
+        <input id="apply_url" placeholder="https://...">
+
+        <label class="muted" style="margin-top:10px; display:flex; gap:10px; align-items:flex-start;">
+          <input type="checkbox" id="honesty_attestation" style="width:auto; margin-top:2px;">
+          <span><b>Required:</b> I attest the job details are accurate and not misleading.</span>
+        </label>
+
+        <div class="hr"></div>
+        <button class="btn green" id="btnPost">Post Job</button>
+        <div id="postOut" class="muted" style="margin-top:10px;"></div>
+      </div>
+    </div>
+
+    <!-- Footer (same as Employer Dashboard) -->
+    
+
+        <div id="qh-global-footer"></div>
+    <script>window.QHGlobalShell && window.QHGlobalShell.mountFooter();</script>
+
+    <script>
+      (function () {
+        var y = new Date().getFullYear();
+        var el = document.getElementById('qh-year');
+        if (el) el.textContent = String(y);
+      })();
+    </script>
+
+    <div id="toast" class="toast"><div class="t"></div><div class="m"></div></div>
+  </div>
+
+<script>
+const session = QH.requireSession("employer");
+if (!session) throw new Error("No session");
+
+document.getElementById("btnLogout").addEventListener("click", () => {
+  QH.clearSession();
+  window.location.href = "/";
+});
+
+function isHttpUrl(u){
+  return /^https?:\/\/.+/i.test(String(u||"").trim());
+}
+
+function isZip(u){
+  // US zip: 12345 or 12345-6789
+  return /^\d{5}(-\d{4})?$/.test(String(u||"").trim());
+}
+
+function toNum(s){
+  const v = String(s||"").trim();
+  if (!v) return NaN;
+  const cleaned = v.replace(/[^0-9.]+/g,"");
+  return Number(cleaned);
+}
+
+document.getElementById("btnPost").addEventListener("click", async () => {
+  const job_title = document.getElementById("job_title").value.trim();
+  const job_description = document.getElementById("job_description").value.trim();
+
+  const city = document.getElementById("city").value.trim();
+  const state = document.getElementById("state").value.trim().toUpperCase();
+  const zipcode = document.getElementById("zipcode").value.trim();
+  const country = document.getElementById("country").value.trim() || "USA";
+
+  const category = document.getElementById("category").value.trim();
+  const schedule = document.getElementById("schedule").value.trim();
+  const experience_level = document.getElementById("experience_level").value.trim();
+  const education_level = document.getElementById("education_level").value.trim();
+
+  const employment_type = document.getElementById("employment_type").value.trim();
+  const work_arrangement = document.getElementById("work_arrangement").value.trim();
+  const hours_per_week = document.getElementById("hours_per_week").value.trim();
+  const exempt_status = document.getElementById("exempt_status").value.trim();
+
+  const pay_type = document.getElementById("pay_type").value.trim();
+  const pay_currency = (document.getElementById("pay_currency").value.trim() || "USD").toUpperCase();
+  const pay_min_raw = document.getElementById("pay_min").value.trim();
+  const pay_max_raw = document.getElementById("pay_max").value.trim();
+
+  const commission_flag = document.getElementById("commission_flag").value.trim();
+  const commission_details = document.getElementById("commission_details").value.trim();
+
+  const skills = document.getElementById("skills").value.trim();
+  const benefits_summary = document.getElementById("benefits_summary").value.trim();
+
+  const apply_url = document.getElementById("apply_url").value.trim();
+  const honesty_attestation = document.getElementById("honesty_attestation").checked;
+
+  // REQUIRED validations
+  if (!job_title || !job_description) return QH.toast("Missing fields", "Job Title and Job Description are required.");
+  if (!city || !state) return QH.toast("Missing fields", "City and State are required.");
+  if (state.length !== 2) return QH.toast("State", "State must be 2 letters (e.g., IN).");
+  if (!zipcode) return QH.toast("Zip Code", "Zip Code is required.");
+  if (!isZip(zipcode)) return QH.toast("Zip Code", "Enter a valid Zip Code (12345 or 12345-6789).");
+
+  if (!employment_type) return QH.toast("Missing fields", "Employment Type is required.");
+  if (!work_arrangement) return QH.toast("Missing fields", "Work Arrangement is required.");
+
+  if (!pay_type) return QH.toast("Pay", "Pay Type is required.");
+  const payMinNum = toNum(pay_min_raw);
+  const payMaxNum = toNum(pay_max_raw);
+  if (!isFinite(payMinNum) || !isFinite(payMaxNum)) return QH.toast("Pay", "Pay Min and Pay Max are required and must be numbers.");
+  if (payMinNum <= 0 || payMaxNum <= 0) return QH.toast("Pay", "Pay Min and Pay Max must be greater than 0.");
+  if (payMinNum > payMaxNum) return QH.toast("Pay", "Pay Min cannot be greater than Pay Max.");
+
+  if (!honesty_attestation) return QH.toast("Required", "You must check the honesty attestation.");
+
+  // Apply URL validation if present
+  if (apply_url && !isHttpUrl(apply_url)){
+    return QH.toast("Apply URL", "Apply URL must start with http:// or https://");
+  }
+
+  // Derived fields
+  const location = [city, state, zipcode, country].filter(Boolean).join(", ");
+
+  const internal_apply_enabled = apply_url ? "FALSE" : "TRUE";
+  const apply_type = apply_url ? "external" : "internal";
+
+  // Canonical values map (fill what we can)
+  const values_map = {
+    job_title,
+    job_description,
+    category,
+    employment_type,
+    schedule,
+    experience_level,
+    education_level,
+    location,
+    city,
+    state,
+    country,
+    zipcode,
+    pay_type,
+    pay_min: String(payMinNum),
+    pay_max: String(payMaxNum),
+    pay_currency,
+    commission_flag: commission_flag ? "TRUE" : "FALSE",
+    commission_details: commission_details,
+    honesty_attestation: honesty_attestation ? "TRUE" : "FALSE",
+    skills,
+    apply_type,
+    apply_url,
+    internal_apply_enabled,
+    work_arrangement,
+    hours_per_week,
+    exempt_status,
+    benefits_summary,
+    status: "live"
+  };
+
+  const btn = document.getElementById("btnPost");
+  const out = document.getElementById("postOut");
+  btn.disabled = true;
+  out.textContent = "Posting…";
+
+  const res = await QH.apiPost("create_job", { session_token: session.session_token, values_map });
+
+  btn.disabled = false;
+
+  if (!res.ok) {
+    out.textContent = "❌ " + (res.error || "Failed to post.");
+    return QH.toast("Failed", res.error || "Could not post.");
+  }
+
+  out.textContent = "✅ Posted. Job ID: " + res.job_id;
+  QH.toast("Posted", "Job created successfully.");
+
+  // Success: bounce to My Jobs so employer can see it immediately
+  setTimeout(() => {
+    window.location.href = "/employer/jobs.html";
+  }, 700);
+});
+</script>
+</body>
+</html>
